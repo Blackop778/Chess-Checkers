@@ -7,6 +7,6 @@ public class Chess_CheckersFrame extends JFrame
 {
 	public Chess_CheckersFrame()
 	{
-
+		add(new Chess_CheckersPanel());
 	}
 }

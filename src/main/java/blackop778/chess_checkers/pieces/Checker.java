@@ -5,6 +5,11 @@ import java.awt.Point;
 
 public class Checker extends CheckersPiece
 {
+	public Checker(boolean white, boolean kinged)
+	{
+		this.white = white;
+		this.kinged = kinged;
+	}
 
 	@Override
 	public void drawSelf(Graphics g, int x, int y)
@@ -15,7 +20,7 @@ public class Checker extends CheckersPiece
 	@Override
 	public Point[] getValidLocations(int x, int y)
 	{
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
