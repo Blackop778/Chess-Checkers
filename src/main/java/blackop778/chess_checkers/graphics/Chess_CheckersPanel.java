@@ -7,6 +7,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+import blackop778.chess_checkers.Chess_Checkers;
+
 @SuppressWarnings("serial")
 public class Chess_CheckersPanel extends JPanel
 {
@@ -17,7 +19,16 @@ public class Chess_CheckersPanel extends JPanel
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-
+				int x = e.getX() / 90;
+				int y = e.getY() / 90;
+				if(Chess_Checkers.board[x][y] != null)
+				{
+					if(!Chess_Checkers.board[x][y].selected)
+						Chess_Checkers.board[x][y].select(x, y);
+					else
+						Chess_Checkers.unselectAll();
+				}
+				repaint();
 			}
 		});
 	}
@@ -34,6 +45,8 @@ public class Chess_CheckersPanel extends JPanel
 				else
 					g.setColor(Color.WHITE);
 				g.fillRect(i * 90, n * 90, (i + 1) * 90, (n + 1) * 90);
+				if(Chess_Checkers.board[i][n] != null)
+					Chess_Checkers.board[i][n].drawSelf(g, i * 90, n * 90);
 			}
 		}
 	}

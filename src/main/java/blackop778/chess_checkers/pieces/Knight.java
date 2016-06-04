@@ -21,7 +21,7 @@ public class Knight extends ChessPiece
 	}
 
 	@Override
-	public void selected(int x, int y)
+	public void select(int x, int y)
 	{
 		// TODO Auto-generated method stub
 
@@ -33,5 +33,4 @@ public class Knight extends ChessPiece
 		// TODO Auto-generated method stub
 
 	}
-
 }
