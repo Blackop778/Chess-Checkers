@@ -2,10 +2,10 @@ package blackop778.chess_checkers.pieces;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.util.ArrayList;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.checkers.JumpTree;
 
 public class Checker extends CheckersPiece
 {
@@ -13,7 +13,7 @@ public class Checker extends CheckersPiece
 	{
 		this.black = black;
 		this.kinged = kinged;
-		this.selected = true;
+		this.selected = false;
 		this.possible = false;
 	}
 
@@ -33,23 +33,23 @@ public class Checker extends CheckersPiece
 	}
 
 	@Override
-	public Point[] getValidLocations(int x, int y)
+	public JumpTree[] getValidLocations(int x, int y)
 	{
-		ArrayList<Point> points = new ArrayList<Point>();
-		Point[] pointArray = {new Point(0, 0)};
+		ArrayList<JumpTree> trees = new ArrayList<JumpTree>();
+		JumpTree[] treeArray = {new JumpTree()};
 
-		return points.toArray(pointArray);
+		return trees.toArray(treeArray);
 	}
 
 	@Override
 	public void select(int x, int y)
 	{
 		selected = true;
-		Point[] points = getValidLocations(x, y);
-		for(Point point : points)
+		JumpTree[] jumps = getValidLocations(x, y);
+		for(JumpTree tree : jumps)
 		{
-
-			Chess_Checkers.board[point.x][point.y].possible = true;
+			if(tree != null)
+				Chess_Checkers.board[tree.getEndPoint().x][tree.getEndPoint().y].possible = true;
 		}
 	}
 
@@ -62,24 +62,66 @@ public class Checker extends CheckersPiece
 	@Override
 	public boolean canJumpPiece(int x, int y)
 	{
-		if(black || kinged)
+		if((black || kinged) && y != 7)
 		{
-			if(Chess_Checkers.board[x - 1][y + 1].black != black)
+			if(Chess_Checkers.board[x - 1][y + 1].black != black
+					&& !(Chess_Checkers.board[x - 1][y + 1] instanceof Piece))
 			{
 				if(Chess_Checkers.board[x - 2][y + 2] instanceof Empty)
 					return true;
 			}
-			if(Chess_Checkers.board[x + 1][y + 1].black != black)
+			if(Chess_Checkers.board[x + 1][y + 1].black != black
+					&& !(Chess_Checkers.board[x + 1][y + 1] instanceof Piece))
 			{
 				if(Chess_Checkers.board[x + 2][y + 2] instanceof Empty)
 					return true;
 			}
 		}
-		if(!black || kinged)
+		if((!black || kinged) && y != 0)
 		{
-
+			if(Chess_Checkers.board[x - 1][y - 1].black != black
+					&& !(Chess_Checkers.board[x - 1][y - 1] instanceof Piece))
+			{
+				if(Chess_Checkers.board[x - 2][y - 2] instanceof Empty)
+					return true;
+			}
+			if(Chess_Checkers.board[x + 1][y - 1].black != black
+					&& !(Chess_Checkers.board[x + 1][y - 1] instanceof Piece))
+			{
+				if(Chess_Checkers.board[x + 2][y - 2] instanceof Empty)
+					return true;
+			}
 		}
 
 		return false;
 	}
+
+	@Override
+	public boolean canMovePiece(int x, int y)
+	{
+		if((black || kinged) && y != 7)
+		{
+			if(Chess_Checkers.board[x - 1][y + 1] instanceof Empty)
+				return true;
+			if(Chess_Checkers.board[x + 1][y + 1] instanceof Empty)
+				return true;
+		}
+		if((!black || kinged) && y != 0)
+		{
+			if(Chess_Checkers.board[x - 1][y - 1] instanceof Empty)
+				return true;
+			if(Chess_Checkers.board[x + 1][y - 1] instanceof Empty)
+				return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public JumpTree extendJumpTree(JumpTree tree, int x, int y)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
