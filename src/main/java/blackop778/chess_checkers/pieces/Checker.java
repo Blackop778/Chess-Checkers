@@ -2,9 +2,11 @@ package blackop778.chess_checkers.pieces;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.util.ArrayList;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.checkers.Jump;
 import blackop778.chess_checkers.checkers.JumpTree;
 
 public class Checker extends CheckersPiece
@@ -60,68 +62,66 @@ public class Checker extends CheckersPiece
 	}
 
 	@Override
-	public boolean canJumpPiece(int x, int y)
+	public Jump[] getJumpablePlaces(int x, int y)
 	{
+		ArrayList<Jump> places = new ArrayList<Jump>();
 		if((black || kinged) && y != 7)
 		{
 			if(Chess_Checkers.board[x - 1][y + 1].black != black
-					&& !(Chess_Checkers.board[x - 1][y + 1] instanceof Piece))
+					&& !(Chess_Checkers.board[x - 1][y + 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x - 2][y + 2] instanceof Empty)
-					return true;
+					places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
 			}
 			if(Chess_Checkers.board[x + 1][y + 1].black != black
-					&& !(Chess_Checkers.board[x + 1][y + 1] instanceof Piece))
+					&& !(Chess_Checkers.board[x + 1][y + 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x + 2][y + 2] instanceof Empty)
-					return true;
+					places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
 			}
 		}
 		if((!black || kinged) && y != 0)
 		{
 			if(Chess_Checkers.board[x - 1][y - 1].black != black
-					&& !(Chess_Checkers.board[x - 1][y - 1] instanceof Piece))
+					&& !(Chess_Checkers.board[x - 1][y - 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x - 2][y - 2] instanceof Empty)
-					return true;
+					places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
 			}
 			if(Chess_Checkers.board[x + 1][y - 1].black != black
-					&& !(Chess_Checkers.board[x + 1][y - 1] instanceof Piece))
+					&& !(Chess_Checkers.board[x + 1][y - 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x + 2][y - 2] instanceof Empty)
-					return true;
+					places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
 			}
 		}
 
-		return false;
+		Jump[] toReturn = new Jump[0];
+		places.trimToSize();
+		return places.toArray(toReturn);
 	}
 
 	@Override
-	public boolean canMovePiece(int x, int y)
+	public Jump[] getMoveablePlaces(int x, int y)
 	{
+		ArrayList<Jump> places = new ArrayList<Jump>();
 		if((black || kinged) && y != 7)
 		{
 			if(Chess_Checkers.board[x - 1][y + 1] instanceof Empty)
-				return true;
+				places.add(new Jump(new Point(x - 1, y + 1)));
 			if(Chess_Checkers.board[x + 1][y + 1] instanceof Empty)
-				return true;
+				places.add(new Jump(new Point(x + 1, y + 1)));
 		}
 		if((!black || kinged) && y != 0)
 		{
 			if(Chess_Checkers.board[x - 1][y - 1] instanceof Empty)
-				return true;
+				places.add(new Jump(new Point(x - 1, y - 1)));
 			if(Chess_Checkers.board[x + 1][y - 1] instanceof Empty)
-				return true;
+				places.add(new Jump(new Point(x + 1, y - 1)));
 		}
 
-		return false;
+		Jump[] toReturn = new Jump[0];
+		places.trimToSize();
+		return places.toArray(toReturn);
 	}
-
-	@Override
-	public JumpTree extendJumpTree(JumpTree tree, int x, int y)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
