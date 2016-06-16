@@ -1,6 +1,5 @@
 package blackop778.chess_checkers.checkers;
 
-import java.awt.Point;
 import java.util.ArrayList;
 
 import blackop778.chess_checkers.Utilities;
@@ -8,59 +7,68 @@ import blackop778.chess_checkers.pieces.Checker;
 
 public class JumpTree
 {
-	private Point endPoint;
-	private ArrayList<Point> midPoints;
+	private Jump endJump;
+	private ArrayList<Jump> midJumps;
 	private boolean jumpMode;
 	private int direction;
 
 	// The values for direction
-	static final int NONE = 0;
-	static final int NE = 2;
-	static final int SE = 4;
-	static final int SW = 6;
-	static final int NW = 8;
+	public static final int NONE = 0;
+	public static final int NE = 2;
+	public static final int SE = 4;
+	public static final int SW = 6;
+	public static final int NW = 8;
 
 	public JumpTree()
 	{
-		endPoint = new Point(-1, -1);
+		endJump = null;
+		midJumps = new ArrayList<Jump>();
+		jumpMode = false;
+		direction = NONE;
 	}
 
-	public Point getEndPoint()
+	public Jump getEndJump()
 	{
-		return new Point(endPoint);
+		return new Jump(endJump);
 	}
 
-	public ArrayList<Point> getMidPoints()
+	public ArrayList<Jump> getMidJumps()
 	{
-		midPoints.trimToSize();
-		return new ArrayList<Point>(midPoints);
+		midJumps.trimToSize();
+		return new ArrayList<Jump>(midJumps);
 	}
 
-	public void addMidPoint(Point point)
+	public void addMidJump(Jump jump)
 	{
-		midPoints.add(point);
+		midJumps.add(jump);
 	}
 
-	public void setEndPoint(Point point)
+	public void setEndJump(Jump Jump)
 	{
-		if(endPoint.equals(new Point(-1, -1)))
+		if(endJump == null)
 		{
-			endPoint = point;
+			endJump = Jump;
 		}
 	}
 
 	public void jumpMode()
 	{
 		if(!jumpMode)
+		{
 			jumpMode = true;
+		}
 	}
 
 	public void setDirection(int direction)
 	{
 		if(direction == NE || direction == SE || direction == SW || direction == NW)
+		{
 			this.direction = direction;
+		}
 		else
+		{
 			this.direction = NONE;
+		}
 	}
 
 	public int getDirection()
@@ -74,7 +82,15 @@ public class JumpTree
 
 		if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y)))
 		{
+			Jump[] places = checker.getJumpablePlaces(x, y);
+			trees = extendArray(trees, places.length);
+			for(int i = 0; i < places.length; i++)
+			{
+				trees[i] = new JumpTree();
+				trees[i].addMidJump(new Jump(places[i].getEndPoint()));
+			}
 
+			trees = continueTree(trees);
 		}
 		else if(!Utilities.isArrayEmpty(checker.getMoveablePlaces(x, y)))
 		{
@@ -83,7 +99,7 @@ public class JumpTree
 			for(int i = 0; i < places.length; i++)
 			{
 				trees[i] = new JumpTree();
-				trees[i].setEndPoint(places[i].getEndPoint());
+				trees[i].setEndJump(new Jump(places[i].getEndPoint()));
 			}
 		}
 
@@ -101,9 +117,13 @@ public class JumpTree
 		for(int i = 0; i < toReturn.length; i++)
 		{
 			if(i < source.length)
+			{
 				toReturn[i] = source[i];
+			}
 			else
+			{
 				toReturn[i] = null;
+			}
 		}
 
 		return toReturn;

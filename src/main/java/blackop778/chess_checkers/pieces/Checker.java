@@ -28,9 +28,13 @@ public class Checker extends CheckersPiece
 			g.fillRect(x + 2, y + 2, 86, 86);
 		}
 		if(black)
+		{
 			g.setColor(Color.BLACK);
+		}
 		else
+		{
 			g.setColor(Color.RED);
+		}
 		g.fillOval(x, y, 90, 90);
 	}
 
@@ -38,8 +42,9 @@ public class Checker extends CheckersPiece
 	public JumpTree[] getValidLocations(int x, int y)
 	{
 		ArrayList<JumpTree> trees = new ArrayList<JumpTree>();
-		JumpTree[] treeArray = {new JumpTree()};
 
+		JumpTree[] treeArray = {new JumpTree()};
+		trees.trimToSize();
 		return trees.toArray(treeArray);
 	}
 
@@ -51,7 +56,10 @@ public class Checker extends CheckersPiece
 		for(JumpTree tree : jumps)
 		{
 			if(tree != null)
-				Chess_Checkers.board[tree.getEndPoint().x][tree.getEndPoint().y].possible = true;
+			{
+				Chess_Checkers.board[tree.getEndJump().getEndPoint().x][tree.getEndJump()
+						.getEndPoint().y].possible = true;
+			}
 		}
 	}
 
@@ -71,13 +79,17 @@ public class Checker extends CheckersPiece
 					&& !(Chess_Checkers.board[x - 1][y + 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x - 2][y + 2] instanceof Empty)
-					places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
+				{
+					places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2), JumpTree.SW));
+				}
 			}
 			if(Chess_Checkers.board[x + 1][y + 1].black != black
 					&& !(Chess_Checkers.board[x + 1][y + 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x + 2][y + 2] instanceof Empty)
-					places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
+				{
+					places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2), JumpTree.SE));
+				}
 			}
 		}
 		if((!black || kinged) && y != 0)
@@ -86,13 +98,17 @@ public class Checker extends CheckersPiece
 					&& !(Chess_Checkers.board[x - 1][y - 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x - 2][y - 2] instanceof Empty)
-					places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
+				{
+					places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2), JumpTree.NW));
+				}
 			}
 			if(Chess_Checkers.board[x + 1][y - 1].black != black
 					&& !(Chess_Checkers.board[x + 1][y - 1] instanceof Empty))
 			{
 				if(Chess_Checkers.board[x + 2][y - 2] instanceof Empty)
-					places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
+				{
+					places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2), JumpTree.NE));
+				}
 			}
 		}
 
@@ -108,16 +124,24 @@ public class Checker extends CheckersPiece
 		if((black || kinged) && y != 7)
 		{
 			if(Chess_Checkers.board[x - 1][y + 1] instanceof Empty)
-				places.add(new Jump(new Point(x - 1, y + 1)));
+			{
+				places.add(new Jump(new Point(x - 1, y + 1), JumpTree.SW));
+			}
 			if(Chess_Checkers.board[x + 1][y + 1] instanceof Empty)
-				places.add(new Jump(new Point(x + 1, y + 1)));
+			{
+				places.add(new Jump(new Point(x + 1, y + 1), JumpTree.SE));
+			}
 		}
 		if((!black || kinged) && y != 0)
 		{
 			if(Chess_Checkers.board[x - 1][y - 1] instanceof Empty)
-				places.add(new Jump(new Point(x - 1, y - 1)));
+			{
+				places.add(new Jump(new Point(x - 1, y - 1), JumpTree.NW));
+			}
 			if(Chess_Checkers.board[x + 1][y - 1] instanceof Empty)
-				places.add(new Jump(new Point(x + 1, y - 1)));
+			{
+				places.add(new Jump(new Point(x + 1, y - 1), JumpTree.NE));
+			}
 		}
 
 		Jump[] toReturn = new Jump[0];
