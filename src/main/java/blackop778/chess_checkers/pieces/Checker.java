@@ -43,7 +43,7 @@ public class Checker extends CheckersPiece
 	{
 		ArrayList<JumpTree> trees = new ArrayList<JumpTree>();
 
-		JumpTree[] treeArray = {new JumpTree()};
+		JumpTree[] treeArray = new JumpTree[0];
 		trees.trimToSize();
 		return trees.toArray(treeArray);
 	}

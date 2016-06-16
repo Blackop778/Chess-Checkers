@@ -9,7 +9,6 @@ public class JumpTree
 {
 	private Jump endJump;
 	private ArrayList<Jump> midJumps;
-	private boolean jumpMode;
 	private int direction;
 
 	// The values for direction
@@ -23,13 +22,24 @@ public class JumpTree
 	{
 		endJump = null;
 		midJumps = new ArrayList<Jump>();
-		jumpMode = false;
 		direction = NONE;
 	}
 
 	public Jump getEndJump()
 	{
 		return new Jump(endJump);
+	}
+
+	@Override
+	public void finalize()
+	{
+		if(endJump == null)
+		{
+			midJumps.trimToSize();
+			Jump last = midJumps.get(midJumps.size() - 1);
+			midJumps.remove(midJumps.size() - 1);
+			endJump = last;
+		}
 	}
 
 	public ArrayList<Jump> getMidJumps()
@@ -43,20 +53,9 @@ public class JumpTree
 		midJumps.add(jump);
 	}
 
-	public void setEndJump(Jump Jump)
+	public void trimMidJumps()
 	{
-		if(endJump == null)
-		{
-			endJump = Jump;
-		}
-	}
-
-	public void jumpMode()
-	{
-		if(!jumpMode)
-		{
-			jumpMode = true;
-		}
+		midJumps.trimToSize();
 	}
 
 	public void setDirection(int direction)
@@ -90,7 +89,7 @@ public class JumpTree
 				trees[i].addMidJump(new Jump(places[i].getEndPoint()));
 			}
 
-			trees = continueTree(trees);
+			trees = continueTree(trees, checker);
 		}
 		else if(!Utilities.isArrayEmpty(checker.getMoveablePlaces(x, y)))
 		{
@@ -99,16 +98,47 @@ public class JumpTree
 			for(int i = 0; i < places.length; i++)
 			{
 				trees[i] = new JumpTree();
-				trees[i].setEndJump(new Jump(places[i].getEndPoint()));
+				trees[i].addMidJump(new Jump(places[i].getEndPoint()));
+				trees[i].finalize();
 			}
 		}
 
 		return trees;
 	}
 
-	private static JumpTree[] continueTree(JumpTree[] tree)
+	private static JumpTree[] continueTree(JumpTree[] tree, Checker owner)
 	{
+		boolean done = true;
+		int length = tree.length;
+		Jump[] places;
+		for(int i = 0; i < length; i++)
+		{
+			if(tree[i].getEndJump() == null)
+			{
+				tree[i].trimMidJumps();
+				places = owner.getJumpablePlaces(
+						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().x,
+						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().y);
+				if(Utilities.isArrayEmpty(places))
+				{
+					tree[i].finalize();
+				}
+				else
+				{
+					done = false;
+					if(places.length > 1)
+						for(int n = 0; n < places.length; n++)
+						{
 
+						}
+				}
+			}
+		}
+
+		if(done)
+			return tree;
+		else
+			return continueTree(tree, owner);
 	}
 
 	static JumpTree[] extendArray(JumpTree[] source, int timesToExtend)
