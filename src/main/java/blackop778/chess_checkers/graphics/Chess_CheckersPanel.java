@@ -21,16 +21,24 @@ public class Chess_CheckersPanel extends JPanel
 			{
 				int x = e.getX() / 90;
 				int y = e.getY() / 90;
-				if(Chess_Checkers.board[x][y] != null)
+				if(Chess_Checkers.board[x][y].possible)
+				{
+					Chess_Checkers.board[x][y].selector.move(x, y);
+				}
+				else
 				{
 					if(!Chess_Checkers.board[x][y].selected)
 						Chess_Checkers.board[x][y].select(x, y);
 					else
+					{
 						Chess_Checkers.unselectAll();
+						Chess_Checkers.board[x][y].selected = false;
+					}
 				}
 				repaint();
 			}
 		});
+
 	}
 
 	@Override

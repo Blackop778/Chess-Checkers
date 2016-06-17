@@ -1,8 +1,6 @@
 package blackop778.chess_checkers;
 
 import java.awt.Dimension;
-import java.awt.Point;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -16,11 +14,7 @@ public class Chess_Checkers
 {
 	public static Piece[][] board;
 
-	public static Point lastSelected;
-
-	public static ArrayList<Checker> blackJumpers;
-
-	public static ArrayList<Checker> redJumpers;
+	public static boolean blackTurn;
 
 	public static void main(String[] args)
 	{
@@ -46,8 +40,6 @@ public class Chess_Checkers
 				board[i][n] = new Empty();
 			}
 		}
-		blackJumpers = new ArrayList<Checker>();
-		redJumpers = new ArrayList<Checker>();
 
 		String input = JOptionPane.showInputDialog(null, "Enter 'chess' to play chess or 'checkers' to play checkers.",
 				"Which game?", JOptionPane.QUESTION_MESSAGE);
@@ -63,6 +55,7 @@ public class Chess_Checkers
 
 		if(input.equalsIgnoreCase("checkers"))
 		{
+			blackTurn = true;
 			for(int i = 0; i < board.length; i++)
 			{
 				for(int n = 0; n < board[0].length; n++)
@@ -83,7 +76,7 @@ public class Chess_Checkers
 		}
 		else
 		{
-
+			blackTurn = false;
 		}
 	}
 
@@ -94,17 +87,8 @@ public class Chess_Checkers
 			for(Piece piece : row)
 			{
 				piece.possible = false;
+				piece.selected = false;
 			}
 		}
-	}
-
-	public static void checkBlackJumps()
-	{
-
-	}
-
-	public static void checkRedJumps()
-	{
-
 	}
 }

@@ -3,6 +3,8 @@ package blackop778.chess_checkers.pieces;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import blackop778.chess_checkers.Chess_Checkers;
+
 public class Empty extends Piece
 {
 
@@ -27,7 +29,14 @@ public class Empty extends Piece
 	@Override
 	public void select(int x, int y)
 	{
-
+		if(possible)
+		{
+			selector.move(x, y);
+		}
+		else
+		{
+			Chess_Checkers.unselectAll();
+		}
 	}
 
 	@Override

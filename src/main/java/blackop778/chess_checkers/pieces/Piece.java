@@ -8,6 +8,8 @@ public abstract class Piece
 
 	public boolean selected;
 
+	public Piece selector;
+
 	public boolean possible;
 
 	public abstract void drawSelf(Graphics g, int x, int y);

@@ -12,7 +12,7 @@ public class JumpTree
 	private int direction;
 
 	// The values for direction
-	public static final int NONE = 0;
+	public static final int NONE = -1;
 	public static final int NE = 2;
 	public static final int SE = 4;
 	public static final int SW = 6;
@@ -27,7 +27,10 @@ public class JumpTree
 
 	public Jump getEndJump()
 	{
-		return new Jump(endJump);
+		if(endJump != null)
+			return new Jump(endJump);
+		else
+			return null;
 	}
 
 	@Override
@@ -75,7 +78,7 @@ public class JumpTree
 		return new Integer(direction);
 	}
 
-	static JumpTree[] makeTree(Checker checker, int x, int y)
+	public static JumpTree[] makeTree(Checker checker, int x, int y)
 	{
 		JumpTree[] trees = new JumpTree[0];
 
@@ -86,7 +89,7 @@ public class JumpTree
 			for(int i = 0; i < places.length; i++)
 			{
 				trees[i] = new JumpTree();
-				trees[i].addMidJump(new Jump(places[i].getEndPoint()));
+				trees[i].addMidJump(new Jump(places[i].getMidPoint(), places[i].getEndPoint()));
 			}
 
 			trees = continueTree(trees, checker);
@@ -118,7 +121,8 @@ public class JumpTree
 				tree[i].trimMidJumps();
 				places = owner.getJumpablePlaces(
 						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().x,
-						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().y);
+						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().y,
+						tree[i].getDirection());
 				if(Utilities.isArrayEmpty(places))
 				{
 					tree[i].finalize();
@@ -127,10 +131,14 @@ public class JumpTree
 				{
 					done = false;
 					if(places.length > 1)
-						for(int n = 0; n < places.length; n++)
-						{
+						tree = extendArray(tree, places.length - 1);
 
-						}
+					for(int n = 1; n < places.length; n++)
+					{
+						tree[tree.length - places.length + n - 1] = tree[i];
+						tree[tree.length - places.length + n - 1].addMidJump(places[n]);
+					}
+					tree[i].addMidJump(places[0]);
 				}
 			}
 		}

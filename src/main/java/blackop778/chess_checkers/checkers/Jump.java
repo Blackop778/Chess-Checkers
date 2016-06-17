@@ -47,12 +47,18 @@ public class Jump
 
 	public Point getMidPoint()
 	{
-		return new Point(midPoint);
+		if(midPoint != null)
+			return new Point(midPoint);
+		else
+			return null;
 	}
 
 	public Point getEndPoint()
 	{
-		return new Point(endPoint);
+		if(endPoint != null)
+			return new Point(endPoint);
+		else
+			return null;
 	}
 
 	public int getDirection()

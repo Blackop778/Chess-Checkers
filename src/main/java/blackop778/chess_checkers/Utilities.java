@@ -4,17 +4,52 @@ public abstract class Utilities
 {
 	public static boolean isArrayEmpty(Object[] array)
 	{
-		if(array.length == 0)
-			return true;
-		else
+		if(array != null)
 		{
-			for(Object object : array)
+			if(array.length == 0)
+				return true;
+			else
 			{
-				if(object != null)
-					return false;
-			}
+				for(Object object : array)
+				{
+					if(object != null)
+						return false;
+				}
 
-			return true;
+				return true;
+			}
 		}
+		else
+			return false;
+	}
+
+	public static boolean arrayContains(Object[] array, Object object)
+	{
+		if(array != null)
+		{
+			for(Object piece : array)
+			{
+				if(piece != null)
+				{
+					if(piece.equals(object))
+						return true;
+				}
+				else
+				{
+					if(object == null)
+						return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean opposite(boolean value)
+	{
+		if(value)
+			return false;
+		else
+			return true;
 	}
 }
