@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.checkers.Jump;
@@ -122,17 +124,21 @@ public class Checker extends CheckersPiece
 				else if(!black && y == 0)
 					kinged = true;
 				Chess_Checkers.board[x][y] = this;
+				if(Utilities.isArrayEmpty(CheckersPiece.checkJumps(!black, true)))
+				{
+					Chess_Checkers.gameOver = true;
+					String winner = black ? "Black" : "Red";
+					JOptionPane.showMessageDialog(null,
+							"Congratulations, " + winner
+									+ " wins. Exit this message and click on the board to restart.",
+							"A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
+				}
 				break;
 			}
 		}
 	}
 
 	@Override
-	public Jump[] getJumpablePlaces(int x, int y)
-	{
-		return getJumpablePlaces(x, y, JumpTree.NONE);
-	}
-
 	public Jump[] getJumpablePlaces(int x, int y, int previousDirection)
 	{
 		ArrayList<Jump> places = new ArrayList<Jump>();
@@ -201,44 +207,45 @@ public class Checker extends CheckersPiece
 	public Jump[] getMoveablePlaces(int x, int y)
 	{
 		ArrayList<Jump> places = new ArrayList<Jump>();
-		if((black || kinged) && y != 7)
+		if(Utilities.isArrayEmpty(CheckersPiece.checkJumps(black, false)))
 		{
-			if(x > 0)
+			if((black || kinged) && y != 7)
 			{
-				if(Chess_Checkers.board[x - 1][y + 1] instanceof Empty)
+				if(x > 0)
 				{
-					places.add(new Jump(new Point(x - 1, y + 1), JumpTree.SW));
+					if(Chess_Checkers.board[x - 1][y + 1] instanceof Empty)
+					{
+						places.add(new Jump(new Point(x - 1, y + 1), JumpTree.SW));
+					}
+				}
+				if(x < 7)
+				{
+					if(Chess_Checkers.board[x + 1][y + 1] instanceof Empty)
+					{
+						places.add(new Jump(new Point(x + 1, y + 1), JumpTree.SE));
+					}
 				}
 			}
-			if(x < 7)
+			if((!black || kinged) && y != 0)
 			{
-				if(Chess_Checkers.board[x + 1][y + 1] instanceof Empty)
+				if(x > 0)
 				{
-					places.add(new Jump(new Point(x + 1, y + 1), JumpTree.SE));
+					if(Chess_Checkers.board[x - 1][y - 1] instanceof Empty)
+					{
+						places.add(new Jump(new Point(x - 1, y - 1), JumpTree.NW));
+					}
 				}
-			}
-		}
-		if((!black || kinged) && y != 0)
-		{
-			if(x > 0)
-			{
-				if(Chess_Checkers.board[x - 1][y - 1] instanceof Empty)
+				if(x < 7)
 				{
-					places.add(new Jump(new Point(x - 1, y - 1), JumpTree.NW));
-				}
-			}
-			if(x < 7)
-			{
-				if(Chess_Checkers.board[x + 1][y - 1] instanceof Empty)
-				{
-					places.add(new Jump(new Point(x + 1, y - 1), JumpTree.NE));
+					if(Chess_Checkers.board[x + 1][y - 1] instanceof Empty)
+					{
+						places.add(new Jump(new Point(x + 1, y - 1), JumpTree.NE));
+					}
 				}
 			}
 		}
 
 		Jump[] toReturn = new Jump[0];
-		if(!Utilities.isArrayEmpty(CheckersPiece.checkJumps(black)))
-			places.clear();
 		places.trimToSize();
 		return places.toArray(toReturn);
 	}

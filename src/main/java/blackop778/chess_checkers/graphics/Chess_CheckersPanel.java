@@ -1,6 +1,7 @@
 package blackop778.chess_checkers.graphics;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,20 +20,27 @@ public class Chess_CheckersPanel extends JPanel
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				int x = e.getX() / 90;
-				int y = e.getY() / 90;
-				if(Chess_Checkers.board[x][y].possible)
+				if(Chess_Checkers.gameOver)
 				{
-					Chess_Checkers.board[x][y].selector.move(x, y);
+					Chess_Checkers.setupGame();
 				}
 				else
 				{
-					if(!Chess_Checkers.board[x][y].selected)
-						Chess_Checkers.board[x][y].select(x, y);
+					int x = e.getX() / 90;
+					int y = (e.getY() - 45) / 90;
+					if(Chess_Checkers.board[x][y].possible)
+					{
+						Chess_Checkers.board[x][y].selector.move(x, y);
+					}
 					else
 					{
-						Chess_Checkers.unselectAll();
-						Chess_Checkers.board[x][y].selected = false;
+						if(!Chess_Checkers.board[x][y].selected)
+							Chess_Checkers.board[x][y].select(x, y);
+						else
+						{
+							Chess_Checkers.unselectAll();
+							Chess_Checkers.board[x][y].selected = false;
+						}
 					}
 				}
 				repaint();
@@ -44,6 +52,8 @@ public class Chess_CheckersPanel extends JPanel
 	@Override
 	protected void paintComponent(Graphics g)
 	{
+		g.setFont(new Font(Font.SERIF, Font.PLAIN, 30));
+		g.drawString("Player turn: ", 10, 35);
 		for(int i = 0; i < 8; i++)
 		{
 			for(int n = 0; n < 8; n++)
@@ -52,9 +62,9 @@ public class Chess_CheckersPanel extends JPanel
 					g.setColor(new Color(119, 215, 247));
 				else
 					g.setColor(Color.WHITE);
-				g.fillRect(i * 90, n * 90, (i + 1) * 90, (n + 1) * 90);
+				g.fillRect(i * 90, n * 90 + 45, (i + 1) * 90, (n + 1) * 90);
 				if(Chess_Checkers.board[i][n] != null)
-					Chess_Checkers.board[i][n].drawSelf(g, i * 90, n * 90);
+					Chess_Checkers.board[i][n].drawSelf(g, i * 90, n * 90 + 45);
 			}
 		}
 	}

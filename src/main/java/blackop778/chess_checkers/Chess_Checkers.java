@@ -16,13 +16,15 @@ public class Chess_Checkers
 
 	public static boolean blackTurn;
 
+	public static boolean gameOver;
+
 	public static void main(String[] args)
 	{
 		setupGame();
 
 		Chess_CheckersFrame frame = new Chess_CheckersFrame();
 		frame.setTitle("Chess-Checkers");
-		frame.setPreferredSize(new Dimension(727, 749));
+		frame.setPreferredSize(new Dimension(727, 794));
 		frame.pack();
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
@@ -32,6 +34,7 @@ public class Chess_Checkers
 
 	public static void setupGame()
 	{
+		gameOver = false;
 		board = new Piece[8][8];
 		for(int i = 0; i < board.length; i++)
 		{

@@ -15,11 +15,11 @@ public abstract class CheckersPiece extends Piece
 
 	public abstract JumpTree[] getValidLocations(int x, int y);
 
-	public abstract Jump[] getJumpablePlaces(int x, int y);
+	public abstract Jump[] getJumpablePlaces(int x, int y, int previousDirection);
 
 	public abstract Jump[] getMoveablePlaces(int x, int y);
 
-	public static CheckersPiece[] checkJumps(boolean black)
+	public static CheckersPiece[] checkJumps(boolean black, boolean includeMoves)
 	{
 		ArrayList<CheckersPiece> jumpers = new ArrayList<CheckersPiece>();
 
@@ -31,9 +31,16 @@ public abstract class CheckersPiece extends Piece
 				if(piece instanceof CheckersPiece && piece.black == black)
 				{
 					CheckersPiece checker = (CheckersPiece) piece;
-					if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y)))
+					if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y, JumpTree.NONE)))
 					{
 						jumpers.add(checker);
+					}
+					else if(includeMoves)
+					{
+						if(!Utilities.isArrayEmpty(checker.getMoveablePlaces(x, y)))
+						{
+							jumpers.add(checker);
+						}
 					}
 				}
 			}

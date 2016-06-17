@@ -82,9 +82,9 @@ public class JumpTree
 	{
 		JumpTree[] trees = new JumpTree[0];
 
-		if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y)))
+		if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y, NONE)))
 		{
-			Jump[] places = checker.getJumpablePlaces(x, y);
+			Jump[] places = checker.getJumpablePlaces(x, y, NONE);
 			trees = extendArray(trees, places.length);
 			for(int i = 0; i < places.length; i++)
 			{
