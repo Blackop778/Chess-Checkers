@@ -18,6 +18,10 @@ public class Chess_Checkers
 
 	public static boolean gameOver;
 
+	public static boolean gameIsCheckers;
+
+	public static boolean offerSurrender;
+
 	public static void main(String[] args)
 	{
 		setupGame();
@@ -58,6 +62,7 @@ public class Chess_Checkers
 
 		if(input.equalsIgnoreCase("checkers"))
 		{
+			gameIsCheckers = true;
 			blackTurn = true;
 			for(int i = 0; i < board.length; i++)
 			{
@@ -79,6 +84,7 @@ public class Chess_Checkers
 		}
 		else
 		{
+			gameIsCheckers = false;
 			blackTurn = false;
 		}
 	}

@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import blackop778.chess_checkers.Chess_Checkers;
@@ -20,9 +21,17 @@ public class Chess_CheckersPanel extends JPanel
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
+				boolean doIt = false;
 				if(Chess_Checkers.gameOver)
 				{
 					Chess_Checkers.setupGame();
+				}
+				else if(e.getY() <= 45)
+				{
+					if(e.getX() >= 200 && e.getX() <= 405)
+					{
+						Chess_Checkers.offerSurrender = true;
+					}
 				}
 				else
 				{
@@ -31,6 +40,8 @@ public class Chess_CheckersPanel extends JPanel
 					if(Chess_Checkers.board[x][y].possible)
 					{
 						Chess_Checkers.board[x][y].selector.move(x, y);
+						if(Chess_Checkers.offerSurrender)
+							doIt = true;
 					}
 					else
 					{
@@ -44,6 +55,33 @@ public class Chess_CheckersPanel extends JPanel
 					}
 				}
 				repaint();
+				if(doIt)
+				{
+					String color;
+					if(!Chess_Checkers.blackTurn)
+						color = "Black";
+					else if(Chess_Checkers.gameIsCheckers)
+						color = "Red";
+					else
+						color = "White";
+					int response = JOptionPane.showConfirmDialog(null,
+							color + " has offered to surrender. Do you accept?", "", JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
+					if(response == JOptionPane.OK_OPTION)
+					{
+						Chess_Checkers.gameOver = true;
+						String winner = Chess_Checkers.blackTurn ? "Red" : "Black";
+						JOptionPane.showMessageDialog(null,
+								"Congratulations, " + winner
+										+ " wins. Exit this message and click on the board to restart.",
+								"A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
+					}
+					else
+					{
+						Chess_Checkers.offerSurrender = false;
+						repaint();
+					}
+				}
 			}
 		});
 
@@ -52,8 +90,28 @@ public class Chess_CheckersPanel extends JPanel
 	@Override
 	protected void paintComponent(Graphics g)
 	{
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(0, 0, 721, 45);
+		g.setColor(Color.BLACK);
 		g.setFont(new Font(Font.SERIF, Font.PLAIN, 30));
 		g.drawString("Player turn: ", 10, 35);
+		if(Chess_Checkers.blackTurn)
+			g.setColor(Color.BLACK);
+		else
+		{
+			if(Chess_Checkers.gameIsCheckers)
+				g.setColor(Color.RED);
+			else
+				g.setColor(Color.WHITE);
+		}
+		g.fillRect(150, 5, 30, 30);
+		if(!Chess_Checkers.offerSurrender)
+		{
+			g.setFont(new Font(Font.SERIF, Font.BOLD, 30));
+			g.setColor(Color.BLACK);
+			g.drawString("Offer Surrender", 200, 35);
+			g.drawRect(200, 1, 205, 43);
+		}
 		for(int i = 0; i < 8; i++)
 		{
 			for(int n = 0; n < 8; n++)
