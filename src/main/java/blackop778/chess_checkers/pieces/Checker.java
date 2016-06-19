@@ -14,12 +14,13 @@ import blackop778.chess_checkers.checkers.JumpTree;
 
 public class Checker extends CheckersPiece
 {
-	public Checker(boolean black, boolean kinged)
+	public Checker(boolean black, Integer UID)
 	{
 		this.black = black;
-		this.kinged = kinged;
+		this.kinged = false;
 		this.selected = false;
 		this.possible = false;
+		this.UID = UID;
 	}
 
 	@Override
@@ -139,7 +140,7 @@ public class Checker extends CheckersPiece
 	}
 
 	@Override
-	public Jump[] getJumpablePlaces(int x, int y, int previousDirection)
+	public Jump[] getJumpablePlaces(int x, int y, ArrayList<Integer> previousUIDs)
 	{
 		ArrayList<Jump> places = new ArrayList<Jump>();
 
@@ -152,8 +153,16 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x - 2][y + 2] instanceof Empty)
 					{
-						if(Math.abs(previousDirection - JumpTree.SW) != 4)
-							places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2), JumpTree.SW));
+
+						if(previousUIDs == null)
+							places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
+						else
+						{
+							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							{
+								places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
+							}
+						}
 					}
 				}
 			}
@@ -164,8 +173,15 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x + 2][y + 2] instanceof Empty)
 					{
-						if(Math.abs(previousDirection - JumpTree.SE) != 4)
-							places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2), JumpTree.SE));
+						if(previousUIDs == null)
+							places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
+						else
+						{
+							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							{
+								places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
+							}
+						}
 					}
 				}
 			}
@@ -179,8 +195,15 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x - 2][y - 2] instanceof Empty)
 					{
-						if(Math.abs(previousDirection - JumpTree.NW) != 4)
-							places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2), JumpTree.NW));
+						if(previousUIDs == null)
+							places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
+						else
+						{
+							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							{
+								places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
+							}
+						}
 					}
 				}
 			}
@@ -191,8 +214,15 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x + 2][y - 2] instanceof Empty)
 					{
-						if(Math.abs(previousDirection - JumpTree.NE) != 4)
-							places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2), JumpTree.NE));
+						if(previousUIDs == null)
+							places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
+						else
+						{
+							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							{
+								places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
+							}
+						}
 					}
 				}
 			}
@@ -215,14 +245,14 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x - 1][y + 1] instanceof Empty)
 					{
-						places.add(new Jump(new Point(x - 1, y + 1), JumpTree.SW));
+						places.add(new Jump(new Point(x - 1, y + 1)));
 					}
 				}
 				if(x < 7)
 				{
 					if(Chess_Checkers.board[x + 1][y + 1] instanceof Empty)
 					{
-						places.add(new Jump(new Point(x + 1, y + 1), JumpTree.SE));
+						places.add(new Jump(new Point(x + 1, y + 1)));
 					}
 				}
 			}
@@ -232,14 +262,14 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x - 1][y - 1] instanceof Empty)
 					{
-						places.add(new Jump(new Point(x - 1, y - 1), JumpTree.NW));
+						places.add(new Jump(new Point(x - 1, y - 1)));
 					}
 				}
 				if(x < 7)
 				{
 					if(Chess_Checkers.board[x + 1][y - 1] instanceof Empty)
 					{
-						places.add(new Jump(new Point(x + 1, y - 1), JumpTree.NE));
+						places.add(new Jump(new Point(x + 1, y - 1)));
 					}
 				}
 			}

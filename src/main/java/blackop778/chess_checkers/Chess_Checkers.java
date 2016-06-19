@@ -72,11 +72,11 @@ public class Chess_Checkers
 					{
 						if(n < 3)
 						{
-							board[i][n] = new Checker(true, false);
+							board[i][n] = new Checker(true, n + (i * 8));
 						}
 						else if(n > 4)
 						{
-							board[i][n] = new Checker(false, false);
+							board[i][n] = new Checker(false, n + (i * 8));
 						}
 					}
 				}

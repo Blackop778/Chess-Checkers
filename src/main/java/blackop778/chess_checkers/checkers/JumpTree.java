@@ -9,20 +9,18 @@ public class JumpTree
 {
 	private Jump endJump;
 	private ArrayList<Jump> midJumps;
-	private int direction;
-
-	// The values for direction
-	public static final int NONE = -1;
-	public static final int NE = 2;
-	public static final int SE = 4;
-	public static final int SW = 6;
-	public static final int NW = 8;
+	private ArrayList<Integer> previousUIDs;
 
 	public JumpTree()
 	{
 		endJump = null;
 		midJumps = new ArrayList<Jump>();
-		direction = NONE;
+	}
+
+	public JumpTree(JumpTree tree)
+	{
+		endJump = tree.getEndJump();
+		midJumps = tree.getMidJumps();
 	}
 
 	public Jump getEndJump()
@@ -61,30 +59,13 @@ public class JumpTree
 		midJumps.trimToSize();
 	}
 
-	public void setDirection(int direction)
-	{
-		if(direction == NE || direction == SE || direction == SW || direction == NW)
-		{
-			this.direction = direction;
-		}
-		else
-		{
-			this.direction = NONE;
-		}
-	}
-
-	public int getDirection()
-	{
-		return new Integer(direction);
-	}
-
 	public static JumpTree[] makeTree(Checker checker, int x, int y)
 	{
 		JumpTree[] trees = new JumpTree[0];
 
-		if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y, NONE)))
+		if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y)))
 		{
-			Jump[] places = checker.getJumpablePlaces(x, y, NONE);
+			Jump[] places = checker.getJumpablePlaces(x, y);
 			trees = extendArray(trees, places.length);
 			for(int i = 0; i < places.length; i++)
 			{
@@ -121,8 +102,7 @@ public class JumpTree
 				tree[i].trimMidJumps();
 				places = owner.getJumpablePlaces(
 						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().x,
-						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().y,
-						tree[i].getDirection());
+						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().y);
 				if(Utilities.isArrayEmpty(places))
 				{
 					tree[i].finalize();
@@ -135,8 +115,8 @@ public class JumpTree
 
 					for(int n = 1; n < places.length; n++)
 					{
-						tree[tree.length - places.length + n - 1] = tree[i];
-						tree[tree.length - places.length + n - 1].addMidJump(places[n]);
+						tree[tree.length - places.length + n] = new JumpTree(tree[i]);
+						tree[tree.length - places.length + n].addMidJump(places[n]);
 					}
 					tree[i].addMidJump(places[0]);
 				}
