@@ -16,26 +16,8 @@ public class Jump
 
 	public Jump(Point midPoint, Point endPoint)
 	{
-		this(midPoint, endPoint, JumpTree.NONE);
-	}
-
-	public Jump(Point endPoint, int direction)
-	{
-		this(null, endPoint, direction);
-	}
-
-	public Jump(Point midPoint, Point endPoint, int direction)
-	{
 		this.midPoint = midPoint;
 		this.endPoint = endPoint;
-		if(direction == JumpTree.NE || direction == JumpTree.SE || direction == JumpTree.SW || direction == JumpTree.NW)
-		{
-			this.direction = direction;
-		}
-		else
-		{
-			this.direction = JumpTree.NONE;
-		}
 	}
 
 	public Jump(Jump jump)

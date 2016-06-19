@@ -2,6 +2,7 @@ package blackop778.chess_checkers.checkers;
 
 import java.util.ArrayList;
 
+import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.pieces.Checker;
 
@@ -15,12 +16,14 @@ public class JumpTree
 	{
 		endJump = null;
 		midJumps = new ArrayList<Jump>();
+		previousUIDs = new ArrayList<Integer>();
 	}
 
 	public JumpTree(JumpTree tree)
 	{
 		endJump = tree.getEndJump();
 		midJumps = tree.getMidJumps();
+		previousUIDs = tree.previousUIDs;
 	}
 
 	public Jump getEndJump()
@@ -63,14 +66,16 @@ public class JumpTree
 	{
 		JumpTree[] trees = new JumpTree[0];
 
-		if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y)))
+		if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y, null)))
 		{
-			Jump[] places = checker.getJumpablePlaces(x, y);
+			Jump[] places = checker.getJumpablePlaces(x, y, null);
 			trees = extendArray(trees, places.length);
 			for(int i = 0; i < places.length; i++)
 			{
 				trees[i] = new JumpTree();
 				trees[i].addMidJump(new Jump(places[i].getMidPoint(), places[i].getEndPoint()));
+				trees[i].previousUIDs
+						.add(Chess_Checkers.board[places[i].getMidPoint().x][places[i].getMidPoint().y].UID);
 			}
 
 			trees = continueTree(trees, checker);
@@ -102,7 +107,8 @@ public class JumpTree
 				tree[i].trimMidJumps();
 				places = owner.getJumpablePlaces(
 						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().x,
-						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().y);
+						tree[i].getMidJumps().get(tree[i].getMidJumps().size() - 1).getEndPoint().y,
+						tree[i].previousUIDs);
 				if(Utilities.isArrayEmpty(places))
 				{
 					tree[i].finalize();
@@ -117,8 +123,12 @@ public class JumpTree
 					{
 						tree[tree.length - places.length + n] = new JumpTree(tree[i]);
 						tree[tree.length - places.length + n].addMidJump(places[n]);
+						tree[tree.length - places.length + n].previousUIDs
+								.add(Chess_Checkers.board[places[n].getMidPoint().x][places[n].getMidPoint().y].UID);
 					}
 					tree[i].addMidJump(places[0]);
+					tree[i].previousUIDs
+							.add(Chess_Checkers.board[places[0].getMidPoint().x][places[0].getMidPoint().y].UID);
 				}
 			}
 		}
