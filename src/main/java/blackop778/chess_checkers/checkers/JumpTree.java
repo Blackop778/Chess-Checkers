@@ -34,8 +34,7 @@ public class JumpTree
 			return null;
 	}
 
-	@Override
-	public void finalize()
+	public void finish()
 	{
 		if(endJump == null)
 		{
@@ -88,7 +87,7 @@ public class JumpTree
 			{
 				trees[i] = new JumpTree();
 				trees[i].addMidJump(new Jump(places[i].getEndPoint()));
-				trees[i].finalize();
+				trees[i].finish();
 			}
 		}
 
@@ -111,7 +110,7 @@ public class JumpTree
 						tree[i].previousUIDs);
 				if(Utilities.isArrayEmpty(places))
 				{
-					tree[i].finalize();
+					tree[i].finish();
 				}
 				else
 				{

@@ -5,8 +5,11 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+
+import blackop778.chess_checkers.Chess_Checkers;
 
 public class Pawn extends ChessPiece
 {
@@ -44,8 +47,32 @@ public class Pawn extends ChessPiece
 	@Override
 	public Point[] getValidLocations(int x, int y)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Point> validLocations = new ArrayList<Point>();
+
+		int yOffset = black ? 1 : -1;
+
+		if(Chess_Checkers.board[x][y + yOffset] instanceof Empty)
+		{
+			if((black && !blackKingInCheck) || (!black && !whiteKingInCheck))
+			{
+				validLocations.add(new Point(x, y + yOffset));
+			}
+			else
+			{
+				Piece replacingPiece = Chess_Checkers.board[x][y + yOffset];
+				Chess_Checkers.board[x][y + yOffset] = this;
+				Chess_Checkers.board[x][y] = new Empty();
+				if(!isKingInCheck(black))
+				{
+					validLocations.add(new Point(x, y + yOffset));
+				}
+				Chess_Checkers.board[x][y + yOffset] = replacingPiece;
+				Chess_Checkers.board[x][y] = this;
+			}
+		}
+
+		Point[] array = new Point[0];
+		return validLocations.toArray(array);
 	}
 
 	@Override
