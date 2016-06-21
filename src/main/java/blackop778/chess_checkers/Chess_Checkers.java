@@ -6,11 +6,18 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.graphics.Chess_CheckersFrame;
+import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
+import blackop778.chess_checkers.pieces.ChessPiece;
 import blackop778.chess_checkers.pieces.Empty;
+import blackop778.chess_checkers.pieces.King;
+import blackop778.chess_checkers.pieces.Knight;
+import blackop778.chess_checkers.pieces.Pawn;
 import blackop778.chess_checkers.pieces.Piece;
+import blackop778.chess_checkers.pieces.Queen;
+import blackop778.chess_checkers.pieces.Rook;
 
-public class Chess_Checkers
+public abstract class Chess_Checkers
 {
 	public static Piece[][] board;
 
@@ -86,6 +93,68 @@ public class Chess_Checkers
 		{
 			gameIsCheckers = false;
 			blackTurn = false;
+			ChessPiece.blackKingInCheck = false;
+			ChessPiece.whiteKingInCheck = false;
+			for(int i = 0; i < board.length; i++)
+			{
+				for(int n = 0; n < board[0].length; n++)
+				{
+					switch(n)
+					{
+						case 0:
+							if(i == 0 || i == 7)
+							{
+								board[i][n] = new Rook(true);
+							}
+							else if(i == 1 || i == 6)
+							{
+								board[i][n] = new Knight(true);
+							}
+							else if(i == 2 || i == 5)
+							{
+								board[i][n] = new Bishop(true);
+							}
+							else if(i == 3)
+							{
+								board[i][n] = new Queen(true);
+							}
+							else if(i == 4)
+							{
+								board[i][n] = new King(true);
+							}
+							break;
+						case 1:
+							board[i][n] = new Pawn(true);
+							break;
+
+						case 6:
+							board[i][n] = new Pawn(false);
+							break;
+						case 7:
+							if(i == 0 || i == 7)
+							{
+								board[i][n] = new Rook(false);
+							}
+							else if(i == 1 || i == 6)
+							{
+								board[i][n] = new Knight(false);
+							}
+							else if(i == 2 || i == 5)
+							{
+								board[i][n] = new Bishop(false);
+							}
+							else if(i == 3)
+							{
+								board[i][n] = new Queen(false);
+							}
+							else if(i == 4)
+							{
+								board[i][n] = new King(false);
+							}
+							break;
+					}
+				}
+			}
 		}
 	}
 

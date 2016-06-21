@@ -66,65 +66,71 @@ public class Checker extends CheckersPiece
 		if(black == Chess_Checkers.blackTurn)
 		{
 			Chess_Checkers.unselectAll();
-			boolean successful = false;
 			JumpTree[] jumps = getValidLocations(x, y);
 			lastValidLocations = jumps;
 			for(JumpTree tree : jumps)
 			{
 				if(tree != null)
 				{
-					successful = true;
+					selected = true;
 					Chess_Checkers.board[tree.getEndJump().getEndPoint().x][tree.getEndJump()
 							.getEndPoint().y].possible = true;
 					Chess_Checkers.board[tree.getEndJump().getEndPoint().x][tree.getEndJump()
 							.getEndPoint().y].selector = this;
 				}
 			}
-
-			if(successful)
-				selected = true;
 		}
 	}
 
 	@Override
 	public void move(int x, int y)
 	{
+		// Reset possible spots for the next piece to move
 		Chess_Checkers.unselectAll();
+		// Change the turn to the opposite player
 		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
 		for(JumpTree tree : lastValidLocations)
 		{
+			// Find which jumptree we're actually following
 			if(x == tree.getEndJump().getEndPoint().x && y == tree.getEndJump().getEndPoint().y)
 			{
 				ArrayList<Jump> midJumpsAL = tree.getMidJumps();
 				Jump[] midJumps = new Jump[0];
+				// Convert the mid jumps to an array for easier handling
 				midJumps = midJumpsAL.toArray(midJumps);
 				for(Jump jump : midJumps)
 				{
 					if(jump != null)
+						// Make the piece(s) we jumped over's place(s) empty
 						Chess_Checkers.board[jump.getMidPoint().x][jump.getMidPoint().y] = new Empty();
 				}
+				// if we aren't moving the piece
 				if(tree.getEndJump().getMidPoint() != null)
 				{
+					// Clear the last piece to be jumped over in the train
 					Chess_Checkers.board[tree.getEndJump().getMidPoint().x][tree.getEndJump()
 							.getMidPoint().y] = new Empty();
 				}
-				outerLoop: for(int i = 0; i < 8; i++)
+				// Find our current self in the board and make it empty
+				findSelfLoop: for(int i = 0; i < 8; i++)
 				{
 					for(int n = 0; n < 8; n++)
 					{
 						if(Chess_Checkers.board[i][n].equals(this))
 						{
 							Chess_Checkers.board[i][n] = new Empty();
-							break outerLoop;
-
+							break findSelfLoop;
 						}
 					}
 				}
+				// Check if we should be kinged
 				if(black && y == 7)
 					kinged = true;
 				else if(!black && y == 0)
 					kinged = true;
+				// Actually put ourselves on the board in the new place
 				Chess_Checkers.board[x][y] = this;
+				// Check if the other team has any possible moved
 				if(Utilities.isArrayEmpty(CheckersPiece.checkJumps(!black, true)))
 				{
 					Chess_Checkers.gameOver = true;
@@ -134,6 +140,7 @@ public class Checker extends CheckersPiece
 									+ " wins. Exit this message and click on the board to restart.",
 							"A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
 				}
+				// End the search for the jumptree we took and end the method
 				break;
 			}
 		}
@@ -158,7 +165,8 @@ public class Checker extends CheckersPiece
 							places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
 						else
 						{
-							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							Checker piece = (Checker) Chess_Checkers.board[x - 1][y + 1];
+							if(!previousUIDs.contains(piece.UID))
 							{
 								places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
 							}
@@ -177,7 +185,8 @@ public class Checker extends CheckersPiece
 							places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
 						else
 						{
-							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							Checker piece = (Checker) Chess_Checkers.board[x + 1][y + 1];
+							if(!previousUIDs.contains(piece.UID))
 							{
 								places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
 							}
@@ -199,7 +208,8 @@ public class Checker extends CheckersPiece
 							places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
 						else
 						{
-							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							Checker piece = (Checker) Chess_Checkers.board[x - 1][y - 1];
+							if(!previousUIDs.contains(piece.UID))
 							{
 								places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
 							}
@@ -218,7 +228,8 @@ public class Checker extends CheckersPiece
 							places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
 						else
 						{
-							if(!previousUIDs.contains(Chess_Checkers.board[x - 1][y + 1].UID))
+							Checker piece = (Checker) Chess_Checkers.board[x + 1][y - 1];
+							if(!previousUIDs.contains(piece.UID))
 							{
 								places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
 							}

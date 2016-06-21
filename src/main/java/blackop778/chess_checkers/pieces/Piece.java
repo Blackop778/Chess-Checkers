@@ -12,8 +12,6 @@ public abstract class Piece
 
 	public boolean possible;
 
-	public Integer UID;
-
 	public abstract void drawSelf(Graphics g, int x, int y);
 
 	public abstract void select(int x, int y);

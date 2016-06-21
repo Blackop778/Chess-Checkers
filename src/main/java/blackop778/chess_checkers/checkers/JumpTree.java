@@ -74,8 +74,8 @@ public class JumpTree
 			{
 				trees[i] = new JumpTree();
 				trees[i].addMidJump(new Jump(places[i].getMidPoint(), places[i].getEndPoint()));
-				trees[i].previousUIDs
-						.add(Chess_Checkers.board[places[i].getMidPoint().x][places[i].getMidPoint().y].UID);
+				Checker piece = (Checker) Chess_Checkers.board[places[i].getMidPoint().x][places[i].getMidPoint().y];
+				trees[i].previousUIDs.add(piece.UID);
 			}
 
 			trees = continueTree(trees, checker);
@@ -123,12 +123,15 @@ public class JumpTree
 					{
 						tree[tree.length - places.length + n] = new JumpTree(tree[i]);
 						tree[tree.length - places.length + n].addMidJump(places[n]);
-						tree[tree.length - places.length + n].previousUIDs
-								.add(Chess_Checkers.board[places[n].getMidPoint().x][places[n].getMidPoint().y].UID);
+						Checker piece = (Checker) Chess_Checkers.board[places[n].getMidPoint().x][places[n]
+								.getMidPoint().y];
+						tree[tree.length - places.length + n].previousUIDs.add(piece.UID);
 					}
 					tree[i].addMidJump(places[0]);
-					tree[i].previousUIDs
-							.add(Chess_Checkers.board[places[0].getMidPoint().x][places[0].getMidPoint().y].UID);
+
+					Checker piece = (Checker) Chess_Checkers.board[places[0].getMidPoint().x][places[0]
+							.getMidPoint().y];
+					tree[i].previousUIDs.add(piece.UID);
 				}
 			}
 		}
