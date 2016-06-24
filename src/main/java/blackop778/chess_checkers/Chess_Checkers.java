@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.graphics.Chess_CheckersFrame;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
@@ -32,6 +33,7 @@ public abstract class Chess_Checkers
 	public static void main(String[] args)
 	{
 		setupGame();
+		PawnPromotion.showDialog();
 
 		Chess_CheckersFrame frame = new Chess_CheckersFrame();
 		frame.setTitle("Chess-Checkers");
