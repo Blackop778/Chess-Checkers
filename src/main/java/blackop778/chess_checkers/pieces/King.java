@@ -5,8 +5,11 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+
+import blackop778.chess_checkers.Chess_Checkers;
 
 public class King extends ChessPiece
 {
@@ -41,22 +44,47 @@ public class King extends ChessPiece
 	@Override
 	public Point[] getValidLocations(int x, int y)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Point> validLocations = new ArrayList<Point>();
+
+		for(int xChange = -1; xChange < 2; xChange++)
+		{
+			for(int yChange = -1; yChange < 2; yChange++)
+			{
+				if(xChange != 0 || yChange != 0)
+				{
+					if(x + xChange > -1 && x + xChange < 8)
+					{
+						if(y + yChange > -1 && y + yChange < 8)
+						{
+							boolean check = false;
+							if(Chess_Checkers.board[x + xChange][y + yChange] instanceof Empty)
+							{
+								check = true;
+							}
+							else if(Chess_Checkers.board[x + xChange][y + yChange].black != black)
+							{
+								check = true;
+							}
+							if(check)
+							{
+								Piece replacingPiece = Chess_Checkers.board[x + xChange][y + yChange];
+								Chess_Checkers.board[x + xChange][y + yChange] = this;
+								Chess_Checkers.board[x][y] = new Empty();
+								if(!isKingInCheck(black))
+								{
+									validLocations.add(new Point(x + xChange, y + yChange));
+								}
+								Chess_Checkers.board[x + xChange][y + yChange] = replacingPiece;
+								Chess_Checkers.board[x][y] = this;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		Point[] array = new Point[0];
+		validLocations.trimToSize();
+		return validLocations.toArray(array);
 	}
-
-	@Override
-	public void select(int x, int y)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void move(int x, int y)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
 }

@@ -1,6 +1,7 @@
 package blackop778.chess_checkers.chess;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,17 +9,41 @@ import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-@SuppressWarnings("serial")
-public class PawnPromotion extends JPanel implements ActionListener
+public class PawnPromotion
 {
+	public String result;
+
 	public PawnPromotion()
 	{
+		JDialog dialog = new JDialog(null, "Promotion", Dialog.DEFAULT_MODALITY_TYPE);
+
+		JComponent component = new DialogWindow(this, dialog);
+		component.setOpaque(true);
+		dialog.setContentPane(component);
+
+		dialog.pack();
+		dialog.setLocationRelativeTo(null);
+		dialog.setVisible(true);
+	}
+}
+
+@SuppressWarnings("serial")
+class DialogWindow extends JPanel implements ActionListener
+{
+	private PawnPromotion controller;
+	private JDialog dialog;
+
+	public DialogWindow(PawnPromotion controller, JDialog dialog)
+	{
 		super(new BorderLayout());
+		this.controller = controller;
+		controller.result = "Queen";
+		this.dialog = dialog;
 
 		ButtonGroup group = new ButtonGroup();
 
@@ -58,29 +83,33 @@ public class PawnPromotion extends JPanel implements ActionListener
 		done.setMnemonic(1);
 
 		JLabel text = new JLabel();
-		text.setText("Pick what piece you want your pawn to be promoted to.");
+		text.setText("Pick what piece you want your pawn to be promoted to?");
 
 		add(text, BorderLayout.NORTH);
 		add(buttonPanel, BorderLayout.WEST);
 		add(done, BorderLayout.SOUTH);
 	}
 
-	public static void showDialog()
-	{
-		JFrame frame = new JFrame("Promotion");
-
-		JComponent component = new PawnPromotion();
-		component.setOpaque(true);
-		frame.setContentPane(component);
-
-		frame.pack();
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent ae)
 	{
-
+		switch(ae.getActionCommand())
+		{
+			case "Done":
+				dialog.dispose();
+				break;
+			case "Queen":
+				controller.result = "Queen";
+				break;
+			case "Rook":
+				controller.result = "Rook";
+				break;
+			case "Knight":
+				controller.result = "Knight";
+				break;
+			case "Bishop":
+				controller.result = "Bishop";
+				break;
+		}
 	}
 }

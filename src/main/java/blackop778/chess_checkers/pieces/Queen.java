@@ -5,8 +5,11 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+
+import blackop778.chess_checkers.Chess_Checkers;
 
 public class Queen extends ChessPiece
 {
@@ -41,22 +44,99 @@ public class Queen extends ChessPiece
 	@Override
 	public Point[] getValidLocations(int x, int y)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Point> validLocations = new ArrayList<Point>();
+		int currentX = x;
+		int currentY = y;
+		int changeX = 0;
+		int changeY = -1;
+
+		for(int i = 0; i < 8; i++)
+		{
+			boolean done = false;
+			while(!done)
+			{
+				currentX += changeX;
+				currentY += changeY;
+				if(currentX > -1 && currentX < 8)
+				{
+					if(currentY > -1 && currentY < 8)
+					{
+						if(Chess_Checkers.board[currentX][currentY] instanceof Empty)
+						{
+							Piece replacingPiece = Chess_Checkers.board[currentX][currentY];
+							Chess_Checkers.board[currentX][currentY] = this;
+							Chess_Checkers.board[x][y] = new Empty();
+							if(!isKingInCheck(black))
+							{
+								validLocations.add(new Point(currentX, currentY));
+							}
+							Chess_Checkers.board[currentX][currentY] = replacingPiece;
+							Chess_Checkers.board[x][y] = this;
+						}
+						else
+						{
+							done = true;
+							if(Chess_Checkers.board[currentX][currentY].black != black)
+							{
+								Piece replacingPiece = Chess_Checkers.board[currentX][currentY];
+								Chess_Checkers.board[currentX][currentY] = this;
+								Chess_Checkers.board[x][y] = new Empty();
+								if(!isKingInCheck(black))
+								{
+									validLocations.add(new Point(currentX, currentY));
+								}
+								Chess_Checkers.board[currentX][currentY] = replacingPiece;
+								Chess_Checkers.board[x][y] = this;
+							}
+						}
+					}
+					else
+					{
+						done = true;
+					}
+				}
+				else
+				{
+					done = true;
+				}
+			}
+			currentX = x;
+			currentY = y;
+			switch(i)
+			{
+				case 0:
+					changeY = 0;
+					changeX = 1;
+					break;
+				case 1:
+					changeY = 1;
+					changeX = 0;
+					break;
+				case 2:
+					changeY = 0;
+					changeX = -1;
+					break;
+				case 3:
+					changeX = 1;
+					changeY = -1;
+					break;
+				case 4:
+					changeY = 1;
+					changeX = 1;
+					break;
+				case 5:
+					changeY = 1;
+					changeX = -1;
+					break;
+				case 6:
+					changeY = -1;
+					changeX = -1;
+					break;
+			}
+		}
+
+		Point[] array = new Point[0];
+		validLocations.trimToSize();
+		return validLocations.toArray(array);
 	}
-
-	@Override
-	public void select(int x, int y)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void move(int x, int y)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
 }

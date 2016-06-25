@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
-import blackop778.chess_checkers.Utilities;
 
 public class Knight extends ChessPiece
 {
@@ -70,22 +69,15 @@ public class Knight extends ChessPiece
 					}
 					if(check)
 					{
-						if((black && !blackKingInCheck) || (!black && !whiteKingInCheck))
+						Piece replacingPiece = Chess_Checkers.board[x + xChange][y + yChange];
+						Chess_Checkers.board[x + xChange][y + yChange] = this;
+						Chess_Checkers.board[x][y] = new Empty();
+						if(!isKingInCheck(black))
 						{
 							validLocations.add(new Point(x + xChange, y + yChange));
 						}
-						else
-						{
-							Piece replacingPiece = Chess_Checkers.board[x + xChange][y + yChange];
-							Chess_Checkers.board[x + xChange][y + yChange] = this;
-							Chess_Checkers.board[x][y] = new Empty();
-							if(!isKingInCheck(black))
-							{
-								validLocations.add(new Point(x + xChange, y + yChange));
-							}
-							Chess_Checkers.board[x + xChange][y + yChange] = replacingPiece;
-							Chess_Checkers.board[x][y] = this;
-						}
+						Chess_Checkers.board[x + xChange][y + yChange] = replacingPiece;
+						Chess_Checkers.board[x][y] = this;
 					}
 				}
 			}
@@ -94,43 +86,5 @@ public class Knight extends ChessPiece
 		Point[] array = new Point[0];
 		validLocations.trimToSize();
 		return validLocations.toArray(array);
-	}
-
-	@Override
-	public void select(int x, int y)
-	{
-		if(black == Chess_Checkers.blackTurn)
-		{
-			Chess_Checkers.unselectAll();
-			Point[] locations = getValidLocations(x, y);
-			for(Point point : locations)
-			{
-				if(point != null)
-				{
-					selected = true;
-					Chess_Checkers.board[point.x][point.y].possible = true;
-					Chess_Checkers.board[point.x][point.y].selector = this;
-				}
-			}
-		}
-	}
-
-	@Override
-	public void move(int x, int y)
-	{
-		Chess_Checkers.unselectAll();
-		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
-		findSelfLoop: for(int i = 0; i < 8; i++)
-		{
-			for(int n = 0; n < 8; n++)
-			{
-				if(Chess_Checkers.board[i][n].equals(this))
-				{
-					Chess_Checkers.board[i][n] = new Empty();
-					break findSelfLoop;
-				}
-			}
-		}
-		Chess_Checkers.board[x][y] = this;
 	}
 }
