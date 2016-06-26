@@ -29,6 +29,7 @@ public abstract class ChessPiece extends Piece
 	}
 
 	@Override
+	// Remember King and Pawn have their own implementations so edit them too
 	public void move(int x, int y)
 	{
 		Chess_Checkers.unselectAll();
@@ -45,13 +46,7 @@ public abstract class ChessPiece extends Piece
 			}
 		}
 		Chess_Checkers.board[x][y] = this;
-		ChessPiece.whiteKingInCheck = ChessPiece.isKingInCheck(false);
-		ChessPiece.blackKingInCheck = ChessPiece.isKingInCheck(true);
 	}
-
-	public static boolean blackKingInCheck;
-
-	public static boolean whiteKingInCheck;
 
 	public static final boolean isKingInCheck(boolean black)
 	{
@@ -143,6 +138,63 @@ public abstract class ChessPiece extends Piece
 								changeY = -1;
 								changeX = -1;
 								break;
+						}
+					}
+					if(black)
+					{
+						if(y + 1 < 8)
+						{
+							if(x - 1 > -1)
+							{
+								if(Chess_Checkers.board[x - 1][y + 1].black != black
+										&& Chess_Checkers.board[x - 1][y + 1] instanceof Pawn)
+									return true;
+							}
+							if(x + 1 < 8)
+							{
+								if(Chess_Checkers.board[x + 1][y + 1].black != black
+										&& Chess_Checkers.board[x + 1][y + 1] instanceof Pawn)
+									return true;
+							}
+						}
+					}
+					else
+					{
+						if(y - 1 > -1)
+						{
+							if(x - 1 > -1)
+							{
+								if(Chess_Checkers.board[x - 1][y - 1].black != black
+										&& Chess_Checkers.board[x - 1][y - 1] instanceof Pawn)
+									return true;
+							}
+							if(x + 1 < 8)
+							{
+								if(Chess_Checkers.board[x + 1][y - 1].black != black
+										&& Chess_Checkers.board[x + 1][y - 1] instanceof Pawn)
+									return true;
+							}
+						}
+					}
+					Point[] xYChanges = {new Point(-2, -1), new Point(-2, 1), new Point(-1, -2), new Point(-1, 2),
+							new Point(1, -2), new Point(1, 2), new Point(2, -1), new Point(2, 1)};
+
+					for(Point point : xYChanges)
+					{
+						int xChange = point.x;
+						int yChange = point.y;
+						if(x + xChange > -1 && x + xChange < 8)
+						{
+							// Ensure the changes remain within the borders of
+							// the board
+							if(y + yChange > -1 && y + yChange < 8)
+							{
+								if(Chess_Checkers.board[x + xChange][y + yChange].black != black
+										&& Chess_Checkers.board[x + xChange][y + yChange] instanceof Knight)
+								{
+									return true;
+								}
+							}
 						}
 					}
 				}

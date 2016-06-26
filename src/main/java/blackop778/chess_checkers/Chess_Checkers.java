@@ -8,7 +8,6 @@ import javax.swing.JOptionPane;
 import blackop778.chess_checkers.graphics.Chess_CheckersFrame;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
-import blackop778.chess_checkers.pieces.ChessPiece;
 import blackop778.chess_checkers.pieces.Empty;
 import blackop778.chess_checkers.pieces.King;
 import blackop778.chess_checkers.pieces.Knight;
@@ -94,8 +93,6 @@ public abstract class Chess_Checkers
 		{
 			gameIsCheckers = false;
 			blackTurn = false;
-			ChessPiece.blackKingInCheck = false;
-			ChessPiece.whiteKingInCheck = false;
 			for(int i = 0; i < board.length; i++)
 			{
 				for(int n = 0; n < board[0].length; n++)

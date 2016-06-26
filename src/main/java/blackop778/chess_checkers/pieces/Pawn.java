@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.Utilities;
 
 public class Pawn extends ChessPiece
 {
-	private boolean moved;
+	private Boolean lastMoveDouble;
 
 	public Pawn(boolean black)
 	{
@@ -21,7 +22,7 @@ public class Pawn extends ChessPiece
 		this.selected = false;
 		this.selector = null;
 		this.possible = false;
-		this.moved = false;
+		this.lastMoveDouble = null;
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class Pawn extends ChessPiece
 				Chess_Checkers.board[x][y] = this;
 			}
 		}
-		if(!moved)
+		if(lastMoveDouble == null)
 		{
 			if(Chess_Checkers.board[x][y + yOffset] instanceof Empty
 					&& Chess_Checkers.board[x][y + (yOffset * 2)] instanceof Empty)
@@ -120,7 +121,27 @@ public class Pawn extends ChessPiece
 	@Override
 	public void move(int x, int y)
 	{
-		super.move(x, y);
-		this.moved = true;
+		Chess_Checkers.unselectAll();
+		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		findSelfLoop: for(int i = 0; i < 8; i++)
+		{
+			for(int n = 0; n < 8; n++)
+			{
+				if(Chess_Checkers.board[i][n].equals(this))
+				{
+					Chess_Checkers.board[i][n] = new Empty();
+					if(n - y == 2 || y - n == 2)
+					{
+						lastMoveDouble = new Boolean(true);
+					}
+					else
+					{
+						lastMoveDouble = new Boolean(false);
+					}
+					break findSelfLoop;
+				}
+			}
+		}
+		Chess_Checkers.board[x][y] = this;
 	}
 }

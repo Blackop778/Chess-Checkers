@@ -10,15 +10,19 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.Utilities;
 
 public class King extends ChessPiece
 {
+	private boolean moved;
+
 	public King(boolean black)
 	{
 		this.black = black;
 		this.selected = false;
 		this.selector = null;
 		this.possible = false;
+		this.moved = false;
 	}
 
 	@Override
@@ -39,6 +43,39 @@ public class King extends ChessPiece
 		{
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void move(int x, int y)
+	{
+		Chess_Checkers.unselectAll();
+		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		findSelfLoop: for(int i = 0; i < 8; i++)
+		{
+			for(int n = 0; n < 8; n++)
+			{
+				if(Chess_Checkers.board[i][n].equals(this))
+				{
+					Chess_Checkers.board[i][n] = new Empty();
+					break findSelfLoop;
+				}
+			}
+		}
+		if(!moved && (x == 2 || x == 6))
+		{
+			if(x == 2)
+			{
+				Chess_Checkers.board[3][y] = Chess_Checkers.board[0][y];
+				Chess_Checkers.board[0][y] = new Empty();
+			}
+			else
+			{
+				Chess_Checkers.board[5][y] = Chess_Checkers.board[7][y];
+				Chess_Checkers.board[7][y] = new Empty();
+			}
+		}
+		Chess_Checkers.board[x][y] = this;
+		moved = true;
 	}
 
 	@Override
@@ -77,6 +114,169 @@ public class King extends ChessPiece
 								Chess_Checkers.board[x + xChange][y + yChange] = replacingPiece;
 								Chess_Checkers.board[x][y] = this;
 							}
+						}
+					}
+				}
+			}
+		}
+		if(!moved)
+		{
+			// Queen side is negative, King side is positive, both is 0, neither
+			// is null
+			Byte sides = null;
+			// Checks if the rooks have moved
+			if(Chess_Checkers.board[0][y] instanceof Rook)
+			{
+				Rook rook = (Rook) Chess_Checkers.board[0][y];
+				if(!rook.getMoved())
+				{
+					sides = -1;
+				}
+			}
+			if(Chess_Checkers.board[7][y] instanceof Rook)
+			{
+				Rook rook = (Rook) Chess_Checkers.board[7][y];
+				if(!rook.getMoved())
+				{
+					if(sides != null)
+						sides = 0;
+					else
+						sides = 1;
+				}
+			}
+			if(sides != null)
+			{
+				// Checks if the space between the king and rook(s) is empty
+				if(sides < 1)
+				{
+					if(Chess_Checkers.board[3][y] instanceof Empty)
+					{
+						if(Chess_Checkers.board[2][y] instanceof Empty)
+						{
+							if(Chess_Checkers.board[1][y] instanceof ChessPiece)
+							{
+								if(sides != 0)
+									sides = null;
+								else
+									sides = 1;
+							}
+						}
+						else
+						{
+							if(sides != 0)
+								sides = null;
+							else
+								sides = 1;
+						}
+					}
+					else
+					{
+						if(sides != 0)
+							sides = null;
+						else
+							sides = 1;
+					}
+				}
+				if(sides > -1)
+				{
+					if(Chess_Checkers.board[5][y] instanceof Empty)
+					{
+						if(Chess_Checkers.board[6][y] instanceof ChessPiece)
+						{
+							if(sides != 0)
+								sides = null;
+							else
+								sides = -1;
+						}
+					}
+					else
+					{
+						if(sides != 0)
+							sides = null;
+						else
+							sides = -1;
+					}
+				}
+				if(sides != null)
+				{
+					// King cannot move out of check
+					if(!ChessPiece.isKingInCheck(black))
+					{
+						// King cannot pass through or move into check
+						if(sides < 1)
+						{
+							Piece piece = Chess_Checkers.board[3][y];
+							Chess_Checkers.board[3][y] = this;
+							Chess_Checkers.board[4][y] = new Empty();
+							if(!ChessPiece.isKingInCheck(black))
+							{
+								Chess_Checkers.board[3][y] = piece;
+								piece = Chess_Checkers.board[2][y];
+								Chess_Checkers.board[2][y] = this;
+								if(ChessPiece.isKingInCheck(black))
+								{
+									if(sides != 0)
+										sides = null;
+									else
+										sides = 1;
+								}
+								Chess_Checkers.board[2][y] = piece;
+								Chess_Checkers.board[4][y] = this;
+							}
+							else
+							{
+								Chess_Checkers.board[3][y] = piece;
+								Chess_Checkers.board[4][y] = this;
+								if(sides != 0)
+									sides = null;
+								else
+									sides = 1;
+							}
+						}
+						if(sides > -1)
+						{
+							Piece piece = Chess_Checkers.board[5][y];
+							Chess_Checkers.board[5][y] = this;
+							Chess_Checkers.board[4][y] = new Empty();
+							if(!ChessPiece.isKingInCheck(black))
+							{
+								Chess_Checkers.board[5][y] = piece;
+								piece = Chess_Checkers.board[6][y];
+								Chess_Checkers.board[6][y] = this;
+								if(ChessPiece.isKingInCheck(black))
+								{
+									if(sides != 0)
+										sides = null;
+									else
+										sides = -1;
+								}
+								Chess_Checkers.board[6][y] = piece;
+								Chess_Checkers.board[4][y] = this;
+							}
+							else
+							{
+								Chess_Checkers.board[5][y] = piece;
+								Chess_Checkers.board[4][y] = this;
+								if(sides != 0)
+									sides = null;
+								else
+									sides = -1;
+							}
+						}
+					}
+					else
+					{
+						sides = null;
+					}
+					if(sides != null)
+					{
+						if(sides < 1)
+						{
+							validLocations.add(new Point(2, y));
+						}
+						if(sides > -1)
+						{
+							validLocations.add(new Point(6, y));
 						}
 					}
 				}

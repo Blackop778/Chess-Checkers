@@ -13,6 +13,8 @@ import blackop778.chess_checkers.Chess_Checkers;
 
 public class Rook extends ChessPiece
 {
+	private boolean moved;
+
 	public Rook(boolean black)
 	{
 		this.black = black;
@@ -39,6 +41,13 @@ public class Rook extends ChessPiece
 		{
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void move(int x, int y)
+	{
+		super.move(x, y);
+		moved = true;
 	}
 
 	@Override
@@ -122,5 +131,10 @@ public class Rook extends ChessPiece
 		Point[] array = new Point[0];
 		validLocations.trimToSize();
 		return validLocations.toArray(array);
+	}
+
+	public boolean getMoved()
+	{
+		return moved;
 	}
 }
