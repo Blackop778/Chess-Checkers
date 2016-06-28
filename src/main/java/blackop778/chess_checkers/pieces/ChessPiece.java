@@ -2,12 +2,18 @@ package blackop778.chess_checkers.pieces;
 
 import java.awt.Point;
 
+import javax.swing.JOptionPane;
+
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
 
 public abstract class ChessPiece extends Piece
 {
 	public abstract Point[] getValidLocations(int x, int y);
+
+	public static Point doubleMovePawn;
+
+	public static int pawnCaptureCount;
 
 	@Override
 	public void select(int x, int y)
@@ -34,6 +40,12 @@ public abstract class ChessPiece extends Piece
 	{
 		Chess_Checkers.unselectAll();
 		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		if(doubleMovePawn != null)
+		{
+			Pawn pawn = (Pawn) Chess_Checkers.board[doubleMovePawn.x][doubleMovePawn.y];
+			pawn.lastMoveDouble = false;
+			doubleMovePawn = null;
+		}
 		findSelfLoop: for(int i = 0; i < 8; i++)
 		{
 			for(int n = 0; n < 8; n++)
@@ -45,7 +57,54 @@ public abstract class ChessPiece extends Piece
 				}
 			}
 		}
+		if(Chess_Checkers.board[x][y] instanceof Empty)
+			pawnCaptureCount++;
+		else
+			pawnCaptureCount = 0;
 		Chess_Checkers.board[x][y] = this;
+		if(pawnCaptureCount == 50)
+		{
+			Chess_Checkers.gameOver = true;
+			JOptionPane.showMessageDialog(null,
+					"50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
+					"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else if(!canMove(!black))
+		{
+			Chess_Checkers.gameOver = true;
+			if(isKingInCheck(!black))
+			{
+				String winner = black ? "black" : "white";
+				JOptionPane.showMessageDialog(null,
+						"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
+						"A Champion has been decided", JOptionPane.INFORMATION_MESSAGE);
+			}
+			else
+			{
+				String cause = !black ? "black" : "white";
+				JOptionPane.showMessageDialog(null,
+						"The game is a draw because " + cause + " cannot move but isn't in check.",
+						"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+	}
+
+	public static boolean canMove(boolean black)
+	{
+		for(int x = 0; x < 8; x++)
+		{
+			for(int y = 0; y < 8; y++)
+			{
+				if(Chess_Checkers.board[x][y].black == black && Chess_Checkers.board[x][y] instanceof ChessPiece)
+				{
+					ChessPiece piece = (ChessPiece) Chess_Checkers.board[x][y];
+					if(!Utilities.isArrayEmpty(piece.getValidLocations(x, y)))
+						return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	public static final boolean isKingInCheck(boolean black)

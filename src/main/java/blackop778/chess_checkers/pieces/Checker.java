@@ -104,7 +104,7 @@ public class Checker extends CheckersPiece
 						// Make the piece(s) we jumped over's place(s) empty
 						Chess_Checkers.board[jump.getMidPoint().x][jump.getMidPoint().y] = new Empty();
 				}
-				// if we aren't moving the piece
+				// if we are jumping the piece
 				if(tree.getEndJump().getMidPoint() != null)
 				{
 					// Clear the last piece to be jumped over in the train
@@ -130,11 +130,11 @@ public class Checker extends CheckersPiece
 					kinged = true;
 				// Actually put ourselves on the board in the new place
 				Chess_Checkers.board[x][y] = this;
-				// Check if the other team has any possible moved
+				// Check if the other team has any possible moves
 				if(Utilities.isArrayEmpty(CheckersPiece.checkJumps(!black, true)))
 				{
 					Chess_Checkers.gameOver = true;
-					String winner = black ? "Black" : "Red";
+					String winner = black ? "black" : "red";
 					JOptionPane.showMessageDialog(null,
 							"Congratulations, " + winner
 									+ " wins. Exit this message and click on the board to restart.",

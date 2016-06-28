@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import blackop778.chess_checkers.graphics.Chess_CheckersFrame;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
+import blackop778.chess_checkers.pieces.ChessPiece;
 import blackop778.chess_checkers.pieces.Empty;
 import blackop778.chess_checkers.pieces.King;
 import blackop778.chess_checkers.pieces.Knight;
@@ -57,8 +58,9 @@ public abstract class Chess_Checkers
 
 		String input = JOptionPane.showInputDialog(null, "Enter 'chess' to play chess or 'checkers' to play checkers.",
 				"Which game?", JOptionPane.QUESTION_MESSAGE);
+		System.out.println(input);
 		if(input == null)
-			input = "null";
+			System.exit(0);
 		while(!input.equalsIgnoreCase("chess") && !input.equalsIgnoreCase("checkers"))
 		{
 			input = JOptionPane.showInputDialog(null, "Invalid input. Enter either 'chess' or 'checkers'.",
@@ -91,6 +93,8 @@ public abstract class Chess_Checkers
 		}
 		else
 		{
+			ChessPiece.doubleMovePawn = null;
+			ChessPiece.pawnCaptureCount = 0;
 			gameIsCheckers = false;
 			blackTurn = false;
 			for(int i = 0; i < board.length; i++)

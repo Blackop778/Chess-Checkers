@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.pieces.ChessPiece;
 
 @SuppressWarnings("serial")
 public class Chess_CheckersPanel extends JPanel
@@ -111,6 +112,30 @@ public class Chess_CheckersPanel extends JPanel
 			g.setColor(Color.BLACK);
 			g.drawString("Offer Surrender", 200, 35);
 			g.drawRect(200, 1, 205, 43);
+		}
+		if(!Chess_Checkers.gameIsCheckers)
+		{
+			g.setColor(Color.BLACK);
+			g.setFont(new Font(Font.SERIF, Font.PLAIN, 30));
+			g.drawString("Check: ", 415, 35);
+			if(ChessPiece.isKingInCheck(Chess_Checkers.blackTurn))
+			{
+				if(!ChessPiece.canMove(Chess_Checkers.blackTurn))
+				{
+					g.setColor(new Color(218, 165, 32));
+					g.setFont(new Font(Font.SERIF, Font.BOLD, 30));
+					g.drawString("MATE", 507, 35);
+				}
+				else
+				{
+					g.setColor(Color.RED);
+					g.drawString("true", 507, 35);
+				}
+			}
+			else
+			{
+				g.drawString("false", 507, 35);
+			}
 		}
 		for(int i = 0; i < 8; i++)
 		{

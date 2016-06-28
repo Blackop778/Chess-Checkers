@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
@@ -50,6 +51,12 @@ public class King extends ChessPiece
 	{
 		Chess_Checkers.unselectAll();
 		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		if(doubleMovePawn != null)
+		{
+			Pawn pawn = (Pawn) Chess_Checkers.board[doubleMovePawn.x][doubleMovePawn.y];
+			pawn.lastMoveDouble = false;
+			doubleMovePawn = null;
+		}
 		findSelfLoop: for(int i = 0; i < 8; i++)
 		{
 			for(int n = 0; n < 8; n++)
@@ -61,21 +68,41 @@ public class King extends ChessPiece
 				}
 			}
 		}
-		if(!moved && (x == 2 || x == 6))
+		if(!moved)
 		{
 			if(x == 2)
 			{
 				Chess_Checkers.board[3][y] = Chess_Checkers.board[0][y];
 				Chess_Checkers.board[0][y] = new Empty();
 			}
-			else
+			else if(x == 6)
 			{
 				Chess_Checkers.board[5][y] = Chess_Checkers.board[7][y];
 				Chess_Checkers.board[7][y] = new Empty();
 			}
 		}
+		if(Chess_Checkers.board[x][y] instanceof Empty)
+			pawnCaptureCount++;
+		else
+			pawnCaptureCount = 0;
 		Chess_Checkers.board[x][y] = this;
 		moved = true;
+
+		if(pawnCaptureCount == 50)
+		{
+			Chess_Checkers.gameOver = true;
+			JOptionPane.showMessageDialog(null,
+					"50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
+					"Draw", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else if(!canMove(!black))
+		{
+			Chess_Checkers.gameOver = true;
+			String winner = black ? "black" : "white";
+			JOptionPane.showMessageDialog(null,
+					"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
+					"A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	@Override
