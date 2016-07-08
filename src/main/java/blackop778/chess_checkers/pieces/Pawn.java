@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
@@ -81,17 +80,6 @@ public class Pawn extends ChessPiece
 				Chess_Checkers.board[x - 1][y + yOffset] = replacingPiece;
 				Chess_Checkers.board[x][y] = this;
 			}
-			if(Chess_Checkers.board[x - 1][y] instanceof Pawn && Chess_Checkers.board[x - 1][y].black != black)
-			{
-				if(Chess_Checkers.board[x - 1][y + yOffset] instanceof Empty)
-				{
-					Pawn pawn = (Pawn) Chess_Checkers.board[x - 1][y];
-					if(pawn.lastMoveDouble == true)
-					{
-						validLocations.add(new Point(x - 1, y + yOffset));
-					}
-				}
-			}
 		}
 		if(x + 1 < 8)
 		{
@@ -108,17 +96,7 @@ public class Pawn extends ChessPiece
 				Chess_Checkers.board[x + 1][y + yOffset] = replacingPiece;
 				Chess_Checkers.board[x][y] = this;
 			}
-			if(Chess_Checkers.board[x + 1][y] instanceof Pawn && Chess_Checkers.board[x + 1][y].black != black)
-			{
-				if(Chess_Checkers.board[x + 1][y + yOffset] instanceof Empty)
-				{
-					Pawn pawn = (Pawn) Chess_Checkers.board[x + 1][y];
-					if(pawn.lastMoveDouble == true)
-					{
-						validLocations.add(new Point(x + 1, y + yOffset));
-					}
-				}
-			}
+
 		}
 		if(lastMoveDouble == null)
 		{
@@ -136,10 +114,54 @@ public class Pawn extends ChessPiece
 				Chess_Checkers.board[x][y] = this;
 			}
 		}
+		Integer sides = canEnPassantCapture(x, y);
+		if(sides != null)
+		{
+			validLocations.add(new Point(x + sides, y + yOffset));
+		}
 
 		Point[] array = new Point[0];
 		validLocations.trimToSize();
 		return validLocations.toArray(array);
+	}
+
+	public Integer canEnPassantCapture(int x, int y)
+	{
+		// null means no captures possible, negative means left side, positive
+		// means right side
+		Integer sides = null;
+		int yOffset = black ? 1 : -1;
+
+		if(x + 1 < 8)
+		{
+			if(Chess_Checkers.board[x + 1][y] instanceof Pawn && Chess_Checkers.board[x + 1][y].black != black)
+			{
+				if(Chess_Checkers.board[x + 1][y + yOffset] instanceof Empty)
+				{
+					Pawn pawn = (Pawn) Chess_Checkers.board[x + 1][y];
+					if(pawn.lastMoveDouble == true)
+					{
+						sides = new Integer(1);
+					}
+				}
+			}
+		}
+		if(x - 1 > -1)
+		{
+			if(Chess_Checkers.board[x - 1][y] instanceof Pawn && Chess_Checkers.board[x - 1][y].black != black)
+			{
+				if(Chess_Checkers.board[x - 1][y + yOffset] instanceof Empty)
+				{
+					Pawn pawn = (Pawn) Chess_Checkers.board[x - 1][y];
+					if(pawn.lastMoveDouble == true)
+					{
+						sides = new Integer(-1);
+					}
+				}
+			}
+		}
+
+		return sides;
 	}
 
 	@Override
@@ -213,20 +235,6 @@ public class Pawn extends ChessPiece
 					break;
 			}
 		}
-		if(pawnCaptureCount == 50)
-		{
-			Chess_Checkers.gameOver = true;
-			JOptionPane.showMessageDialog(null,
-					"50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
-					"Draw", JOptionPane.INFORMATION_MESSAGE);
-		}
-		else if(!canMove(!black))
-		{
-			Chess_Checkers.gameOver = true;
-			String winner = black ? "black" : "white";
-			JOptionPane.showMessageDialog(null,
-					"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
-					"A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
-		}
+		endGameCheck();
 	}
 }

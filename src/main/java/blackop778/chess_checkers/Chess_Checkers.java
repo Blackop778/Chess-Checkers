@@ -58,7 +58,6 @@ public abstract class Chess_Checkers
 
 		String input = JOptionPane.showInputDialog(null, "Enter 'chess' to play chess or 'checkers' to play checkers.",
 				"Which game?", JOptionPane.QUESTION_MESSAGE);
-		System.out.println(input);
 		if(input == null)
 			System.exit(0);
 		while(!input.equalsIgnoreCase("chess") && !input.equalsIgnoreCase("checkers"))

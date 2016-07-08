@@ -1,11 +1,13 @@
 package blackop778.chess_checkers.pieces;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
+import blackop778.chess_checkers.chess.Snapshot;
 
 public abstract class ChessPiece extends Piece
 {
@@ -14,6 +16,8 @@ public abstract class ChessPiece extends Piece
 	public static Point doubleMovePawn;
 
 	public static int pawnCaptureCount;
+
+	public static ArrayList<Snapshot> snapshots;
 
 	@Override
 	public void select(int x, int y)
@@ -62,31 +66,7 @@ public abstract class ChessPiece extends Piece
 		else
 			pawnCaptureCount = 0;
 		Chess_Checkers.board[x][y] = this;
-		if(pawnCaptureCount == 50)
-		{
-			Chess_Checkers.gameOver = true;
-			JOptionPane.showMessageDialog(null,
-					"50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
-					"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
-		}
-		else if(!canMove(!black))
-		{
-			Chess_Checkers.gameOver = true;
-			if(isKingInCheck(!black))
-			{
-				String winner = black ? "black" : "white";
-				JOptionPane.showMessageDialog(null,
-						"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
-						"A Champion has been decided", JOptionPane.INFORMATION_MESSAGE);
-			}
-			else
-			{
-				String cause = !black ? "black" : "white";
-				JOptionPane.showMessageDialog(null,
-						"The game is a draw because " + cause + " cannot move but isn't in check.",
-						"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
-			}
-		}
+		endGameCheck();
 	}
 
 	public static boolean canMove(boolean black)
@@ -260,5 +240,34 @@ public abstract class ChessPiece extends Piece
 			}
 		}
 		return false;
+	}
+
+	public void endGameCheck()
+	{
+		if(pawnCaptureCount == 50)
+		{
+			Chess_Checkers.gameOver = true;
+			JOptionPane.showMessageDialog(null,
+					"50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
+					"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else if(!canMove(!black))
+		{
+			Chess_Checkers.gameOver = true;
+			if(isKingInCheck(!black))
+			{
+				String winner = black ? "black" : "white";
+				JOptionPane.showMessageDialog(null,
+						"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
+						"A Champion has been decided", JOptionPane.INFORMATION_MESSAGE);
+			}
+			else
+			{
+				String cause = !black ? "black" : "white";
+				JOptionPane.showMessageDialog(null,
+						"The game is a draw because " + cause + " cannot move but isn't in check.",
+						"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
 	}
 }

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
@@ -87,22 +86,7 @@ public class King extends ChessPiece
 			pawnCaptureCount = 0;
 		Chess_Checkers.board[x][y] = this;
 		moved = true;
-
-		if(pawnCaptureCount == 50)
-		{
-			Chess_Checkers.gameOver = true;
-			JOptionPane.showMessageDialog(null,
-					"50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
-					"Draw", JOptionPane.INFORMATION_MESSAGE);
-		}
-		else if(!canMove(!black))
-		{
-			Chess_Checkers.gameOver = true;
-			String winner = black ? "black" : "white";
-			JOptionPane.showMessageDialog(null,
-					"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
-					"A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
-		}
+		endGameCheck();
 	}
 
 	@Override
@@ -146,11 +130,32 @@ public class King extends ChessPiece
 				}
 			}
 		}
+
+		Integer sides = canCastle(x, y);
+		if(sides != null)
+		{
+			if(sides < 1)
+			{
+				validLocations.add(new Point(2, y));
+			}
+			if(sides > -1)
+			{
+				validLocations.add(new Point(6, y));
+			}
+		}
+
+		Point[] array = new Point[0];
+		validLocations.trimToSize();
+		return validLocations.toArray(array);
+	}
+
+	public Integer canCastle(int x, int y)
+	{
+		// Queen side is negative, King side is positive, both is 0, neither
+		// is null
+		Integer sides = null;
 		if(!moved)
 		{
-			// Queen side is negative, King side is positive, both is 0, neither
-			// is null
-			Byte sides = null;
 			// Checks if the rooks have moved
 			if(Chess_Checkers.board[0][y] instanceof Rook)
 			{
@@ -295,23 +300,10 @@ public class King extends ChessPiece
 					{
 						sides = null;
 					}
-					if(sides != null)
-					{
-						if(sides < 1)
-						{
-							validLocations.add(new Point(2, y));
-						}
-						if(sides > -1)
-						{
-							validLocations.add(new Point(6, y));
-						}
-					}
+
 				}
 			}
 		}
-
-		Point[] array = new Point[0];
-		validLocations.trimToSize();
-		return validLocations.toArray(array);
+		return sides;
 	}
 }
