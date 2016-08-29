@@ -71,7 +71,11 @@ public class Chess_CheckersPanel extends JPanel
 					if(response == JOptionPane.OK_OPTION)
 					{
 						Chess_Checkers.gameOver = true;
-						String winner = Chess_Checkers.blackTurn ? "Red" : "Black";
+						String winner;
+						if(Chess_Checkers.gameIsCheckers)
+							winner = Chess_Checkers.blackTurn ?  "Black" : "Red";
+						else
+							winner = Chess_Checkers.blackTurn ? "Black" : "White";
 						JOptionPane.showMessageDialog(null,
 								"Congratulations, " + winner
 										+ " wins. Exit this message and click on the board to restart.",

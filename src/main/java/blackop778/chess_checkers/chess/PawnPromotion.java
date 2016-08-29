@@ -83,7 +83,7 @@ class DialogWindow extends JPanel implements ActionListener
 		done.setMnemonic(1);
 
 		JLabel text = new JLabel();
-		text.setText("Pick what piece you want your pawn to be promoted to?");
+		text.setText("What piece do you want your pawn to be promoted to?");
 
 		add(text, BorderLayout.NORTH);
 		add(buttonPanel, BorderLayout.WEST);

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import blackop778.chess_checkers.chess.SnapshotStorage;
 import blackop778.chess_checkers.graphics.Chess_CheckersFrame;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
@@ -70,6 +71,7 @@ public abstract class Chess_Checkers
 
 		if(input.equalsIgnoreCase("checkers"))
 		{
+			SnapshotStorage.initialize(false);
 			gameIsCheckers = true;
 			blackTurn = true;
 			for(int i = 0; i < board.length; i++)
@@ -92,6 +94,7 @@ public abstract class Chess_Checkers
 		}
 		else
 		{
+			SnapshotStorage.initialize(true);
 			ChessPiece.doubleMovePawn = null;
 			ChessPiece.pawnCaptureCount = 0;
 			gameIsCheckers = false;
