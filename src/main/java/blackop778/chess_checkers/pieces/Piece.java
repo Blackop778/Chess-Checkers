@@ -16,5 +16,9 @@ public abstract class Piece
 
 	public abstract void select(int x, int y);
 
+	/**
+	 * @param x The x coordinate to move to
+	 * @param y The y coordinate to move to
+	 */
 	public abstract void move(int x, int y);
 }

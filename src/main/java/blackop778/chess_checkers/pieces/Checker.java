@@ -111,7 +111,7 @@ public class Checker extends CheckersPiece
 					Chess_Checkers.board[tree.getEndJump().getMidPoint().x][tree.getEndJump()
 							.getMidPoint().y] = new Empty();
 				}
-				// Find our current self in the board and make it empty
+				// Find our current square in the board and make it empty
 				findSelfLoop: for(int i = 0; i < 8; i++)
 				{
 					for(int n = 0; n < 8; n++)
@@ -147,9 +147,10 @@ public class Checker extends CheckersPiece
 	}
 
 	@Override
-	public Jump[] getJumpablePlaces(int x, int y, ArrayList<Integer> previousUIDs)
+	public Jump[] getJumpablePlaces(int x, int y)
 	{
 		ArrayList<Jump> places = new ArrayList<Jump>();
+		ArrayList<Integer> previousUIDs = new ArrayList<Integer>();
 
 		if((black || kinged) && y < 6)
 		{
@@ -160,16 +161,10 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x - 2][y + 2] instanceof Empty)
 					{
-
-						if(previousUIDs == null)
-							places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
-						else
+						Checker piece = (Checker) Chess_Checkers.board[x - 1][y + 1];
+						if(!previousUIDs.contains(piece.UID))
 						{
-							Checker piece = (Checker) Chess_Checkers.board[x - 1][y + 1];
-							if(!previousUIDs.contains(piece.UID))
-							{
-								places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
-							}
+							places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
 						}
 					}
 				}

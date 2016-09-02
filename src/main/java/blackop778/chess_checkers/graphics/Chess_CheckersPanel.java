@@ -10,6 +10,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.chess.Snapshot;
+import blackop778.chess_checkers.chess.SnapshotStorage;
 import blackop778.chess_checkers.pieces.ChessPiece;
 
 @SuppressWarnings("serial")
@@ -22,7 +24,6 @@ public class Chess_CheckersPanel extends JPanel
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				boolean doIt = false;
 				if(Chess_Checkers.gameOver)
 				{
 					Chess_Checkers.setupGame();
@@ -41,8 +42,13 @@ public class Chess_CheckersPanel extends JPanel
 					if(Chess_Checkers.board[x][y].possible)
 					{
 						Chess_Checkers.board[x][y].selector.move(x, y);
-						if(Chess_Checkers.offerSurrender)
-							doIt = true;
+						if(!Chess_Checkers.gameIsCheckers)
+						{
+							if(SnapshotStorage.addSnapshot(new Snapshot()))
+							{
+								Chess_Checkers.gameOver = true;
+							}
+						}
 					}
 					else
 					{
@@ -56,7 +62,7 @@ public class Chess_CheckersPanel extends JPanel
 					}
 				}
 				repaint();
-				if(doIt)
+				if(Chess_Checkers.offerSurrender)
 				{
 					String color;
 					if(!Chess_Checkers.blackTurn)
