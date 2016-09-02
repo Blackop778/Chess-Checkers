@@ -1,13 +1,11 @@
 package blackop778.chess_checkers.pieces;
 
 import java.awt.Point;
-import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
-import blackop778.chess_checkers.chess.Snapshot;
 
 public abstract class ChessPiece extends Piece
 {
@@ -17,7 +15,7 @@ public abstract class ChessPiece extends Piece
 
 	public static int pawnCaptureCount;
 
-	public static ArrayList<Snapshot> snapshots;
+	public static boolean threefoldRepetition;
 
 	@Override
 	public void select(int x, int y)

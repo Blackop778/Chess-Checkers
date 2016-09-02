@@ -21,6 +21,11 @@ public abstract class SnapshotStorage
 		}
 	}
 	
+	/**
+	 * 
+	 * @param shot The snapshot to add
+	 * @return true if the board has been repeated 3 times, else false
+	 */
 	public static boolean addSnapshot(Snapshot shot)
 	{
 		int index = snapshots.indexOf(shot);
@@ -31,7 +36,11 @@ public abstract class SnapshotStorage
 		}
 		else
 		{
-			count.get(index)
+			if(index == 2)
+				return true;
+			count.set(index, (byte) (count.get(index) + 1));
 		}
+		
+		return false;
 	}
 }

@@ -23,11 +23,8 @@ public abstract class Chess_Checkers
 	public static Piece[][] board;
 
 	public static boolean blackTurn;
-
 	public static boolean gameOver;
-
 	public static boolean gameIsCheckers;
-
 	public static boolean offerSurrender;
 
 	public static void main(String[] args)
@@ -71,6 +68,7 @@ public abstract class Chess_Checkers
 
 		if(input.equalsIgnoreCase("checkers"))
 		{
+			ChessPiece.threefoldRepetition = false;
 			SnapshotStorage.initialize(false);
 			gameIsCheckers = true;
 			blackTurn = true;
@@ -94,6 +92,7 @@ public abstract class Chess_Checkers
 		}
 		else
 		{
+			ChessPiece.threefoldRepetition = true;
 			SnapshotStorage.initialize(true);
 			ChessPiece.doubleMovePawn = null;
 			ChessPiece.pawnCaptureCount = 0;
