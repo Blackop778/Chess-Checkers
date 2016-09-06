@@ -17,7 +17,7 @@ public abstract class CheckersPiece extends Piece
 
 	public abstract JumpTree[] getValidLocations(int x, int y);
 
-	public abstract Jump[] getJumpablePlaces(int x, int y);
+	public abstract Jump[] getJumpablePlaces(int x, int y, ArrayList<Integer> previousUIDs);
 
 	public abstract Jump[] getMoveablePlaces(int x, int y);
 

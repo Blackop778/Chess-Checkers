@@ -147,10 +147,9 @@ public class Checker extends CheckersPiece
 	}
 
 	@Override
-	public Jump[] getJumpablePlaces(int x, int y)
+	public Jump[] getJumpablePlaces(int x, int y, ArrayList<Integer> previousUIDs)
 	{
 		ArrayList<Jump> places = new ArrayList<Jump>();
-		ArrayList<Integer> previousUIDs = new ArrayList<Integer>();
 
 		if((black || kinged) && y < 6)
 		{
@@ -161,10 +160,15 @@ public class Checker extends CheckersPiece
 				{
 					if(Chess_Checkers.board[x - 2][y + 2] instanceof Empty)
 					{
-						Checker piece = (Checker) Chess_Checkers.board[x - 1][y + 1];
-						if(!previousUIDs.contains(piece.UID))
-						{
+						if(previousUIDs == null)
 							places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
+						else
+						{
+							Checker piece = (Checker) Chess_Checkers.board[x - 1][y + 1];
+							if(!previousUIDs.contains(piece.UID))
+							{
+								places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
+							}
 						}
 					}
 				}
