@@ -38,7 +38,7 @@ public abstract class CheckersPiece extends Piece
 				if(piece instanceof CheckersPiece && piece.black == black)
 				{
 					CheckersPiece checker = (CheckersPiece) piece;
-					if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y)))
+					if(!Utilities.isArrayEmpty(checker.getJumpablePlaces(x, y, null)))
 					{
 						jumpers.add(checker);
 					}
