@@ -90,4 +90,27 @@ public class Snapshot
 			}
 		}
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(!(obj instanceof Snapshot))
+		{
+			return false;
+		}
+		else
+		{
+			Snapshot other = (Snapshot) obj;
+			for(int x = 0; x < 8; x++)
+			{
+				for(int y=0; y < 9; y++)
+				{
+					if(!(board[x][y] == other.board[x][y]))
+						return false;
+				}
+			}
+			
+			return true;
+		}
+	}
 }

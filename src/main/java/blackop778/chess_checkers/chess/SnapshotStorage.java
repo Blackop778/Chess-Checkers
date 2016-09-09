@@ -28,6 +28,8 @@ public abstract class SnapshotStorage
 	 */
 	public static boolean addSnapshot(Snapshot shot)
 	{
+		ArrayList<Snapshot> snaps = snapshots;
+		ArrayList<Byte> counts = count;
 		int index = snapshots.indexOf(shot);
 		if(index == -1)
 		{
@@ -36,7 +38,7 @@ public abstract class SnapshotStorage
 		}
 		else
 		{
-			if(index == 2)
+			if(index == 0)
 				return true;
 			count.set(index, (byte) (count.get(index) + 1));
 		}
