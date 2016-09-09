@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
-import blackop778.chess_checkers.Utilities;
 
 public class King extends ChessPiece
 {
@@ -49,7 +48,7 @@ public class King extends ChessPiece
 	public void move(int x, int y)
 	{
 		Chess_Checkers.unselectAll();
-		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
 		if(doubleMovePawn != null)
 		{
 			Pawn pawn = (Pawn) Chess_Checkers.board[doubleMovePawn.x][doubleMovePawn.y];

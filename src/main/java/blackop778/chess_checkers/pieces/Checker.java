@@ -88,7 +88,7 @@ public class Checker extends CheckersPiece
 		// Reset possible spots for the next piece to move
 		Chess_Checkers.unselectAll();
 		// Change the turn to the opposite player
-		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
 		for(JumpTree tree : lastValidLocations)
 		{
 			// Find which jumptree we're actually following

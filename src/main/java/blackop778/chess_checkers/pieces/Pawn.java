@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
-import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.chess.PawnPromotion;
 
 public class Pawn extends ChessPiece
@@ -168,7 +167,7 @@ public class Pawn extends ChessPiece
 	public void move(int x, int y)
 	{
 		Chess_Checkers.unselectAll();
-		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
 		pawnCaptureCount = 0;
 		if(doubleMovePawn != null)
 		{

@@ -41,7 +41,7 @@ public abstract class ChessPiece extends Piece
 	public void move(int x, int y)
 	{
 		Chess_Checkers.unselectAll();
-		Chess_Checkers.blackTurn = Utilities.opposite(Chess_Checkers.blackTurn);
+		Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
 		if(doubleMovePawn != null)
 		{
 			Pawn pawn = (Pawn) Chess_Checkers.board[doubleMovePawn.x][doubleMovePawn.y];

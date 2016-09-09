@@ -47,6 +47,9 @@ public class Chess_CheckersPanel extends JPanel
 							if(SnapshotStorage.addSnapshot(new Snapshot()))
 							{
 								Chess_Checkers.gameOver = true;
+								JOptionPane.showMessageDialog(null, "Threefold repitition has occured, and the game is"
+										+ " a draw. Click on the board after exiting this message to start a new game.",
+										"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
 							}
 						}
 					}

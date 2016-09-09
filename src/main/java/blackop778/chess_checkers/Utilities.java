@@ -44,12 +44,4 @@ public abstract class Utilities
 
 		return false;
 	}
-
-	public static boolean opposite(boolean value)
-	{
-		if(value)
-			return false;
-		else
-			return true;
-	}
 }

@@ -103,7 +103,7 @@ public class Snapshot
 			Snapshot other = (Snapshot) obj;
 			for(int x = 0; x < 8; x++)
 			{
-				for(int y=0; y < 9; y++)
+				for(int y = 0; y < 8; y++)
 				{
 					if(!(board[x][y] == other.board[x][y]))
 						return false;
