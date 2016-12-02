@@ -1,8 +1,18 @@
 package blackop778.chess_checkers.net;
 
+import java.awt.Point;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.Utilities;
+import blackop778.chess_checkers.checkers.Jump;
+import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.SnapshotStorage;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
+import blackop778.chess_checkers.pieces.CheckersPiece;
 import blackop778.chess_checkers.pieces.ChessPiece;
 import blackop778.chess_checkers.pieces.Empty;
 import blackop778.chess_checkers.pieces.King;
@@ -104,6 +114,68 @@ public class Client extends ChannelInboundHandlerAdapter {
 	}
     }
 
+    public void select(Point point, Piece selector) {
+	select(point.x, point.y, selector);
+    }
+
+    public void select(int x, int y, Piece selector) {
+	board[x][y].possible = true;
+	board[x][y].selector = selector;
+    }
+
+    public void moveChecker(int x, int y, Checker checker) {
+	// Reset possible spots for the next piece to move
+	Chess_Checkers.client.unselectAll();
+	// Change the turn to the opposite player
+	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
+	for (JumpTree tree : checker.lastValidLocations) {
+	    // Find which jumptree we're actually following
+	    if (x == tree.getEndJump().getEndPoint().x && y == tree.getEndJump().getEndPoint().y) {
+		ArrayList<Jump> midJumpsAL = tree.getMidJumps();
+		Jump[] midJumps = new Jump[0];
+		// Convert the mid jumps to an array for easier handling
+		midJumps = midJumpsAL.toArray(midJumps);
+		for (Jump jump : midJumps) {
+		    if (jump != null)
+			// Make the piece(s) we jumped over's place(s) empty
+			board[jump.getMidPoint().x][jump.getMidPoint().y] = new Empty();
+		}
+		// if we are jumping the piece
+		if (tree.getEndJump().getMidPoint() != null) {
+		    // Clear the last piece to be jumped over in the train
+		    board[tree.getEndJump().getMidPoint().x][tree.getEndJump().getMidPoint().y] = new Empty();
+		}
+		// Find our current square in the board and make it empty
+		findSelfLoop: for (int i = 0; i < 8; i++) {
+		    for (int n = 0; n < 8; n++) {
+			if (board[i][n].equals(checker)) {
+			    board[i][n] = new Empty();
+			    break findSelfLoop;
+			}
+		    }
+		}
+		// Check if we should be kinged
+		if (black && y == 7)
+		    checker.kinged = true;
+		else if (!black && y == 0)
+		    checker.kinged = true;
+		// Actually put ourselves on the board in the new place
+		board[x][y] = checker;
+		// Check if the other team has any possible moves
+		if (Utilities.isArrayEmpty(CheckersPiece.checkJumps(!black, true))) {
+		    Chess_Checkers.gameOver = true;
+		    String winner = black ? "black" : "red";
+		    JOptionPane.showMessageDialog(null,
+			    "Congratulations, " + winner
+				    + " wins. Exit this message and click on the board to restart.",
+			    "A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
+		}
+		// End the search for the jumptree we took and end the method
+		break;
+	    }
+	}
+    }
+
     public void unselectAll() {
 	for (Piece[] row : board) {
 	    for (Piece piece : row) {
@@ -117,7 +189,7 @@ public class Client extends ChannelInboundHandlerAdapter {
 	return board;
     }
 
-    public boolean isTurn() {
+    public boolean getTurn() {
 	return turn;
     }
 }

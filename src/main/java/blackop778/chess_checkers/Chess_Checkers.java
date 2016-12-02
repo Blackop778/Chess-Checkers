@@ -11,6 +11,7 @@ import blackop778.chess_checkers.net.Client;
 public abstract class Chess_Checkers {
     public static Client client;
     public static boolean offerSurrender;
+    public static boolean gameOver = false;
 
     public static void main(String[] args) {
 	setupGame();
