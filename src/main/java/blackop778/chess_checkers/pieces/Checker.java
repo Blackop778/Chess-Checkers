@@ -70,17 +70,17 @@ public class Checker extends CheckersPiece {
 
     @Override
     public Jump[] getJumpablePlaces(int x, int y, ArrayList<Integer> previousUIDs) {
-	ArrayList<Jump> places = new ArrayList<Jump>();
+	ArrayList<Jump> places = new ArrayList<>();
+	Piece[][] board = Chess_Checkers.client.getBoard();
 
 	if ((black || kinged) && y < 6) {
 	    if (x > 1) {
-		if (Chess_Checkers.board[x - 1][y + 1].black != black
-			&& !(Chess_Checkers.board[x - 1][y + 1] instanceof Empty)) {
-		    if (Chess_Checkers.board[x - 2][y + 2] instanceof Empty) {
-			if (previousUIDs == null)
+		if (board[x - 1][y + 1].black != black && !(board[x - 1][y + 1] instanceof Empty)) {
+		    if (board[x - 2][y + 2] instanceof Empty) {
+			if (previousUIDs == null) {
 			    places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
-			else {
-			    Checker piece = (Checker) Chess_Checkers.board[x - 1][y + 1];
+			} else {
+			    Checker piece = (Checker) board[x - 1][y + 1];
 			    if (!previousUIDs.contains(piece.UID)) {
 				places.add(new Jump(new Point(x - 1, y + 1), new Point(x - 2, y + 2)));
 			    }
@@ -89,13 +89,12 @@ public class Checker extends CheckersPiece {
 		}
 	    }
 	    if (x < 6) {
-		if (Chess_Checkers.board[x + 1][y + 1].black != black
-			&& !(Chess_Checkers.board[x + 1][y + 1] instanceof Empty)) {
-		    if (Chess_Checkers.board[x + 2][y + 2] instanceof Empty) {
-			if (previousUIDs == null)
+		if (board[x + 1][y + 1].black != black && !(board[x + 1][y + 1] instanceof Empty)) {
+		    if (board[x + 2][y + 2] instanceof Empty) {
+			if (previousUIDs == null) {
 			    places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
-			else {
-			    Checker piece = (Checker) Chess_Checkers.board[x + 1][y + 1];
+			} else {
+			    Checker piece = (Checker) board[x + 1][y + 1];
 			    if (!previousUIDs.contains(piece.UID)) {
 				places.add(new Jump(new Point(x + 1, y + 1), new Point(x + 2, y + 2)));
 			    }
@@ -106,13 +105,12 @@ public class Checker extends CheckersPiece {
 	}
 	if ((!black || kinged) && y > 1) {
 	    if (x > 1) {
-		if (Chess_Checkers.board[x - 1][y - 1].black != black
-			&& !(Chess_Checkers.board[x - 1][y - 1] instanceof Empty)) {
-		    if (Chess_Checkers.board[x - 2][y - 2] instanceof Empty) {
-			if (previousUIDs == null)
+		if (board[x - 1][y - 1].black != black && !(board[x - 1][y - 1] instanceof Empty)) {
+		    if (board[x - 2][y - 2] instanceof Empty) {
+			if (previousUIDs == null) {
 			    places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
-			else {
-			    Checker piece = (Checker) Chess_Checkers.board[x - 1][y - 1];
+			} else {
+			    Checker piece = (Checker) board[x - 1][y - 1];
 			    if (!previousUIDs.contains(piece.UID)) {
 				places.add(new Jump(new Point(x - 1, y - 1), new Point(x - 2, y - 2)));
 			    }
@@ -121,13 +119,12 @@ public class Checker extends CheckersPiece {
 		}
 	    }
 	    if (x < 6) {
-		if (Chess_Checkers.board[x + 1][y - 1].black != black
-			&& !(Chess_Checkers.board[x + 1][y - 1] instanceof Empty)) {
-		    if (Chess_Checkers.board[x + 2][y - 2] instanceof Empty) {
-			if (previousUIDs == null)
+		if (board[x + 1][y - 1].black != black && !(board[x + 1][y - 1] instanceof Empty)) {
+		    if (board[x + 2][y - 2] instanceof Empty) {
+			if (previousUIDs == null) {
 			    places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
-			else {
-			    Checker piece = (Checker) Chess_Checkers.board[x + 1][y - 1];
+			} else {
+			    Checker piece = (Checker) board[x + 1][y - 1];
 			    if (!previousUIDs.contains(piece.UID)) {
 				places.add(new Jump(new Point(x + 1, y - 1), new Point(x + 2, y - 2)));
 			    }
@@ -144,28 +141,29 @@ public class Checker extends CheckersPiece {
 
     @Override
     public Jump[] getMoveablePlaces(int x, int y) {
-	ArrayList<Jump> places = new ArrayList<Jump>();
+	ArrayList<Jump> places = new ArrayList<>();
+	Piece[][] board = Chess_Checkers.client.getBoard();
 	if (Utilities.isArrayEmpty(CheckersPiece.checkJumps(black, false))) {
 	    if ((black || kinged) && y != 7) {
 		if (x > 0) {
-		    if (Chess_Checkers.board[x - 1][y + 1] instanceof Empty) {
+		    if (board[x - 1][y + 1] instanceof Empty) {
 			places.add(new Jump(new Point(x - 1, y + 1)));
 		    }
 		}
 		if (x < 7) {
-		    if (Chess_Checkers.board[x + 1][y + 1] instanceof Empty) {
+		    if (board[x + 1][y + 1] instanceof Empty) {
 			places.add(new Jump(new Point(x + 1, y + 1)));
 		    }
 		}
 	    }
 	    if ((!black || kinged) && y != 0) {
 		if (x > 0) {
-		    if (Chess_Checkers.board[x - 1][y - 1] instanceof Empty) {
+		    if (board[x - 1][y - 1] instanceof Empty) {
 			places.add(new Jump(new Point(x - 1, y - 1)));
 		    }
 		}
 		if (x < 7) {
-		    if (Chess_Checkers.board[x + 1][y - 1] instanceof Empty) {
+		    if (board[x + 1][y - 1] instanceof Empty) {
 			places.add(new Jump(new Point(x + 1, y - 1)));
 		    }
 		}

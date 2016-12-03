@@ -13,7 +13,7 @@ import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.chess.PawnPromotion;
 
 public class Pawn extends ChessPiece {
-    protected Boolean lastMoveDouble;
+    public Boolean lastMoveDouble;
 
     public Pawn(boolean black) {
 	this.black = black;
@@ -40,7 +40,7 @@ public class Pawn extends ChessPiece {
 
     @Override
     public Point[] getValidLocations(int x, int y) {
-	ArrayList<Point> validLocations = new ArrayList<Point>();
+	ArrayList<Point> validLocations = new ArrayList<>();
 
 	int yOffset = black ? 1 : -1;
 
@@ -169,9 +169,9 @@ public class Pawn extends ChessPiece {
 		}
 	    }
 	}
-	if (y != 7 && y != 0)
+	if (y != 7 && y != 0) {
 	    Chess_Checkers.board[x][y] = this;
-	else {
+	} else {
 	    PawnPromotion promoter = new PawnPromotion();
 	    String promotion = promoter.result;
 	    switch (promotion) {

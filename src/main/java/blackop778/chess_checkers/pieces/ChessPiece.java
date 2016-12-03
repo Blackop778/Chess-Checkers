@@ -18,8 +18,8 @@ public abstract class ChessPiece extends Piece {
 
     @Override
     public void select(int x, int y) {
-	if (black == Chess_Checkers.blackTurn) {
-	    Chess_Checkers.unselectAll();
+	if (black == Chess_Checkers.client.black) {
+	    Chess_Checkers.client.unselectAll();
 	    Point[] locations = getValidLocations(x, y);
 	    for (Point point : locations) {
 		if (point != null) {
@@ -34,27 +34,7 @@ public abstract class ChessPiece extends Piece {
     @Override
     // Remember King and Pawn have their own implementations so edit them too
     public void move(int x, int y) {
-	Chess_Checkers.unselectAll();
-	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
-	if (doubleMovePawn != null) {
-	    Pawn pawn = (Pawn) Chess_Checkers.board[doubleMovePawn.x][doubleMovePawn.y];
-	    pawn.lastMoveDouble = false;
-	    doubleMovePawn = null;
-	}
-	findSelfLoop: for (int i = 0; i < 8; i++) {
-	    for (int n = 0; n < 8; n++) {
-		if (Chess_Checkers.board[i][n].equals(this)) {
-		    Chess_Checkers.board[i][n] = new Empty();
-		    break findSelfLoop;
-		}
-	    }
-	}
-	if (Chess_Checkers.board[x][y] instanceof Empty)
-	    pawnCaptureCount++;
-	else
-	    pawnCaptureCount = 0;
-	Chess_Checkers.board[x][y] = this;
-	endGameCheck();
+
     }
 
     public static boolean canMove(boolean black) {
@@ -109,14 +89,12 @@ public abstract class ChessPiece extends Piece {
 					    if (i < 4) {
 						// If it can murder us
 						if (Chess_Checkers.board[currentX][currentY] instanceof Rook
-							|| Chess_Checkers.board[currentX][currentY] instanceof Queen) {
+							|| Chess_Checkers.board[currentX][currentY] instanceof Queen)
 						    return true;
-						}
 					    } else {
 						if (Chess_Checkers.board[currentX][currentY] instanceof Bishop
-							|| Chess_Checkers.board[currentX][currentY] instanceof Queen) {
+							|| Chess_Checkers.board[currentX][currentY] instanceof Queen)
 						    return true;
-						}
 					    }
 					}
 				    }
@@ -202,9 +180,8 @@ public abstract class ChessPiece extends Piece {
 			    // the board
 			    if (y + yChange > -1 && y + yChange < 8) {
 				if (Chess_Checkers.board[x + xChange][y + yChange].black != black
-					&& Chess_Checkers.board[x + xChange][y + yChange] instanceof Knight) {
+					&& Chess_Checkers.board[x + xChange][y + yChange] instanceof Knight)
 				    return true;
-				}
 			    }
 			}
 		    }
@@ -217,21 +194,21 @@ public abstract class ChessPiece extends Piece {
 	return false;
     }
 
-    public void endGameCheck() {
+    public static void endGameCheck() {
 	if (pawnCaptureCount == 50) {
 	    Chess_Checkers.gameOver = true;
 	    JOptionPane.showMessageDialog(null,
 		    "50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
 		    "Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
-	} else if (!canMove(!black)) {
+	} else if (!canMove(!Chess_Checkers.client.black)) {
 	    Chess_Checkers.gameOver = true;
-	    if (isKingInCheck(!black)) {
-		String winner = black ? "black" : "white";
+	    if (isKingInCheck(!Chess_Checkers.client.black)) {
+		String winner = Chess_Checkers.client.black ? "black" : "white";
 		JOptionPane.showMessageDialog(null,
 			"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
 			"A Champion has been decided", JOptionPane.INFORMATION_MESSAGE);
 	    } else {
-		String cause = !black ? "black" : "white";
+		String cause = !Chess_Checkers.client.black ? "black" : "white";
 		JOptionPane.showMessageDialog(null,
 			"The game is a draw because " + cause + " cannot move but isn't in check.",
 			"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);

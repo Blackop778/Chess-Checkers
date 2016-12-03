@@ -136,9 +136,10 @@ public class Client extends ChannelInboundHandlerAdapter {
 		// Convert the mid jumps to an array for easier handling
 		midJumps = midJumpsAL.toArray(midJumps);
 		for (Jump jump : midJumps) {
-		    if (jump != null)
+		    if (jump != null) {
 			// Make the piece(s) we jumped over's place(s) empty
 			board[jump.getMidPoint().x][jump.getMidPoint().y] = new Empty();
+		    }
 		}
 		// if we are jumping the piece
 		if (tree.getEndJump().getMidPoint() != null) {
@@ -155,10 +156,11 @@ public class Client extends ChannelInboundHandlerAdapter {
 		    }
 		}
 		// Check if we should be kinged
-		if (black && y == 7)
+		if (black && y == 7) {
 		    checker.kinged = true;
-		else if (!black && y == 0)
+		} else if (!black && y == 0) {
 		    checker.kinged = true;
+		}
 		// Actually put ourselves on the board in the new place
 		board[x][y] = checker;
 		// Check if the other team has any possible moves
@@ -174,6 +176,31 @@ public class Client extends ChannelInboundHandlerAdapter {
 		break;
 	    }
 	}
+    }
+
+    public void moveChess(int x, int y, ChessPiece piece) {
+	Chess_Checkers.client.unselectAll();
+	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
+	if (ChessPiece.doubleMovePawn != null) {
+	    Pawn pawn = (Pawn) board[ChessPiece.doubleMovePawn.x][ChessPiece.doubleMovePawn.y];
+	    pawn.lastMoveDouble = false;
+	    ChessPiece.doubleMovePawn = null;
+	}
+	findSelfLoop: for (int i = 0; i < 8; i++) {
+	    for (int n = 0; n < 8; n++) {
+		if (board[i][n].equals(this)) {
+		    board[i][n] = new Empty();
+		    break findSelfLoop;
+		}
+	    }
+	}
+	if (board[x][y] instanceof Empty) {
+	    ChessPiece.pawnCaptureCount++;
+	} else {
+	    ChessPiece.pawnCaptureCount = 0;
+	}
+	board[x][y] = piece;
+	ChessPiece.endGameCheck();
     }
 
     public void unselectAll() {
