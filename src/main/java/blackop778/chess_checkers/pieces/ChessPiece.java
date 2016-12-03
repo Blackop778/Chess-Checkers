@@ -18,14 +18,15 @@ public abstract class ChessPiece extends Piece {
 
     @Override
     public void select(int x, int y) {
+	Piece[][] board = Chess_Checkers.client.getBoard();
 	if (black == Chess_Checkers.client.black) {
 	    Chess_Checkers.client.unselectAll();
 	    Point[] locations = getValidLocations(x, y);
 	    for (Point point : locations) {
 		if (point != null) {
 		    selected = true;
-		    Chess_Checkers.board[point.x][point.y].possible = true;
-		    Chess_Checkers.board[point.x][point.y].selector = this;
+		    board[point.x][point.y].possible = true;
+		    board[point.x][point.y].selector = this;
 		}
 	    }
 	}
@@ -34,14 +35,15 @@ public abstract class ChessPiece extends Piece {
     @Override
     // Remember King and Pawn have their own implementations so edit them too
     public void move(int x, int y) {
-
+	Chess_Checkers.client.moveChess(x, y, this);
     }
 
     public static boolean canMove(boolean black) {
+	Piece[][] board = Chess_Checkers.client.getBoard();
 	for (int x = 0; x < 8; x++) {
 	    for (int y = 0; y < 8; y++) {
-		if (Chess_Checkers.board[x][y].black == black && Chess_Checkers.board[x][y] instanceof ChessPiece) {
-		    ChessPiece piece = (ChessPiece) Chess_Checkers.board[x][y];
+		if (board[x][y].black == black && board[x][y] instanceof ChessPiece) {
+		    ChessPiece piece = (ChessPiece) board[x][y];
 		    if (!Utilities.isArrayEmpty(piece.getValidLocations(x, y)))
 			return true;
 		}
@@ -52,9 +54,10 @@ public abstract class ChessPiece extends Piece {
     }
 
     public static final boolean isKingInCheck(boolean black) {
+	Piece[][] board = Chess_Checkers.client.getBoard();
 	for (int x = 0; x < 8; x++) {
 	    for (int y = 0; y < 8; y++) {
-		if (Chess_Checkers.board[x][y] instanceof King && Chess_Checkers.board[x][y].black == black) {
+		if (board[x][y] instanceof King && board[x][y].black == black) {
 		    int currentX = x;
 		    int currentY = y;
 		    int changeX = 0;
@@ -72,28 +75,28 @@ public abstract class ChessPiece extends Piece {
 				    // Check kings
 				    if (first) {
 					first = false;
-					if (Chess_Checkers.board[currentX][currentY] instanceof King) {
-					    if (Chess_Checkers.board[currentX][currentY].black != black)
+					if (board[currentX][currentY] instanceof King) {
+					    if (board[currentX][currentY].black != black)
 						return true;
 					}
 				    }
 				    // If we found a piece
-				    if (Chess_Checkers.board[currentX][currentY] instanceof ChessPiece) {
+				    if (board[currentX][currentY] instanceof ChessPiece) {
 					done = true;
 					// If the piece we found is a different
 					// color
-					if (Chess_Checkers.board[currentX][currentY].black != black) {
+					if (board[currentX][currentY].black != black) {
 					    // No sense in doing extra checks
 					    // (Oh no! One extra OR statement!
 					    // The horror!)
 					    if (i < 4) {
 						// If it can murder us
-						if (Chess_Checkers.board[currentX][currentY] instanceof Rook
-							|| Chess_Checkers.board[currentX][currentY] instanceof Queen)
+						if (board[currentX][currentY] instanceof Rook
+							|| board[currentX][currentY] instanceof Queen)
 						    return true;
 					    } else {
-						if (Chess_Checkers.board[currentX][currentY] instanceof Bishop
-							|| Chess_Checkers.board[currentX][currentY] instanceof Queen)
+						if (board[currentX][currentY] instanceof Bishop
+							|| board[currentX][currentY] instanceof Queen)
 						    return true;
 					    }
 					}
@@ -144,26 +147,22 @@ public abstract class ChessPiece extends Piece {
 		    if (black) {
 			if (y + 1 < 8) {
 			    if (x - 1 > -1) {
-				if (Chess_Checkers.board[x - 1][y + 1].black != black
-					&& Chess_Checkers.board[x - 1][y + 1] instanceof Pawn)
+				if (board[x - 1][y + 1].black != black && board[x - 1][y + 1] instanceof Pawn)
 				    return true;
 			    }
 			    if (x + 1 < 8) {
-				if (Chess_Checkers.board[x + 1][y + 1].black != black
-					&& Chess_Checkers.board[x + 1][y + 1] instanceof Pawn)
+				if (board[x + 1][y + 1].black != black && board[x + 1][y + 1] instanceof Pawn)
 				    return true;
 			    }
 			}
 		    } else {
 			if (y - 1 > -1) {
 			    if (x - 1 > -1) {
-				if (Chess_Checkers.board[x - 1][y - 1].black != black
-					&& Chess_Checkers.board[x - 1][y - 1] instanceof Pawn)
+				if (board[x - 1][y - 1].black != black && board[x - 1][y - 1] instanceof Pawn)
 				    return true;
 			    }
 			    if (x + 1 < 8) {
-				if (Chess_Checkers.board[x + 1][y - 1].black != black
-					&& Chess_Checkers.board[x + 1][y - 1] instanceof Pawn)
+				if (board[x + 1][y - 1].black != black && board[x + 1][y - 1] instanceof Pawn)
 				    return true;
 			    }
 			}
@@ -179,8 +178,8 @@ public abstract class ChessPiece extends Piece {
 			    // Ensure the changes remain within the borders of
 			    // the board
 			    if (y + yChange > -1 && y + yChange < 8) {
-				if (Chess_Checkers.board[x + xChange][y + yChange].black != black
-					&& Chess_Checkers.board[x + xChange][y + yChange] instanceof Knight)
+				if (board[x + xChange][y + yChange].black != black
+					&& board[x + xChange][y + yChange] instanceof Knight)
 				    return true;
 			    }
 			}

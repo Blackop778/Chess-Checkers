@@ -41,57 +41,55 @@ public class Pawn extends ChessPiece {
     @Override
     public Point[] getValidLocations(int x, int y) {
 	ArrayList<Point> validLocations = new ArrayList<>();
+	Piece[][] board = Chess_Checkers.client.getBoard();
 
 	int yOffset = black ? 1 : -1;
 
-	if (Chess_Checkers.board[x][y + yOffset] instanceof Empty) {
-	    Piece replacingPiece = Chess_Checkers.board[x][y + yOffset];
-	    Chess_Checkers.board[x][y + yOffset] = this;
-	    Chess_Checkers.board[x][y] = new Empty();
+	if (board[x][y + yOffset] instanceof Empty) {
+	    Piece replacingPiece = board[x][y + yOffset];
+	    board[x][y + yOffset] = this;
+	    board[x][y] = new Empty();
 	    if (!isKingInCheck(black)) {
 		validLocations.add(new Point(x, y + yOffset));
 	    }
-	    Chess_Checkers.board[x][y + yOffset] = replacingPiece;
-	    Chess_Checkers.board[x][y] = this;
+	    board[x][y + yOffset] = replacingPiece;
+	    board[x][y] = this;
 	}
 	if (x - 1 > -1) {
-	    if (Chess_Checkers.board[x - 1][y + yOffset] instanceof ChessPiece
-		    && Chess_Checkers.board[x - 1][y + yOffset].black != black) {
-		Piece replacingPiece = Chess_Checkers.board[x - 1][y + yOffset];
-		Chess_Checkers.board[x - 1][y + yOffset] = this;
-		Chess_Checkers.board[x][y] = new Empty();
+	    if (board[x - 1][y + yOffset] instanceof ChessPiece && board[x - 1][y + yOffset].black != black) {
+		Piece replacingPiece = board[x - 1][y + yOffset];
+		board[x - 1][y + yOffset] = this;
+		board[x][y] = new Empty();
 		if (!isKingInCheck(black)) {
 		    validLocations.add(new Point(x - 1, y + yOffset));
 		}
-		Chess_Checkers.board[x - 1][y + yOffset] = replacingPiece;
-		Chess_Checkers.board[x][y] = this;
+		board[x - 1][y + yOffset] = replacingPiece;
+		board[x][y] = this;
 	    }
 	}
 	if (x + 1 < 8) {
-	    if (Chess_Checkers.board[x + 1][y + yOffset] instanceof ChessPiece
-		    && Chess_Checkers.board[x + 1][y + yOffset].black != black) {
-		Piece replacingPiece = Chess_Checkers.board[x + 1][y + yOffset];
-		Chess_Checkers.board[x + 1][y + yOffset] = this;
-		Chess_Checkers.board[x][y] = new Empty();
+	    if (board[x + 1][y + yOffset] instanceof ChessPiece && board[x + 1][y + yOffset].black != black) {
+		Piece replacingPiece = board[x + 1][y + yOffset];
+		board[x + 1][y + yOffset] = this;
+		board[x][y] = new Empty();
 		if (!isKingInCheck(black)) {
 		    validLocations.add(new Point(x + 1, y + yOffset));
 		}
-		Chess_Checkers.board[x + 1][y + yOffset] = replacingPiece;
-		Chess_Checkers.board[x][y] = this;
+		board[x + 1][y + yOffset] = replacingPiece;
+		board[x][y] = this;
 	    }
 
 	}
 	if (lastMoveDouble == null) {
-	    if (Chess_Checkers.board[x][y + yOffset] instanceof Empty
-		    && Chess_Checkers.board[x][y + (yOffset * 2)] instanceof Empty) {
-		Piece replacingPiece = Chess_Checkers.board[x][y + (yOffset * 2)];
-		Chess_Checkers.board[x][y + (yOffset * 2)] = this;
-		Chess_Checkers.board[x][y] = new Empty();
+	    if (board[x][y + yOffset] instanceof Empty && board[x][y + (yOffset * 2)] instanceof Empty) {
+		Piece replacingPiece = board[x][y + (yOffset * 2)];
+		board[x][y + (yOffset * 2)] = this;
+		board[x][y] = new Empty();
 		if (!isKingInCheck(black)) {
 		    validLocations.add(new Point(x, y + (yOffset * 2)));
 		}
-		Chess_Checkers.board[x][y + (yOffset * 2)] = replacingPiece;
-		Chess_Checkers.board[x][y] = this;
+		board[x][y + (yOffset * 2)] = replacingPiece;
+		board[x][y] = this;
 	    }
 	}
 	Integer sides = canEnPassantCapture(x, y);
@@ -109,11 +107,12 @@ public class Pawn extends ChessPiece {
 	// means right side
 	Integer sides = null;
 	int yOffset = black ? 1 : -1;
+	Piece[][] board = Chess_Checkers.client.getBoard();
 
 	if (x + 1 < 8) {
-	    if (Chess_Checkers.board[x + 1][y] instanceof Pawn && Chess_Checkers.board[x + 1][y].black != black) {
-		if (Chess_Checkers.board[x + 1][y + yOffset] instanceof Empty) {
-		    Pawn pawn = (Pawn) Chess_Checkers.board[x + 1][y];
+	    if (board[x + 1][y] instanceof Pawn && board[x + 1][y].black != black) {
+		if (board[x + 1][y + yOffset] instanceof Empty) {
+		    Pawn pawn = (Pawn) board[x + 1][y];
 		    if (pawn.lastMoveDouble == true) {
 			sides = new Integer(1);
 		    }
@@ -121,9 +120,9 @@ public class Pawn extends ChessPiece {
 	    }
 	}
 	if (x - 1 > -1) {
-	    if (Chess_Checkers.board[x - 1][y] instanceof Pawn && Chess_Checkers.board[x - 1][y].black != black) {
-		if (Chess_Checkers.board[x - 1][y + yOffset] instanceof Empty) {
-		    Pawn pawn = (Pawn) Chess_Checkers.board[x - 1][y];
+	    if (board[x - 1][y] instanceof Pawn && board[x - 1][y].black != black) {
+		if (board[x - 1][y + yOffset] instanceof Empty) {
+		    Pawn pawn = (Pawn) board[x - 1][y];
 		    if (pawn.lastMoveDouble == true) {
 			sides = new Integer(-1);
 		    }
@@ -140,25 +139,25 @@ public class Pawn extends ChessPiece {
 	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
 	pawnCaptureCount = 0;
 	if (doubleMovePawn != null) {
-	    Pawn pawn = (Pawn) Chess_Checkers.board[doubleMovePawn.x][doubleMovePawn.y];
+	    Pawn pawn = (Pawn) board[doubleMovePawn.x][doubleMovePawn.y];
 	    pawn.lastMoveDouble = false;
 	    doubleMovePawn = null;
 	}
-	if (Chess_Checkers.board[x][y] instanceof Empty) {
+	if (board[x][y] instanceof Empty) {
 	    if (black) {
-		if (Chess_Checkers.board[x][y - 1] instanceof Pawn && Chess_Checkers.board[x][y - 1].black != black) {
-		    Chess_Checkers.board[x][y - 1] = new Empty();
+		if (board[x][y - 1] instanceof Pawn && board[x][y - 1].black != black) {
+		    board[x][y - 1] = new Empty();
 		}
 	    } else {
-		if (Chess_Checkers.board[x][y + 1] instanceof Pawn && Chess_Checkers.board[x][y + 1].black != black) {
-		    Chess_Checkers.board[x][y + 1] = new Empty();
+		if (board[x][y + 1] instanceof Pawn && board[x][y + 1].black != black) {
+		    board[x][y + 1] = new Empty();
 		}
 	    }
 	}
 	findSelfLoop: for (int i = 0; i < 8; i++) {
 	    for (int n = 0; n < 8; n++) {
-		if (Chess_Checkers.board[i][n].equals(this)) {
-		    Chess_Checkers.board[i][n] = new Empty();
+		if (board[i][n].equals(this)) {
+		    board[i][n] = new Empty();
 		    if (n - y == 2 || y - n == 2) {
 			lastMoveDouble = new Boolean(true);
 			doubleMovePawn = new Point(x, y);
@@ -170,22 +169,22 @@ public class Pawn extends ChessPiece {
 	    }
 	}
 	if (y != 7 && y != 0) {
-	    Chess_Checkers.board[x][y] = this;
+	    board[x][y] = this;
 	} else {
 	    PawnPromotion promoter = new PawnPromotion();
 	    String promotion = promoter.result;
 	    switch (promotion) {
 	    case "Queen":
-		Chess_Checkers.board[x][y] = new Queen(black);
+		board[x][y] = new Queen(black);
 		break;
 	    case "Rook":
-		Chess_Checkers.board[x][y] = new Rook(black);
+		board[x][y] = new Rook(black);
 		break;
 	    case "Knight":
-		Chess_Checkers.board[x][y] = new Knight(black);
+		board[x][y] = new Knight(black);
 		break;
 	    case "Bishop":
-		Chess_Checkers.board[x][y] = new Bishop(black);
+		board[x][y] = new Bishop(black);
 		break;
 	    }
 	}

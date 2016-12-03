@@ -188,16 +188,29 @@ public class Client extends ChannelInboundHandlerAdapter {
 	}
 	findSelfLoop: for (int i = 0; i < 8; i++) {
 	    for (int n = 0; n < 8; n++) {
-		if (board[i][n].equals(this)) {
+		if (board[i][n].equals(piece)) {
 		    board[i][n] = new Empty();
 		    break findSelfLoop;
 		}
 	    }
 	}
-	if (board[x][y] instanceof Empty) {
-	    ChessPiece.pawnCaptureCount++;
-	} else {
+	if (piece instanceof King) {
+	    King pieceK = (King) piece;
+	    if (!pieceK.moved) {
+		pieceK.moved = true;
+		if (x == 2) {
+		    board[3][y] = board[0][y];
+		    board[0][y] = new Empty();
+		} else if (x == 6) {
+		    board[5][y] = board[7][y];
+		    board[7][y] = new Empty();
+		}
+	    }
+	}
+	if (piece instanceof Pawn || !(board[x][y] instanceof Empty)) {
 	    ChessPiece.pawnCaptureCount = 0;
+	} else {
+	    ChessPiece.pawnCaptureCount++;
 	}
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();

@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
 import blackop778.chess_checkers.Chess_Checkers;
 
 public class King extends ChessPiece {
-    private boolean moved;
+    public boolean moved;
 
     public King(boolean black) {
 	this.black = black;
@@ -39,42 +39,13 @@ public class King extends ChessPiece {
 
     @Override
     public void move(int x, int y) {
-	Chess_Checkers.unselectAll();
-	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
-	if (doubleMovePawn != null) {
-	    Pawn pawn = (Pawn) Chess_Checkers.board[doubleMovePawn.x][doubleMovePawn.y];
-	    pawn.lastMoveDouble = false;
-	    doubleMovePawn = null;
-	}
-	findSelfLoop: for (int i = 0; i < 8; i++) {
-	    for (int n = 0; n < 8; n++) {
-		if (Chess_Checkers.board[i][n].equals(this)) {
-		    Chess_Checkers.board[i][n] = new Empty();
-		    break findSelfLoop;
-		}
-	    }
-	}
-	if (!moved) {
-	    if (x == 2) {
-		Chess_Checkers.board[3][y] = Chess_Checkers.board[0][y];
-		Chess_Checkers.board[0][y] = new Empty();
-	    } else if (x == 6) {
-		Chess_Checkers.board[5][y] = Chess_Checkers.board[7][y];
-		Chess_Checkers.board[7][y] = new Empty();
-	    }
-	}
-	if (Chess_Checkers.board[x][y] instanceof Empty)
-	    pawnCaptureCount++;
-	else
-	    pawnCaptureCount = 0;
-	Chess_Checkers.board[x][y] = this;
-	moved = true;
-	endGameCheck();
+	Chess_Checkers.client.moveChess(x, y, this);
     }
 
     @Override
     public Point[] getValidLocations(int x, int y) {
 	ArrayList<Point> validLocations = new ArrayList<>();
+	Piece[][] board = Chess_Checkers.client.getBoard();
 
 	for (int xChange = -1; xChange < 2; xChange++) {
 	    for (int yChange = -1; yChange < 2; yChange++) {
@@ -82,20 +53,20 @@ public class King extends ChessPiece {
 		    if (x + xChange > -1 && x + xChange < 8) {
 			if (y + yChange > -1 && y + yChange < 8) {
 			    boolean check = false;
-			    if (Chess_Checkers.board[x + xChange][y + yChange] instanceof Empty) {
+			    if (board[x + xChange][y + yChange] instanceof Empty) {
 				check = true;
-			    } else if (Chess_Checkers.board[x + xChange][y + yChange].black != black) {
+			    } else if (board[x + xChange][y + yChange].black != black) {
 				check = true;
 			    }
 			    if (check) {
-				Piece replacingPiece = Chess_Checkers.board[x + xChange][y + yChange];
-				Chess_Checkers.board[x + xChange][y + yChange] = this;
-				Chess_Checkers.board[x][y] = new Empty();
+				Piece replacingPiece = board[x + xChange][y + yChange];
+				board[x + xChange][y + yChange] = this;
+				board[x][y] = new Empty();
 				if (!isKingInCheck(black)) {
 				    validLocations.add(new Point(x + xChange, y + yChange));
 				}
-				Chess_Checkers.board[x + xChange][y + yChange] = replacingPiece;
-				Chess_Checkers.board[x][y] = this;
+				board[x + xChange][y + yChange] = replacingPiece;
+				board[x][y] = this;
 			    }
 			}
 		    }
@@ -131,60 +102,67 @@ public class King extends ChessPiece {
 	// Queen side is negative, King side is positive, both is 0, neither is
 	// null
 	Integer sides = null;
+	Piece[][] board = Chess_Checkers.client.getBoard();
 	if (!moved) {
 	    // Checks if the rooks have moved
-	    if (Chess_Checkers.board[0][y] instanceof Rook) {
-		Rook rook = (Rook) Chess_Checkers.board[0][y];
+	    if (board[0][y] instanceof Rook) {
+		Rook rook = (Rook) board[0][y];
 		if (!rook.getMoved()) {
 		    sides = -1;
 		}
 	    }
-	    if (Chess_Checkers.board[7][y] instanceof Rook) {
-		Rook rook = (Rook) Chess_Checkers.board[7][y];
+	    if (board[7][y] instanceof Rook) {
+		Rook rook = (Rook) board[7][y];
 		if (!rook.getMoved()) {
-		    if (sides != null)
+		    if (sides != null) {
 			sides = 0;
-		    else
+		    } else {
 			sides = 1;
+		    }
 		}
 	    }
 	    if (sides != null) {
 		// Checks if the space between the king and rook(s) is empty
 		if (sides < 1) {
-		    if (Chess_Checkers.board[3][y] instanceof Empty) {
-			if (Chess_Checkers.board[2][y] instanceof Empty) {
-			    if (Chess_Checkers.board[1][y] instanceof ChessPiece) {
-				if (sides != 0)
+		    if (board[3][y] instanceof Empty) {
+			if (board[2][y] instanceof Empty) {
+			    if (board[1][y] instanceof ChessPiece) {
+				if (sides != 0) {
 				    sides = null;
-				else
+				} else {
 				    sides = 1;
+				}
 			    }
 			} else {
-			    if (sides != 0)
+			    if (sides != 0) {
 				sides = null;
-			    else
+			    } else {
 				sides = 1;
+			    }
 			}
 		    } else {
-			if (sides != 0)
+			if (sides != 0) {
 			    sides = null;
-			else
+			} else {
 			    sides = 1;
+			}
 		    }
 		}
 		if (sides > -1) {
-		    if (Chess_Checkers.board[5][y] instanceof Empty) {
-			if (Chess_Checkers.board[6][y] instanceof ChessPiece) {
-			    if (sides != 0)
+		    if (board[5][y] instanceof Empty) {
+			if (board[6][y] instanceof ChessPiece) {
+			    if (sides != 0) {
 				sides = null;
-			    else
+			    } else {
 				sides = -1;
+			    }
 			}
 		    } else {
-			if (sides != 0)
+			if (sides != 0) {
 			    sides = null;
-			else
+			} else {
 			    sides = -1;
+			}
 		    }
 		}
 		if (sides != null) {
@@ -192,53 +170,57 @@ public class King extends ChessPiece {
 		    if (!ChessPiece.isKingInCheck(black)) {
 			// King cannot pass through or move into check
 			if (sides < 1) {
-			    Piece piece = Chess_Checkers.board[3][y];
-			    Chess_Checkers.board[3][y] = this;
-			    Chess_Checkers.board[4][y] = new Empty();
+			    Piece piece = board[3][y];
+			    board[3][y] = this;
+			    board[4][y] = new Empty();
 			    if (!ChessPiece.isKingInCheck(black)) {
-				Chess_Checkers.board[3][y] = piece;
-				piece = Chess_Checkers.board[2][y];
-				Chess_Checkers.board[2][y] = this;
+				board[3][y] = piece;
+				piece = board[2][y];
+				board[2][y] = this;
 				if (ChessPiece.isKingInCheck(black)) {
-				    if (sides != 0)
+				    if (sides != 0) {
 					sides = null;
-				    else
+				    } else {
 					sides = 1;
+				    }
 				}
-				Chess_Checkers.board[2][y] = piece;
-				Chess_Checkers.board[4][y] = this;
+				board[2][y] = piece;
+				board[4][y] = this;
 			    } else {
-				Chess_Checkers.board[3][y] = piece;
-				Chess_Checkers.board[4][y] = this;
-				if (sides != 0)
+				board[3][y] = piece;
+				board[4][y] = this;
+				if (sides != 0) {
 				    sides = null;
-				else
+				} else {
 				    sides = 1;
+				}
 			    }
 			}
 			if (sides > -1) {
-			    Piece piece = Chess_Checkers.board[5][y];
-			    Chess_Checkers.board[5][y] = this;
-			    Chess_Checkers.board[4][y] = new Empty();
+			    Piece piece = board[5][y];
+			    board[5][y] = this;
+			    board[4][y] = new Empty();
 			    if (!ChessPiece.isKingInCheck(black)) {
-				Chess_Checkers.board[5][y] = piece;
-				piece = Chess_Checkers.board[6][y];
-				Chess_Checkers.board[6][y] = this;
+				board[5][y] = piece;
+				piece = board[6][y];
+				board[6][y] = this;
 				if (ChessPiece.isKingInCheck(black)) {
-				    if (sides != 0)
+				    if (sides != 0) {
 					sides = null;
-				    else
+				    } else {
 					sides = -1;
+				    }
 				}
-				Chess_Checkers.board[6][y] = piece;
-				Chess_Checkers.board[4][y] = this;
+				board[6][y] = piece;
+				board[4][y] = this;
 			    } else {
-				Chess_Checkers.board[5][y] = piece;
-				Chess_Checkers.board[4][y] = this;
-				if (sides != 0)
+				board[5][y] = piece;
+				board[4][y] = this;
+				if (sides != 0) {
 				    sides = null;
-				else
+				} else {
 				    sides = -1;
+				}
 			    }
 			}
 		    } else {
