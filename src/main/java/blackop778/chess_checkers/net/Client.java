@@ -9,6 +9,7 @@ import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.checkers.Jump;
 import blackop778.chess_checkers.checkers.JumpTree;
+import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
@@ -181,11 +182,6 @@ public class Client extends ChannelInboundHandlerAdapter {
     public void moveChess(int x, int y, ChessPiece piece) {
 	Chess_Checkers.client.unselectAll();
 	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
-	if (ChessPiece.doubleMovePawn != null) {
-	    Pawn pawn = (Pawn) board[ChessPiece.doubleMovePawn.x][ChessPiece.doubleMovePawn.y];
-	    pawn.lastMoveDouble = false;
-	    ChessPiece.doubleMovePawn = null;
-	}
 	findSelfLoop: for (int i = 0; i < 8; i++) {
 	    for (int n = 0; n < 8; n++) {
 		if (board[i][n].equals(piece)) {
@@ -205,13 +201,46 @@ public class Client extends ChannelInboundHandlerAdapter {
 		    board[5][y] = board[7][y];
 		    board[7][y] = new Empty();
 		}
+		piece = pieceK;
+	    }
+	} else if (piece instanceof Rook) {
+	    Rook pieceR = (Rook) piece;
+	    if (!pieceR.moved) {
+		pieceR.moved = true;
 	    }
 	}
-	if (piece instanceof Pawn || !(board[x][y] instanceof Empty)) {
+	if (piece instanceof Pawn) {
+	    Pawn pieceP = (Pawn) piece;
 	    ChessPiece.pawnCaptureCount = 0;
-	} else {
+	    int yOffset = black ? -1 : 1;
+	    if (board[x][y + yOffset].equals(ChessPiece.doubleMovePawn)) {
+		board[x][y + yOffset] = new Empty();
+	    }
+	    ChessPiece.doubleMovePawn = pieceP;
+	    if (y == 0 || y == 7) {
+		PawnPromotion promoter = new PawnPromotion();
+		String promotion = promoter.result;
+		switch (promotion) {
+		case "Queen":
+		    piece = new Queen(black);
+		    break;
+		case "Rook":
+		    piece = new Rook(black);
+		    break;
+		case "Knight":
+		    piece = new Knight(black);
+		    break;
+		case "Bishop":
+		    piece = new Bishop(black);
+		    break;
+		}
+	    }
+	} else if (board[x][y] instanceof Empty) {
 	    ChessPiece.pawnCaptureCount++;
+	} else {
+	    ChessPiece.pawnCaptureCount = 0;
 	}
+	ChessPiece.doubleMovePawn = null;
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();
     }

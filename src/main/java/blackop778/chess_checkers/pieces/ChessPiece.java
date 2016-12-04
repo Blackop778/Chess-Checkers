@@ -10,7 +10,7 @@ import blackop778.chess_checkers.Utilities;
 public abstract class ChessPiece extends Piece {
     public abstract Point[] getValidLocations(int x, int y);
 
-    public static Point doubleMovePawn;
+    public static Pawn doubleMovePawn;
 
     public static int pawnCaptureCount;
 
@@ -33,8 +33,7 @@ public abstract class ChessPiece extends Piece {
     }
 
     @Override
-    // Remember King and Pawn have their own implementations so edit them too
-    public void move(int x, int y) {
+    public final void move(int x, int y) {
 	Chess_Checkers.client.moveChess(x, y, this);
     }
 

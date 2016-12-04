@@ -38,11 +38,6 @@ public class King extends ChessPiece {
     }
 
     @Override
-    public void move(int x, int y) {
-	Chess_Checkers.client.moveChess(x, y, this);
-    }
-
-    @Override
     public Point[] getValidLocations(int x, int y) {
 	ArrayList<Point> validLocations = new ArrayList<>();
 	Piece[][] board = Chess_Checkers.client.getBoard();
@@ -107,13 +102,13 @@ public class King extends ChessPiece {
 	    // Checks if the rooks have moved
 	    if (board[0][y] instanceof Rook) {
 		Rook rook = (Rook) board[0][y];
-		if (!rook.getMoved()) {
+		if (!rook.moved) {
 		    sides = -1;
 		}
 	    }
 	    if (board[7][y] instanceof Rook) {
 		Rook rook = (Rook) board[7][y];
-		if (!rook.getMoved()) {
+		if (!rook.moved) {
 		    if (sides != null) {
 			sides = 0;
 		    } else {

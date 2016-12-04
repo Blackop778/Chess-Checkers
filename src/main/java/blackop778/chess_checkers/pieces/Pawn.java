@@ -10,17 +10,14 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
-import blackop778.chess_checkers.chess.PawnPromotion;
 
 public class Pawn extends ChessPiece {
-    public Boolean lastMoveDouble;
 
     public Pawn(boolean black) {
 	this.black = black;
 	this.selected = false;
 	this.selector = null;
 	this.possible = false;
-	this.lastMoveDouble = null;
     }
 
     @Override
@@ -80,7 +77,7 @@ public class Pawn extends ChessPiece {
 	    }
 
 	}
-	if (lastMoveDouble == null) {
+	if ((y == 1 && black) || (y == 7 && !black)) {
 	    if (board[x][y + yOffset] instanceof Empty && board[x][y + (yOffset * 2)] instanceof Empty) {
 		Piece replacingPiece = board[x][y + (yOffset * 2)];
 		board[x][y + (yOffset * 2)] = this;
@@ -113,7 +110,7 @@ public class Pawn extends ChessPiece {
 	    if (board[x + 1][y] instanceof Pawn && board[x + 1][y].black != black) {
 		if (board[x + 1][y + yOffset] instanceof Empty) {
 		    Pawn pawn = (Pawn) board[x + 1][y];
-		    if (pawn.lastMoveDouble == true) {
+		    if (pawn.equals(doubleMovePawn)) {
 			sides = new Integer(1);
 		    }
 		}
@@ -123,7 +120,7 @@ public class Pawn extends ChessPiece {
 	    if (board[x - 1][y] instanceof Pawn && board[x - 1][y].black != black) {
 		if (board[x - 1][y + yOffset] instanceof Empty) {
 		    Pawn pawn = (Pawn) board[x - 1][y];
-		    if (pawn.lastMoveDouble == true) {
+		    if (pawn.equals(doubleMovePawn)) {
 			sides = new Integer(-1);
 		    }
 		}
@@ -131,63 +128,5 @@ public class Pawn extends ChessPiece {
 	}
 
 	return sides;
-    }
-
-    @Override
-    public void move(int x, int y) {
-	Chess_Checkers.unselectAll();
-	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
-	pawnCaptureCount = 0;
-	if (doubleMovePawn != null) {
-	    Pawn pawn = (Pawn) board[doubleMovePawn.x][doubleMovePawn.y];
-	    pawn.lastMoveDouble = false;
-	    doubleMovePawn = null;
-	}
-	if (board[x][y] instanceof Empty) {
-	    if (black) {
-		if (board[x][y - 1] instanceof Pawn && board[x][y - 1].black != black) {
-		    board[x][y - 1] = new Empty();
-		}
-	    } else {
-		if (board[x][y + 1] instanceof Pawn && board[x][y + 1].black != black) {
-		    board[x][y + 1] = new Empty();
-		}
-	    }
-	}
-	findSelfLoop: for (int i = 0; i < 8; i++) {
-	    for (int n = 0; n < 8; n++) {
-		if (board[i][n].equals(this)) {
-		    board[i][n] = new Empty();
-		    if (n - y == 2 || y - n == 2) {
-			lastMoveDouble = new Boolean(true);
-			doubleMovePawn = new Point(x, y);
-		    } else {
-			lastMoveDouble = new Boolean(false);
-		    }
-		    break findSelfLoop;
-		}
-	    }
-	}
-	if (y != 7 && y != 0) {
-	    board[x][y] = this;
-	} else {
-	    PawnPromotion promoter = new PawnPromotion();
-	    String promotion = promoter.result;
-	    switch (promotion) {
-	    case "Queen":
-		board[x][y] = new Queen(black);
-		break;
-	    case "Rook":
-		board[x][y] = new Rook(black);
-		break;
-	    case "Knight":
-		board[x][y] = new Knight(black);
-		break;
-	    case "Bishop":
-		board[x][y] = new Bishop(black);
-		break;
-	    }
-	}
-	endGameCheck();
     }
 }
