@@ -115,6 +115,10 @@ public class Client extends ChannelInboundHandlerAdapter {
 	}
     }
 
+    public void start(String host, int port) {
+
+    }
+
     public void select(Point point, Piece selector) {
 	select(point.x, point.y, selector);
     }
