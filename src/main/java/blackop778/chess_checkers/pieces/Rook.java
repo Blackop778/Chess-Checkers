@@ -29,6 +29,7 @@ public class Rook extends ChessPiece {
 	}
 	String color = black ? "Black" : "White";
 	File image = new File("resources\\" + color + "Rook.png");
+	System.err.println(image.exists());
 	try {
 	    g.drawImage(ImageIO.read(image), x, y, null);
 	} catch (IOException e) {

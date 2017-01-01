@@ -11,6 +11,7 @@ import blackop778.chess_checkers.checkers.Jump;
 import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
+import blackop778.chess_checkers.net.Message.ChessMessage;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
 import blackop778.chess_checkers.pieces.CheckersPiece;
@@ -22,15 +23,25 @@ import blackop778.chess_checkers.pieces.Pawn;
 import blackop778.chess_checkers.pieces.Piece;
 import blackop778.chess_checkers.pieces.Queen;
 import blackop778.chess_checkers.pieces.Rook;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
-public class Client extends ChannelInboundHandlerAdapter {
+public class Client {
 
     private Piece[][] board;
     public final boolean black;
     public final boolean gameIsCheckers;
     private boolean turn;
+    private ChannelHandlerContext context;
 
     public Client(boolean black, boolean gameIsCheckers) {
 	this.black = black;
@@ -108,15 +119,57 @@ public class Client extends ChannelInboundHandlerAdapter {
 	}
     }
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-	if (msg instanceof EventMessage) {
-	    EventMessage event = (EventMessage) msg;
+    public class ClientHandler extends ChannelInboundHandlerAdapter {
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+	    context = ctx;
+	    if (msg instanceof Message) {
+		turn = true;
+		if (msg instanceof ChessMessage) {
+		    ChessMessage event = (ChessMessage) msg;
+		}
+	    }
+	}
+
+	@Override
+	public void channelRegistered(ChannelHandlerContext ctx) {
+	    context = ctx;
 	}
     }
 
     public void start(String host, int port) {
+	EventLoopGroup group = new NioEventLoopGroup();
+	try {
+	    Bootstrap b = new Bootstrap();
+	    b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
+		    .handler(new ChannelInitializer<SocketChannel>() {
+			@Override
+			public void initChannel(SocketChannel ch) throws Exception {
+			    ChannelPipeline p = ch.pipeline();
+			    p.addLast(new ClientHandler());
+			}
+		    });
 
+	    // Start the client.
+	    ChannelFuture future = b.connect(host, port).sync();
+
+	    // Wait until the connection is closed.
+	    future.channel().closeFuture().sync();
+	} catch (InterruptedException e) {
+	    e.printStackTrace();
+	} finally {
+	    // Shut down the event loop to terminate all threads.
+	    group.shutdownGracefully();
+	}
+    }
+
+    private void passChessTurn(String coordinate1, String coordinate2, boolean offerSurrender) {
+	turn = false;
+	context.write(ChessMessage.instantiate(coordinate1, coordinate2, offerSurrender));
+    }
+
+    private void passCheckersTurn(String coordinate1, JumpTree tree, boolean offerSurrender) {
+	turn = false;
     }
 
     public void select(Point point, Piece selector) {
@@ -131,8 +184,6 @@ public class Client extends ChannelInboundHandlerAdapter {
     public void moveChecker(int x, int y, Checker checker) {
 	// Reset possible spots for the next piece to move
 	Chess_Checkers.client.unselectAll();
-	// Change the turn to the opposite player
-	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
 	for (JumpTree tree : checker.lastValidLocations) {
 	    // Find which jumptree we're actually following
 	    if (x == tree.getEndJump().getEndPoint().x && y == tree.getEndJump().getEndPoint().y) {
@@ -152,8 +203,10 @@ public class Client extends ChannelInboundHandlerAdapter {
 		    board[tree.getEndJump().getMidPoint().x][tree.getEndJump().getMidPoint().y] = new Empty();
 		}
 		// Find our current square in the board and make it empty
-		findSelfLoop: for (int i = 0; i < 8; i++) {
-		    for (int n = 0; n < 8; n++) {
+		int i;
+		int n = 0;
+		findSelfLoop: for (i = 0; i < 8; i++) {
+		    for (n = 0; n < 8; n++) {
 			if (board[i][n].equals(checker)) {
 			    board[i][n] = new Empty();
 			    break findSelfLoop;
@@ -177,6 +230,8 @@ public class Client extends ChannelInboundHandlerAdapter {
 				    + " wins. Exit this message and click on the board to restart.",
 			    "A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
 		}
+		passCheckersTurn(new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(), tree,
+			false);
 		// End the search for the jumptree we took and end the method
 		break;
 	    }
@@ -185,9 +240,10 @@ public class Client extends ChannelInboundHandlerAdapter {
 
     public void moveChess(int x, int y, ChessPiece piece) {
 	Chess_Checkers.client.unselectAll();
-	Chess_Checkers.blackTurn = !Chess_Checkers.blackTurn;
-	findSelfLoop: for (int i = 0; i < 8; i++) {
-	    for (int n = 0; n < 8; n++) {
+	int i;
+	int n = 0;
+	findSelfLoop: for (i = 0; i < 8; i++) {
+	    for (n = 0; n < 8; n++) {
 		if (board[i][n].equals(piece)) {
 		    board[i][n] = new Empty();
 		    break findSelfLoop;
@@ -247,6 +303,8 @@ public class Client extends ChannelInboundHandlerAdapter {
 	ChessPiece.doubleMovePawn = null;
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();
+	passChessTurn(new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(),
+		new StringBuilder().append(Message.numberToLetter(x)).append(y).toString(), false);
     }
 
     public void unselectAll() {
