@@ -134,6 +134,7 @@ public class Client {
 	@Override
 	public void channelRegistered(ChannelHandlerContext ctx) {
 	    context = ctx;
+	    ctx.write("Hi");
 	}
     }
 
