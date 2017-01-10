@@ -31,27 +31,17 @@ public abstract class Chess_Checkers {
     public static void setupGame() {
 	offerSurrender = false;
 
-	String gameType = JOptionPane.showInputDialog(null,
-		"Enter 'chess' to play chess or 'checkers' to play checkers.", "Which game?",
-		JOptionPane.QUESTION_MESSAGE);
+	gameType = JOptionPane.showInputDialog(null, "Enter 'chess' to play chess or 'checkers' to play checkers.",
+		"Which game?", JOptionPane.QUESTION_MESSAGE);
 	if (gameType == null)
 	    System.exit(0);
 	while (!gameType.equalsIgnoreCase("chess") && !gameType.equalsIgnoreCase("checkers")) {
-	    gameType = JOptionPane.showInputDialog(null, "Invalid gameType. Enter either 'chess' or 'checkers'.",
+	    gameType = JOptionPane.showInputDialog(null, "Invalid input. Enter either 'chess' or 'checkers'.",
 		    "Ohoes noes", JOptionPane.ERROR_MESSAGE);
 	    if (gameType == null)
 		gameType = "null";
 	}
-	Thread serverT = new Thread(new Runnable() {
-
-	    @Override
-	    public void run() {
-		Server server = new Server(false, !Chess_Checkers.gameType.equalsIgnoreCase("checkers"));
-		server.startServer(778);
-	    }
-	});
-	client = new Client(false, true);
-	client.start("127.0.0.1", 778);
-
+	client = new Server(false, !Chess_Checkers.gameType.equalsIgnoreCase("checkers"));
+	((Server) client).startServer(1778);
     }
 }

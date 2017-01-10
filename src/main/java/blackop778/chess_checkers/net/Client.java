@@ -28,12 +28,12 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.channel.local.LocalAddress;
+import io.netty.channel.local.LocalChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 public class Client {
 
@@ -123,6 +123,7 @@ public class Client {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
 	    context = ctx;
+	    System.out.println("Message recieved");
 	    if (msg instanceof Message) {
 		turn = true;
 		if (msg instanceof ChessMessage) {
@@ -132,31 +133,30 @@ public class Client {
 	}
 
 	@Override
-	public void channelRegistered(ChannelHandlerContext ctx) {
+	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
-	    ctx.write("Hi");
+	    context.writeAndFlush(new Message());
 	}
     }
 
-    public void start(String host, int port) {
-	EventLoopGroup group = new NioEventLoopGroup();
+    public void start(EventLoopGroup group, LocalAddress local) {
 	try {
 	    Bootstrap b = new Bootstrap();
-	    b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
-		    .handler(new ChannelInitializer<SocketChannel>() {
-			@Override
-			public void initChannel(SocketChannel ch) throws Exception {
-			    ChannelPipeline p = ch.pipeline();
-			    p.addLast(new ClientHandler());
-			}
-		    });
+	    b.group(group).channel(LocalChannel.class).handler(new ChannelInitializer<LocalChannel>() {
+		@Override
+		public void initChannel(LocalChannel ch) throws Exception {
+		    ChannelPipeline p = ch.pipeline();
+		    p.addLast(new LoggingHandler(LogLevel.INFO), new ClientHandler());
+		}
+	    });
 
 	    // Start the client.
-	    ChannelFuture future = b.connect(host, port).sync();
+	    ChannelFuture future = b.connect(local).sync();
 
 	    // Wait until the connection is closed.
 	    future.channel().closeFuture().sync();
 	} catch (InterruptedException e) {
+	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	} finally {
 	    // Shut down the event loop to terminate all threads.
