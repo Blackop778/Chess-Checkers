@@ -3,7 +3,6 @@ package blackop778.chess_checkers.net;
 import blackop778.chess_checkers.Chess_Checkers;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.DefaultEventLoopGroup;
@@ -16,8 +15,6 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 public class Server extends Client {
-
-    private ChannelHandlerContext context;
 
     public Server(boolean black, boolean gameIsCheckers, boolean localServer) {
 	super(black, gameIsCheckers, localServer);
@@ -40,7 +37,7 @@ public class Server extends Client {
 			    @Override
 			    public void initChannel(LocalChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.INFO), new ServerHandler());
+				p.addLast(new LoggingHandler(LogLevel.INFO), new ClientHandler());
 			    }
 			});
 
@@ -60,13 +57,6 @@ public class Server extends Client {
 		serverGroup.shutdownGracefully();
 		clientGroup.shutdownGracefully();
 	    }
-	}
-    }
-
-    public class ServerHandler extends ClientHandler {
-	@Override
-	public void channelActive(ChannelHandlerContext ctx) {
-	    context = ctx;
 	}
     }
 }

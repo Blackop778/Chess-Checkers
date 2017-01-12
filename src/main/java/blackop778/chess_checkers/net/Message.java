@@ -63,10 +63,7 @@ public class Message {
 	}
 
 	public static ChessMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender) {
-	    if (coordinate1.matches("[A-H][1-8]") && coordinate2.matches("[A-H][1-8]")) {
-		return new ChessMessage(coordinate1, coordinate2, offerSurrender);
-	    }
-	    return null;
+	    return new ChessMessage(coordinate1, coordinate2, offerSurrender);
 	}
 
 	private ChessMessage(String coordinate1, String coordinate2, boolean offerSurrender) {

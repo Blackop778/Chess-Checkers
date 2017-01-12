@@ -143,7 +143,7 @@ public class Client {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
-	    context.write(new Message());
+	    context.writeAndFlush(new Message());
 	}
     }
 
