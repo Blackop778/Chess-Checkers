@@ -11,13 +11,16 @@ import blackop778.chess_checkers.net.Server;
 
 public abstract class Chess_Checkers {
     public static Client client;
+    public static Client clientPartner;
     public static boolean offerSurrender;
     public static boolean gameOver = false;
     public static String gameType;
 
     public static void main(String[] args) {
 	setupGame();
+    }
 
+    public static void startGUI() {
 	Chess_CheckersFrame frame = new Chess_CheckersFrame();
 	frame.setTitle("Chess-Checkers");
 	frame.setPreferredSize(new Dimension(727, 794));
@@ -41,7 +44,7 @@ public abstract class Chess_Checkers {
 	    if (gameType == null)
 		gameType = "null";
 	}
-	client = new Server(false, !Chess_Checkers.gameType.equalsIgnoreCase("checkers"));
-	((Server) client).startServer(1778);
+	client = new Server(false, Chess_Checkers.gameType.equalsIgnoreCase("checkers"), true);
+	((Server) client).startLocalServer();
     }
 }

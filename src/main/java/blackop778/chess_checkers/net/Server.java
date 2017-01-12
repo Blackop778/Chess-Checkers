@@ -1,5 +1,6 @@
 package blackop778.chess_checkers.net;
 
+import blackop778.chess_checkers.Chess_Checkers;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,49 +17,49 @@ import io.netty.handler.logging.LoggingHandler;
 
 public class Server extends Client {
 
-    private Client partner;
     private ChannelHandlerContext context;
 
-    public Server(boolean black, boolean gameIsCheckers) {
-	super(black, gameIsCheckers);
-
+    public Server(boolean black, boolean gameIsCheckers, boolean localServer) {
+	super(black, gameIsCheckers, localServer);
     }
 
-    public void startServer(int port) {
-	final LocalAddress local = new LocalAddress("1778");
-	EventLoopGroup serverGroup = new DefaultEventLoopGroup();
-	EventLoopGroup clientGroup = new NioEventLoopGroup();
-	try {
-	    ServerBootstrap b = new ServerBootstrap();
-	    b.group(serverGroup, clientGroup).channel(LocalServerChannel.class)
-		    .handler(new ChannelInitializer<LocalServerChannel>() {
-			@Override
-			public void initChannel(LocalServerChannel ch) throws Exception {
-			    ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
-			}
-		    }).childHandler(new ChannelInitializer<LocalChannel>() {
-			@Override
-			public void initChannel(LocalChannel ch) throws Exception {
-			    ChannelPipeline p = ch.pipeline();
-			    p.addLast(new LoggingHandler(LogLevel.INFO), new ServerHandler());
-			}
-		    });
+    public void startLocalServer() {
+	if (localServer) {
+	    final LocalAddress local = new LocalAddress("1778");
+	    EventLoopGroup serverGroup = new DefaultEventLoopGroup();
+	    EventLoopGroup clientGroup = new NioEventLoopGroup();
+	    try {
+		ServerBootstrap b = new ServerBootstrap();
+		b.group(serverGroup, clientGroup).channel(LocalServerChannel.class)
+			.handler(new ChannelInitializer<LocalServerChannel>() {
+			    @Override
+			    public void initChannel(LocalServerChannel ch) throws Exception {
+				ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+			    }
+			}).childHandler(new ChannelInitializer<LocalChannel>() {
+			    @Override
+			    public void initChannel(LocalChannel ch) throws Exception {
+				ChannelPipeline p = ch.pipeline();
+				p.addLast(new LoggingHandler(LogLevel.INFO), new ServerHandler());
+			    }
+			});
 
-	    // Start the server.
-	    System.out.println("Server listening to port " + port);
-	    ChannelFuture f = b.bind(local).sync();
-	    partner = new Client(false, gameIsCheckers);
-	    partner.start(clientGroup, local);
+		// Start the server.
+		System.out.println("Server listening to port " + local.id());
+		ChannelFuture f = b.bind(local).sync();
+		Chess_Checkers.clientPartner = new Client(false, gameIsCheckers, true);
+		Chess_Checkers.clientPartner.start(clientGroup, local);
 
-	    // Wait until the server socket is closed.
-	    f.channel().closeFuture().sync();
-	} catch (InterruptedException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} finally {
-	    // Shut down all event loops to terminate all threads.
-	    serverGroup.shutdownGracefully();
-	    clientGroup.shutdownGracefully();
+		// Wait until the server socket is closed.
+		f.channel().closeFuture().sync();
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } finally {
+		// Shut down all event loops to terminate all threads.
+		serverGroup.shutdownGracefully();
+		clientGroup.shutdownGracefully();
+	    }
 	}
     }
 

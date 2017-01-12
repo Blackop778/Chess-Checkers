@@ -1,6 +1,7 @@
 package blackop778.chess_checkers.net;
 
 import java.awt.Point;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -30,7 +31,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -42,10 +42,12 @@ public class Client {
     public final boolean gameIsCheckers;
     private boolean turn;
     private ChannelHandlerContext context;
+    protected final boolean localServer;
 
-    public Client(boolean black, boolean gameIsCheckers) {
+    public Client(boolean black, boolean gameIsCheckers, boolean localServer) {
 	this.black = black;
 	this.gameIsCheckers = gameIsCheckers;
+	this.localServer = localServer;
 
 	board = new Piece[8][8];
 	for (int i = 0; i < board.length; i++) {
@@ -122,12 +124,18 @@ public class Client {
     public class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-	    context = ctx;
-	    System.out.println("Message recieved");
+	    System.out.println("Message Recieved");
 	    if (msg instanceof Message) {
 		turn = true;
 		if (msg instanceof ChessMessage) {
 		    ChessMessage event = (ChessMessage) msg;
+		    int[] coords = new int[4];
+		    coords[0] = Message.letterToNumber(event.coordinate1.charAt(0));
+		    coords[1] = Integer.valueOf(event.coordinate1.substring(1, 2));
+		    coords[2] = Message.letterToNumber(event.coordinate2.charAt(0));
+		    coords[3] = Integer.valueOf(event.coordinate2.substring(1, 2));
+		    board[coords[2]][coords[3]] = board[coords[0]][coords[1]];
+		    board[coords[0]][coords[1]] = new Empty();
 		}
 	    }
 	}
@@ -135,42 +143,57 @@ public class Client {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
-	    context.writeAndFlush(new Message());
+	    context.write(new Message());
 	}
     }
 
-    public void start(EventLoopGroup group, LocalAddress local) {
-	try {
-	    Bootstrap b = new Bootstrap();
-	    b.group(group).channel(LocalChannel.class).handler(new ChannelInitializer<LocalChannel>() {
-		@Override
-		public void initChannel(LocalChannel ch) throws Exception {
-		    ChannelPipeline p = ch.pipeline();
-		    p.addLast(new LoggingHandler(LogLevel.INFO), new ClientHandler());
-		}
-	    });
+    public void start(EventLoopGroup group, SocketAddress local) {
+	if (localServer) {
+	    try {
+		Bootstrap b = new Bootstrap();
+		b.group(group).channel(LocalChannel.class).handler(new ChannelInitializer<LocalChannel>() {
+		    @Override
+		    public void initChannel(LocalChannel ch) throws Exception {
+			ChannelPipeline p = ch.pipeline();
+			p.addLast(new LoggingHandler(LogLevel.INFO), new ClientHandler());
+		    }
+		});
 
-	    // Start the client.
-	    ChannelFuture future = b.connect(local).sync();
+		// Start the client.
+		ChannelFuture future = b.connect(local).sync();
 
-	    // Wait until the connection is closed.
-	    future.channel().closeFuture().sync();
-	} catch (InterruptedException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	} finally {
-	    // Shut down the event loop to terminate all threads.
-	    group.shutdownGracefully();
+		// Start GUI
+		Chess_Checkers.startGUI();
+
+		// Wait until the connection is closed.
+		future.channel().closeFuture().sync();
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } finally {
+		// Shut down the event loop to terminate all threads.
+		group.shutdownGracefully();
+	    }
 	}
     }
 
     private void passChessTurn(String coordinate1, String coordinate2, boolean offerSurrender) {
 	turn = false;
-	context.write(ChessMessage.instantiate(coordinate1, coordinate2, offerSurrender));
+	context.writeAndFlush(ChessMessage.instantiate(coordinate1, coordinate2, offerSurrender));
+	if (localServer) {
+	    Client t = Chess_Checkers.client;
+	    Chess_Checkers.client = Chess_Checkers.clientPartner;
+	    Chess_Checkers.clientPartner = t;
+	}
     }
 
     private void passCheckersTurn(String coordinate1, JumpTree tree, boolean offerSurrender) {
 	turn = false;
+	if (localServer) {
+	    Client t = Chess_Checkers.client;
+	    Chess_Checkers.client = Chess_Checkers.clientPartner;
+	    Chess_Checkers.clientPartner = t;
+	}
     }
 
     public void select(Point point, Piece selector) {

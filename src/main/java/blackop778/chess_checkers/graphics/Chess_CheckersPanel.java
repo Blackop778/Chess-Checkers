@@ -89,10 +89,10 @@ public class Chess_CheckersPanel extends JPanel {
 	g.setColor(Color.BLACK);
 	g.setFont(new Font(Font.SERIF, Font.PLAIN, 30));
 	g.drawString("Player turn: ", 10, 35);
-	if (Chess_Checkers.client.getTurn())
+	if (Chess_Checkers.client.getTurn() && Chess_Checkers.client.black)
 	    g.setColor(Color.BLACK);
 	else {
-	    if (Chess_Checkers.client.gameIsCheckers)
+	    if (Chess_Checkers.client.gameIsCheckers && Chess_Checkers.client.black)
 		g.setColor(Color.RED);
 	    else
 		g.setColor(Color.WHITE);
