@@ -47,7 +47,7 @@ public class Message {
 	throw new InvalidCoordinateException();
     }
 
-    public static class ChessMessage {
+    public static class ChessMessage extends Message {
 	public final String coordinate1;
 	public final String coordinate2;
 	public final boolean offerSurrender;
@@ -73,7 +73,7 @@ public class Message {
 	}
     }
 
-    public static class CheckersMessage {
+    public static class CheckersMessage extends Message {
 	public final String coordinate1;
 	public final JumpTree tree;
 	public final boolean offerSurrender;
@@ -83,9 +83,8 @@ public class Message {
 	}
 
 	public static CheckersMessage instantiate(String coordinate1, JumpTree tree, boolean offerSurrender) {
-	    if (coordinate1.matches("[A-H][1-8]")) {
+	    if (coordinate1.matches("[A-H][1-8]"))
 		return new CheckersMessage(coordinate1, tree, offerSurrender);
-	    }
 	    throw new InvalidCoordinateException();
 	}
 

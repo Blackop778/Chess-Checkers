@@ -24,7 +24,7 @@ public class Chess_CheckersPanel extends JPanel {
 		    Chess_Checkers.setupGame();
 		} else if (e.getY() <= 45) {
 		    if (e.getX() >= 200 && e.getX() <= 405) {
-			Chess_Checkers.offerSurrender = true;
+			repaint();
 		    }
 		} else {
 		    int x = e.getX() / 90;
@@ -41,9 +41,9 @@ public class Chess_CheckersPanel extends JPanel {
 			    }
 			}
 		    } else {
-			if (!Chess_Checkers.client.getBoard()[x][y].selected)
+			if (!Chess_Checkers.client.getBoard()[x][y].selected) {
 			    Chess_Checkers.client.getBoard()[x][y].select(x, y);
-			else {
+			} else {
 			    Chess_Checkers.client.unselectAll();
 			    Chess_Checkers.client.getBoard()[x][y].selected = false;
 			}
@@ -52,22 +52,24 @@ public class Chess_CheckersPanel extends JPanel {
 		repaint();
 		if (Chess_Checkers.offerSurrender) {
 		    String color;
-		    if (!Chess_Checkers.client.getTurn())
+		    if (!Chess_Checkers.client.getTurn()) {
 			color = "Black";
-		    else if (Chess_Checkers.client.gameIsCheckers)
+		    } else if (Chess_Checkers.client.gameIsCheckers) {
 			color = "Red";
-		    else
+		    } else {
 			color = "White";
+		    }
 		    int response = JOptionPane.showConfirmDialog(null,
 			    color + " has offered to surrender. Do you accept?", "", JOptionPane.YES_NO_OPTION,
 			    JOptionPane.QUESTION_MESSAGE);
 		    if (response == JOptionPane.OK_OPTION) {
 			Chess_Checkers.gameOver = true;
 			String winner;
-			if (Chess_Checkers.client.gameIsCheckers)
+			if (Chess_Checkers.client.gameIsCheckers) {
 			    winner = Chess_Checkers.client.getTurn() ? "Black" : "Red";
-			else
+			} else {
 			    winner = Chess_Checkers.client.getTurn() ? "Black" : "White";
+			}
 			JOptionPane.showMessageDialog(null,
 				"Congratulations, " + winner
 					+ " wins. Exit this message and click on the board to restart.",
@@ -89,13 +91,14 @@ public class Chess_CheckersPanel extends JPanel {
 	g.setColor(Color.BLACK);
 	g.setFont(new Font(Font.SERIF, Font.PLAIN, 30));
 	g.drawString("Player turn: ", 10, 35);
-	if (Chess_Checkers.client.getTurn() && Chess_Checkers.client.black)
+	if (Chess_Checkers.client.getTurn() && Chess_Checkers.client.black) {
 	    g.setColor(Color.BLACK);
-	else {
-	    if (Chess_Checkers.client.gameIsCheckers && Chess_Checkers.client.black)
+	} else {
+	    if (Chess_Checkers.client.gameIsCheckers && Chess_Checkers.client.black) {
 		g.setColor(Color.RED);
-	    else
+	    } else {
 		g.setColor(Color.WHITE);
+	    }
 	}
 	g.fillRect(150, 5, 30, 30);
 	if (!Chess_Checkers.offerSurrender) {
@@ -123,13 +126,15 @@ public class Chess_CheckersPanel extends JPanel {
 	}
 	for (int i = 0; i < 8; i++) {
 	    for (int n = 0; n < 8; n++) {
-		if ((i + n) % 2 == 1)
+		if ((i + n) % 2 == 1) {
 		    g.setColor(new Color(119, 215, 247));
-		else
+		} else {
 		    g.setColor(Color.WHITE);
+		}
 		g.fillRect(i * 90, n * 90 + 45, (i + 1) * 90, (n + 1) * 90);
-		if (Chess_Checkers.client.getBoard()[i][n] != null)
+		if (Chess_Checkers.client.getBoard()[i][n] != null) {
 		    Chess_Checkers.client.getBoard()[i][n].drawSelf(g, i * 90, n * 90 + 45);
+		}
 	    }
 	}
     }

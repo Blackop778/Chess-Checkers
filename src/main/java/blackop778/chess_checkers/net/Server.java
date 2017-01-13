@@ -44,7 +44,7 @@ public class Server extends Client {
 		// Start the server.
 		System.out.println("Server listening to port " + local.id());
 		ChannelFuture f = b.bind(local).sync();
-		Chess_Checkers.clientPartner = new Client(false, gameIsCheckers, true);
+		Chess_Checkers.clientPartner = new Client(!black, gameIsCheckers, true);
 		Chess_Checkers.clientPartner.start(clientGroup, local);
 
 		// Wait until the server socket is closed.

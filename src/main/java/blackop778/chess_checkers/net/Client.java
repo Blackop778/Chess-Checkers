@@ -124,7 +124,6 @@ public class Client {
     public class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-	    System.out.println("Message Recieved");
 	    if (msg instanceof Message) {
 		turn = true;
 		if (msg instanceof ChessMessage) {
@@ -138,12 +137,14 @@ public class Client {
 		    board[coords[0]][coords[1]] = new Empty();
 		}
 	    }
+	    if (Chess_Checkers.panel != null) {
+		Chess_Checkers.panel.repaint();
+	    }
 	}
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
-	    context.writeAndFlush(new Message());
 	}
     }
 
