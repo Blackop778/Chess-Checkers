@@ -63,13 +63,35 @@ public class Message {
 	}
 
 	public static ChessMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender) {
-	    return new ChessMessage(coordinate1, coordinate2, offerSurrender);
+	    if (coordinate1.matches("[A-H][1-8]") && coordinate2.matches("[A-H][1-8]"))
+		return new ChessMessage(coordinate1, coordinate2, offerSurrender);
+	    return null;
 	}
 
 	private ChessMessage(String coordinate1, String coordinate2, boolean offerSurrender) {
 	    this.coordinate1 = coordinate1;
 	    this.coordinate2 = coordinate2;
 	    this.offerSurrender = offerSurrender;
+	}
+    }
+
+    public static class PawnPromotionMessage extends ChessMessage {
+	static enum Promotion {
+	    Queen, Rook, Bishop, Knight
+	};
+
+	public final Promotion promo;
+
+	private PawnPromotionMessage(String coordinate1, String coordinate2, boolean offerSurrender, Promotion promo) {
+	    super(coordinate1, coordinate2, offerSurrender);
+	    this.promo = promo;
+	}
+
+	public static PawnPromotionMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender,
+		Promotion promo) {
+	    if (coordinate1.matches("[A-H][1-8]") && coordinate2.matches("[A-H][1-8]"))
+		return new PawnPromotionMessage(coordinate1, coordinate2, offerSurrender, promo);
+	    return null;
 	}
     }
 
@@ -85,7 +107,7 @@ public class Message {
 	public static CheckersMessage instantiate(String coordinate1, JumpTree tree, boolean offerSurrender) {
 	    if (coordinate1.matches("[A-H][1-8]"))
 		return new CheckersMessage(coordinate1, tree, offerSurrender);
-	    throw new InvalidCoordinateException();
+	    return null;
 	}
 
 	private CheckersMessage(String coordinate1, JumpTree tree, boolean offerSurrender) {

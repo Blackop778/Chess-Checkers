@@ -275,6 +275,7 @@ public class Client {
 		}
 	    }
 	}
+
 	if (piece instanceof King) {
 	    King pieceK = (King) piece;
 	    if (!pieceK.moved) {
@@ -294,6 +295,9 @@ public class Client {
 		pieceR.moved = true;
 	    }
 	}
+
+	ChessMessage message;
+
 	if (piece instanceof Pawn) {
 	    Pawn pieceP = (Pawn) piece;
 	    ChessPiece.pawnCaptureCount = 0;
@@ -320,14 +324,17 @@ public class Client {
 		    break;
 		}
 	    }
-	} else if (board[x][y] instanceof Empty) {
-	    ChessPiece.pawnCaptureCount++;
 	} else {
-	    ChessPiece.pawnCaptureCount = 0;
+	    if (board[x][y] instanceof Empty) {
+		ChessPiece.pawnCaptureCount++;
+	    } else {
+		ChessPiece.pawnCaptureCount = 0;
+	    }
 	}
 	ChessPiece.doubleMovePawn = null;
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();
+
 	passChessTurn(new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(),
 		new StringBuilder().append(Message.numberToLetter(x)).append(y).toString(), false);
     }
