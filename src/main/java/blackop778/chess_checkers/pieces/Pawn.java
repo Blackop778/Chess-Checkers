@@ -77,7 +77,7 @@ public class Pawn extends ChessPiece {
 	    }
 
 	}
-	if ((y == 1 && black) || (y == 7 && !black)) {
+	if ((y == 1 && black) || (y == 6 && !black)) {
 	    if (board[x][y + yOffset] instanceof Empty && board[x][y + (yOffset * 2)] instanceof Empty) {
 		Piece replacingPiece = board[x][y + (yOffset * 2)];
 		board[x][y + (yOffset * 2)] = this;
