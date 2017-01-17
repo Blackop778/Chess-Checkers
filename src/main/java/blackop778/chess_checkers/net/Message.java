@@ -1,6 +1,7 @@
 package blackop778.chess_checkers.net;
 
 import blackop778.chess_checkers.checkers.JumpTree;
+import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
 public class Message {
     public static char numberToLetter(int number) {
@@ -63,7 +64,7 @@ public class Message {
 	}
 
 	public static ChessMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender) {
-	    if (coordinate1.matches("[A-H][1-8]") && coordinate2.matches("[A-H][1-8]"))
+	    if (coordinate1.matches("[A-H][0-7]") && coordinate2.matches("[A-H][0-7]"))
 		return new ChessMessage(coordinate1, coordinate2, offerSurrender);
 	    return null;
 	}
@@ -76,10 +77,6 @@ public class Message {
     }
 
     public static class PawnPromotionMessage extends ChessMessage {
-	static enum Promotion {
-	    Queen, Rook, Bishop, Knight
-	};
-
 	public final Promotion promo;
 
 	private PawnPromotionMessage(String coordinate1, String coordinate2, boolean offerSurrender, Promotion promo) {

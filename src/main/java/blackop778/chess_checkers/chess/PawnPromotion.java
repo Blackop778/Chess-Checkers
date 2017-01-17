@@ -14,102 +14,102 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-public class PawnPromotion
-{
-	public String result;
+import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
-	public PawnPromotion()
-	{
-		JDialog dialog = new JDialog(null, "Promotion", Dialog.DEFAULT_MODALITY_TYPE);
+public class PawnPromotion {
+    public static enum Promotion {
+	Queen, Rook, Bishop, Knight
+    };
 
-		JComponent component = new DialogWindow(this, dialog);
-		component.setOpaque(true);
-		dialog.setContentPane(component);
+    public Promotion result;
 
-		dialog.pack();
-		dialog.setLocationRelativeTo(null);
-		dialog.setVisible(true);
-	}
+    public PawnPromotion() {
+	JDialog dialog = new JDialog(null, "Promotion", Dialog.DEFAULT_MODALITY_TYPE);
+
+	JComponent component = new DialogWindow(this, dialog);
+	component.setOpaque(true);
+	dialog.setContentPane(component);
+
+	dialog.pack();
+	dialog.setLocationRelativeTo(null);
+	dialog.setVisible(true);
+    }
 }
 
 @SuppressWarnings("serial")
-class DialogWindow extends JPanel implements ActionListener
-{
-	private PawnPromotion controller;
-	private JDialog dialog;
+class DialogWindow extends JPanel implements ActionListener {
+    private PawnPromotion controller;
+    private JDialog dialog;
 
-	public DialogWindow(PawnPromotion controller, JDialog dialog)
-	{
-		super(new BorderLayout());
-		this.controller = controller;
-		controller.result = "Queen";
-		this.dialog = dialog;
+    public DialogWindow(PawnPromotion controller, JDialog dialog) {
+	super(new BorderLayout());
+	this.controller = controller;
+	controller.result = Promotion.Queen;
+	this.dialog = dialog;
 
-		ButtonGroup group = new ButtonGroup();
+	ButtonGroup group = new ButtonGroup();
 
-		JRadioButton queen = new JRadioButton("Queen", true);
-		queen.addActionListener(this);
-		queen.setActionCommand("Queen");
-		queen.setMnemonic(1);
-		group.add(queen);
+	JRadioButton queen = new JRadioButton("Queen", true);
+	queen.addActionListener(this);
+	queen.setActionCommand("Queen");
+	queen.setMnemonic(1);
+	group.add(queen);
 
-		JRadioButton rook = new JRadioButton("Rook", false);
-		rook.addActionListener(this);
-		rook.setActionCommand("Rook");
-		rook.setMnemonic(1);
-		group.add(rook);
+	JRadioButton rook = new JRadioButton("Rook", false);
+	rook.addActionListener(this);
+	rook.setActionCommand("Rook");
+	rook.setMnemonic(1);
+	group.add(rook);
 
-		JRadioButton knight = new JRadioButton("Knight", false);
-		knight.addActionListener(this);
-		knight.setActionCommand("Knight");
-		knight.setMnemonic(1);
-		group.add(knight);
+	JRadioButton knight = new JRadioButton("Knight", false);
+	knight.addActionListener(this);
+	knight.setActionCommand("Knight");
+	knight.setMnemonic(1);
+	group.add(knight);
 
-		JRadioButton bishop = new JRadioButton("Bishop", false);
-		bishop.addActionListener(this);
-		bishop.setActionCommand("Bishop");
-		bishop.setMnemonic(1);
-		group.add(bishop);
+	JRadioButton bishop = new JRadioButton("Bishop", false);
+	bishop.addActionListener(this);
+	bishop.setActionCommand("Bishop");
+	bishop.setMnemonic(1);
+	group.add(bishop);
 
-		JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
-		buttonPanel.add(queen);
-		buttonPanel.add(rook);
-		buttonPanel.add(knight);
-		buttonPanel.add(bishop);
+	JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
+	buttonPanel.add(queen);
+	buttonPanel.add(rook);
+	buttonPanel.add(knight);
+	buttonPanel.add(bishop);
 
-		JButton done = new JButton("Done");
-		done.addActionListener(this);
-		done.setActionCommand("Done");
-		done.setMnemonic(1);
+	JButton done = new JButton("Done");
+	done.addActionListener(this);
+	done.setActionCommand("Done");
+	done.setMnemonic(1);
 
-		JLabel text = new JLabel();
-		text.setText("What piece do you want your pawn to be promoted to?");
+	JLabel text = new JLabel();
+	text.setText("What piece do you want your pawn to be promoted to?");
 
-		add(text, BorderLayout.NORTH);
-		add(buttonPanel, BorderLayout.WEST);
-		add(done, BorderLayout.SOUTH);
+	add(text, BorderLayout.NORTH);
+	add(buttonPanel, BorderLayout.WEST);
+	add(done, BorderLayout.SOUTH);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+	switch (ae.getActionCommand()) {
+	case "Done":
+	    dialog.dispose();
+	    break;
+	case "Queen":
+	    controller.result = Promotion.Queen;
+	    break;
+	case "Rook":
+	    controller.result = Promotion.Rook;
+	    break;
+	case "Knight":
+	    controller.result = Promotion.Knight;
+	    break;
+	case "Bishop":
+	    controller.result = Promotion.Bishop;
+	    break;
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent ae)
-	{
-		switch(ae.getActionCommand())
-		{
-			case "Done":
-				dialog.dispose();
-				break;
-			case "Queen":
-				controller.result = "Queen";
-				break;
-			case "Rook":
-				controller.result = "Rook";
-				break;
-			case "Knight":
-				controller.result = "Knight";
-				break;
-			case "Bishop":
-				controller.result = "Bishop";
-				break;
-		}
-	}
+    }
 }

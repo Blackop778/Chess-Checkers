@@ -11,8 +11,10 @@ import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.checkers.Jump;
 import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion;
+import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
 import blackop778.chess_checkers.net.Message.ChessMessage;
+import blackop778.chess_checkers.net.Message.PawnPromotionMessage;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
 import blackop778.chess_checkers.pieces.CheckersPiece;
@@ -135,6 +137,25 @@ public class Client {
 		    coords[3] = Integer.valueOf(event.coordinate2.substring(1, 2));
 		    board[coords[2]][coords[3]] = board[coords[0]][coords[1]];
 		    board[coords[0]][coords[1]] = new Empty();
+		    if (event instanceof PawnPromotionMessage) {
+			if (board[coords[2]][coords[3]] instanceof Pawn) {
+			    PawnPromotionMessage ppm = (PawnPromotionMessage) event;
+			    switch (ppm.promo) {
+			    case Queen:
+				board[coords[2]][coords[3]] = new Queen(!black);
+				break;
+			    case Rook:
+				board[coords[2]][coords[3]] = new Rook(!black);
+				break;
+			    case Knight:
+				board[coords[2]][coords[3]] = new Knight(!black);
+				break;
+			    case Bishop:
+				board[coords[2]][coords[3]] = new Bishop(!black);
+				break;
+			    }
+			}
+		    }
 		}
 	    }
 	    if (Chess_Checkers.panel != null) {
@@ -156,7 +177,7 @@ public class Client {
 		    @Override
 		    public void initChannel(LocalChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.INFO), new ClientHandler());
+			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
 		    }
 		});
 
@@ -178,9 +199,9 @@ public class Client {
 	}
     }
 
-    private void passChessTurn(String coordinate1, String coordinate2, boolean offerSurrender) {
+    private void passChessTurn(ChessMessage cm) {
 	turn = false;
-	context.writeAndFlush(ChessMessage.instantiate(coordinate1, coordinate2, offerSurrender));
+	context.writeAndFlush(cm);
 	if (localServer) {
 	    Client t = Chess_Checkers.client;
 	    Chess_Checkers.client = Chess_Checkers.clientPartner;
@@ -296,33 +317,38 @@ public class Client {
 	    }
 	}
 
-	ChessMessage message;
+	ChessMessage message = null;
 
 	if (piece instanceof Pawn) {
 	    Pawn pieceP = (Pawn) piece;
 	    ChessPiece.pawnCaptureCount = 0;
 	    int yOffset = black ? -1 : 1;
+	    // Check En passant capturing
 	    if (board[x][y + yOffset].equals(ChessPiece.doubleMovePawn)) {
 		board[x][y + yOffset] = new Empty();
 	    }
 	    ChessPiece.doubleMovePawn = pieceP;
 	    if (y == 0 || y == 7) {
 		PawnPromotion promoter = new PawnPromotion();
-		String promotion = promoter.result;
+		Promotion promotion = promoter.result;
 		switch (promotion) {
-		case "Queen":
+		case Queen:
 		    piece = new Queen(black);
 		    break;
-		case "Rook":
+		case Rook:
 		    piece = new Rook(black);
 		    break;
-		case "Knight":
+		case Knight:
 		    piece = new Knight(black);
 		    break;
-		case "Bishop":
+		case Bishop:
 		    piece = new Bishop(black);
 		    break;
 		}
+
+		message = PawnPromotionMessage.instantiate(
+			new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(),
+			new StringBuilder().append(Message.numberToLetter(x)).append(y).toString(), false, promotion);
 	    }
 	} else {
 	    if (board[x][y] instanceof Empty) {
@@ -335,8 +361,10 @@ public class Client {
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();
 
-	passChessTurn(new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(),
-		new StringBuilder().append(Message.numberToLetter(x)).append(y).toString(), false);
+	passChessTurn((message == null)
+		? ChessMessage.instantiate(new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(),
+			new StringBuilder().append(Message.numberToLetter(x)).append(y).toString(), false)
+		: message);
     }
 
     public void unselectAll() {

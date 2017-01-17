@@ -37,7 +37,7 @@ public class Server extends Client {
 			    @Override
 			    public void initChannel(LocalChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.INFO), new ClientHandler());
+				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
 			    }
 			});
 

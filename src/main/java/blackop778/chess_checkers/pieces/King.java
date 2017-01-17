@@ -91,7 +91,8 @@ public class King extends ChessPiece {
      * @param y
      *            Y of the king
      * @return Valid sides: Queen side is negative, King side is positive, both
-     *         is 0, neither is null
+     *         is 0, neither is null TODO: Check whether King starts in check or
+     *         moves across check
      */
     public Integer canCastle(int x, int y) {
 	// Queen side is negative, King side is positive, both is 0, neither is
