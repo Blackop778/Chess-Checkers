@@ -91,8 +91,7 @@ public class King extends ChessPiece {
      * @param y
      *            Y of the king
      * @return Valid sides: Queen side is negative, King side is positive, both
-     *         is 0, neither is null TODO: Check whether King starts in check or
-     *         moves across check
+     *         is 0, neither is null
      */
     public Integer canCastle(int x, int y) {
 	// Queen side is negative, King side is positive, both is 0, neither is
@@ -144,85 +143,87 @@ public class King extends ChessPiece {
 			}
 		    }
 		}
-		if (sides > -1) {
-		    if (board[5][y] instanceof Empty) {
-			if (board[6][y] instanceof ChessPiece) {
-			    if (sides != 0) {
-				sides = null;
-			    } else {
-				sides = -1;
-			    }
-			}
-		    } else {
-			if (sides != 0) {
-			    sides = null;
-			} else {
-			    sides = -1;
-			}
-		    }
-		}
 		if (sides != null) {
-		    // King cannot move out of check
-		    if (!ChessPiece.isKingInCheck(black)) {
-			// King cannot pass through or move into check
-			if (sides < 1) {
-			    Piece piece = board[3][y];
-			    board[3][y] = this;
-			    board[4][y] = new Empty();
-			    if (!ChessPiece.isKingInCheck(black)) {
-				board[3][y] = piece;
-				piece = board[2][y];
-				board[2][y] = this;
-				if (ChessPiece.isKingInCheck(black)) {
-				    if (sides != 0) {
-					sides = null;
-				    } else {
-					sides = 1;
-				    }
-				}
-				board[2][y] = piece;
-				board[4][y] = this;
-			    } else {
-				board[3][y] = piece;
-				board[4][y] = this;
-				if (sides != 0) {
-				    sides = null;
-				} else {
-				    sides = 1;
-				}
-			    }
-			}
-			if (sides > -1) {
-			    Piece piece = board[5][y];
-			    board[5][y] = this;
-			    board[4][y] = new Empty();
-			    if (!ChessPiece.isKingInCheck(black)) {
-				board[5][y] = piece;
-				piece = board[6][y];
-				board[6][y] = this;
-				if (ChessPiece.isKingInCheck(black)) {
-				    if (sides != 0) {
-					sides = null;
-				    } else {
-					sides = -1;
-				    }
-				}
-				board[6][y] = piece;
-				board[4][y] = this;
-			    } else {
-				board[5][y] = piece;
-				board[4][y] = this;
+		    if (sides > -1) {
+			if (board[5][y] instanceof Empty) {
+			    if (board[6][y] instanceof ChessPiece) {
 				if (sides != 0) {
 				    sides = null;
 				} else {
 				    sides = -1;
 				}
 			    }
+			} else {
+			    if (sides != 0) {
+				sides = null;
+			    } else {
+				sides = -1;
+			    }
 			}
-		    } else {
-			sides = null;
 		    }
+		    if (sides != null) {
+			// King cannot move out of check
+			if (!ChessPiece.isKingInCheck(black)) {
+			    // King cannot pass through or move into check
+			    if (sides < 1) {
+				Piece piece = board[3][y];
+				board[3][y] = this;
+				board[4][y] = new Empty();
+				if (!ChessPiece.isKingInCheck(black)) {
+				    board[3][y] = piece;
+				    piece = board[2][y];
+				    board[2][y] = this;
+				    if (ChessPiece.isKingInCheck(black)) {
+					if (sides != 0) {
+					    sides = null;
+					} else {
+					    sides = 1;
+					}
+				    }
+				    board[2][y] = piece;
+				    board[4][y] = this;
+				} else {
+				    board[3][y] = piece;
+				    board[4][y] = this;
+				    if (sides != 0) {
+					sides = null;
+				    } else {
+					sides = 1;
+				    }
+				}
+			    }
+			    if (sides > -1) {
+				Piece piece = board[5][y];
+				board[5][y] = this;
+				board[4][y] = new Empty();
+				if (!ChessPiece.isKingInCheck(black)) {
+				    board[5][y] = piece;
+				    piece = board[6][y];
+				    board[6][y] = this;
+				    if (ChessPiece.isKingInCheck(black)) {
+					if (sides != 0) {
+					    sides = null;
+					} else {
+					    sides = -1;
+					}
+				    }
+				    board[6][y] = piece;
+				    board[4][y] = this;
+				} else {
+				    board[5][y] = piece;
+				    board[4][y] = this;
+				    if (sides != 0) {
+					sides = null;
+				    } else {
+					sides = -1;
+				    }
+				}
+			    }
+			} else {
+			    sides = null;
+			}
 
+		    }
 		}
 	    }
 	}

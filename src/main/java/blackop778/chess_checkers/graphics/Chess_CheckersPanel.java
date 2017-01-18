@@ -89,7 +89,7 @@ public class Chess_CheckersPanel extends JPanel {
 	g.setColor(Color.LIGHT_GRAY);
 	g.fillRect(0, 0, 721, 45);
 	g.setColor(Color.BLACK);
-	g.setFont(new Font(Font.SERIF, Font.PLAIN, 30));
+	g.setFont(Chess_Checkers.font.deriveFont(30f));
 	g.drawString("Player turn: ", 10, 35);
 	if (Chess_Checkers.client.getTurn() && Chess_Checkers.client.black) {
 	    g.setColor(Color.BLACK);
@@ -102,19 +102,19 @@ public class Chess_CheckersPanel extends JPanel {
 	}
 	g.fillRect(150, 5, 30, 30);
 	if (!Chess_Checkers.offerSurrender) {
-	    g.setFont(new Font(Font.SERIF, Font.BOLD, 30));
+	    g.setFont(Chess_Checkers.font.deriveFont(Font.BOLD, 30f));
 	    g.setColor(Color.BLACK);
 	    g.drawString("Offer Surrender", 200, 35);
 	    g.drawRect(200, 1, 205, 43);
 	}
 	if (!Chess_Checkers.client.gameIsCheckers) {
 	    g.setColor(Color.BLACK);
-	    g.setFont(new Font(Font.SERIF, Font.PLAIN, 30));
+	    g.setFont(Chess_Checkers.font.deriveFont(30f));
 	    g.drawString("Check: ", 415, 35);
-	    if (ChessPiece.isKingInCheck(Chess_Checkers.client.getTurn())) {
-		if (!ChessPiece.canMove(Chess_Checkers.client.getTurn())) {
+	    if (ChessPiece.isKingInCheck(Chess_Checkers.client.black)) {
+		if (!ChessPiece.canMove(Chess_Checkers.client.black)) {
 		    g.setColor(new Color(218, 165, 32));
-		    g.setFont(new Font(Font.SERIF, Font.BOLD, 30));
+		    g.setFont(Chess_Checkers.font.deriveFont(Font.BOLD, 30f));
 		    g.drawString("MATE", 507, 35);
 		} else {
 		    g.setColor(Color.RED);

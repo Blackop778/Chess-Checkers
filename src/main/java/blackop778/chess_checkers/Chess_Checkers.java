@@ -1,6 +1,10 @@
 package blackop778.chess_checkers;
 
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -17,8 +21,15 @@ public abstract class Chess_Checkers {
     public static boolean gameOver = false;
     public static String gameType;
     public static Chess_CheckersPanel panel;
+    public static Font font;
 
     public static void main(String[] args) {
+	try {
+	    font = Font.createFont(Font.TRUETYPE_FONT, new File("resources" + File.separator + "FreeSans.otf"));
+	} catch (FontFormatException | IOException e) {
+	    e.printStackTrace();
+	}
+
 	setupGame();
     }
 

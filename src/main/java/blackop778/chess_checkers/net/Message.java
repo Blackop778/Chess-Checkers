@@ -86,7 +86,7 @@ public class Message {
 
 	public static PawnPromotionMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender,
 		Promotion promo) {
-	    if (coordinate1.matches("[A-H][1-8]") && coordinate2.matches("[A-H][1-8]"))
+	    if (coordinate1.matches("[A-H][0-7]") && coordinate2.matches("[A-H][0-7]"))
 		return new PawnPromotionMessage(coordinate1, coordinate2, offerSurrender, promo);
 	    return null;
 	}
@@ -102,7 +102,7 @@ public class Message {
 	}
 
 	public static CheckersMessage instantiate(String coordinate1, JumpTree tree, boolean offerSurrender) {
-	    if (coordinate1.matches("[A-H][1-8]"))
+	    if (coordinate1.matches("[A-H][0-7]"))
 		return new CheckersMessage(coordinate1, tree, offerSurrender);
 	    return null;
 	}
