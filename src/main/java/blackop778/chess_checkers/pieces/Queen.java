@@ -26,11 +26,11 @@ public class Queen extends ChessPiece {
 	    g.fillRect(x + 2, y + 2, 86, 86);
 	}
 	String color = black ? "Black" : "White";
-	File image = new File("resources\\" + color + "Queen.png");
+	File image = new File("resources" + File.separator + color + "Queen.png");
 	try {
 	    g.drawImage(ImageIO.read(image), x, y, null);
 	} catch (IOException e) {
-	    e.printStackTrace();
+	    // e.printStackTrace();
 	}
     }
 

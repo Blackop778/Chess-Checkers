@@ -29,7 +29,7 @@ public class King extends ChessPiece {
 	    g.fillRect(x + 2, y + 2, 86, 86);
 	}
 	String color = black ? "Black" : "White";
-	File image = new File("resources\\" + color + "King.png");
+	File image = new File("resources" + File.separator + color + "King.png");
 	try {
 	    g.drawImage(ImageIO.read(image), x, y, null);
 	} catch (IOException e) {

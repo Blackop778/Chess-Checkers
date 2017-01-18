@@ -31,7 +31,7 @@ public class Server extends Client {
 			.handler(new ChannelInitializer<LocalServerChannel>() {
 			    @Override
 			    public void initChannel(LocalServerChannel ch) throws Exception {
-				ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+				ch.pipeline().addLast(new LoggingHandler(LogLevel.ERROR));
 			    }
 			}).childHandler(new ChannelInitializer<LocalChannel>() {
 			    @Override

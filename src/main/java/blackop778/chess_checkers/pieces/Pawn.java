@@ -27,11 +27,11 @@ public class Pawn extends ChessPiece {
 	    g.fillRect(x + 2, y + 2, 86, 86);
 	}
 	String color = black ? "Black" : "White";
-	File image = new File("resources\\" + color + "Pawn.png");
+	File image = new File("resources" + File.separator + color + "Pawn.png");
 	try {
 	    g.drawImage(ImageIO.read(image), x, y, null);
 	} catch (IOException e) {
-	    e.printStackTrace();
+	    // e.printStackTrace();
 	}
     }
 
