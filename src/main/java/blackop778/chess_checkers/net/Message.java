@@ -1,9 +1,87 @@
 package blackop778.chess_checkers.net;
 
+import java.awt.Point;
+
 import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
 public class Message {
+
+    /**
+     * Assumes (0,0) is the top left square
+     * 
+     * @param x
+     * @param y
+     * @return
+     */
+    public static String pointToChessNotation(int x, int y) {
+	String xL;
+	switch (x) {
+	case 0:
+	    xL = "a";
+	    break;
+	case 1:
+	    xL = "b";
+	    break;
+	case 2:
+	    xL = "c";
+	    break;
+	case 3:
+	    xL = "d";
+	    break;
+	case 4:
+	    xL = "e";
+	    break;
+	case 5:
+	    xL = "f";
+	    break;
+	case 6:
+	    xL = "g";
+	    break;
+	case 7:
+	    xL = "h";
+	    break;
+	default:
+	    throw new InvalidCoordinateException();
+	}
+
+	return xL + String.valueOf(Math.abs(y - 8));
+    }
+
+    public static Point ChessNotationToPoint(String notation) {
+	int x;
+	switch (notation.charAt(0)) {
+	case 'a':
+	    x = 0;
+	    break;
+	case 'b':
+	    x = 1;
+	    break;
+	case 'c':
+	    x = 2;
+	    break;
+	case 'd':
+	    x = 3;
+	    break;
+	case 'e':
+	    x = 4;
+	    break;
+	case 'f':
+	    x = 5;
+	    break;
+	case 'g':
+	    x = 6;
+	    break;
+	case 'h':
+	    x = 7;
+	    break;
+	default:
+	    throw new InvalidCoordinateException();
+	}
+
+	return new Point(x, Math.abs(Integer.valueOf(notation.substring(1)) - 8));
+    }
+
     public static char numberToLetter(int number) {
 	switch (number) {
 	case 0:
