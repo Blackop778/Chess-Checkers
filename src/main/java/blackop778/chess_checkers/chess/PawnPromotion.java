@@ -55,17 +55,17 @@ class DialogWindow extends JPanel implements ActionListener {
 	queen.setMnemonic(1);
 	group.add(queen);
 
-	JRadioButton rook = new JRadioButton("Rook", false);
-	rook.addActionListener(this);
-	rook.setActionCommand("Rook");
-	rook.setMnemonic(1);
-	group.add(rook);
-
 	JRadioButton knight = new JRadioButton("Knight", false);
 	knight.addActionListener(this);
 	knight.setActionCommand("Knight");
 	knight.setMnemonic(1);
 	group.add(knight);
+
+	JRadioButton rook = new JRadioButton("Rook", false);
+	rook.addActionListener(this);
+	rook.setActionCommand("Rook");
+	rook.setMnemonic(1);
+	group.add(rook);
 
 	JRadioButton bishop = new JRadioButton("Bishop", false);
 	bishop.addActionListener(this);
@@ -75,8 +75,8 @@ class DialogWindow extends JPanel implements ActionListener {
 
 	JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
 	buttonPanel.add(queen);
-	buttonPanel.add(rook);
 	buttonPanel.add(knight);
+	buttonPanel.add(rook);
 	buttonPanel.add(bishop);
 
 	JButton done = new JButton("Done");
@@ -101,11 +101,11 @@ class DialogWindow extends JPanel implements ActionListener {
 	case "Queen":
 	    controller.result = Promotion.Queen;
 	    break;
-	case "Rook":
-	    controller.result = Promotion.Rook;
-	    break;
 	case "Knight":
 	    controller.result = Promotion.Knight;
+	    break;
+	case "Rook":
+	    controller.result = Promotion.Rook;
 	    break;
 	case "Bishop":
 	    controller.result = Promotion.Bishop;

@@ -137,18 +137,25 @@ public class Client {
 		    coords[3] = Integer.valueOf(event.coordinate2.substring(1, 2));
 		    board[coords[2]][coords[3]] = board[coords[0]][coords[1]];
 		    board[coords[0]][coords[1]] = new Empty();
-		    if (event instanceof PawnPromotionMessage) {
+		    // Castling
+		    if (board[coords[2]][coords[3]] instanceof King) {
+			if (Math.abs(coords[2] - coords[0]) == 2 && coords[1] == coords[3]) {
+			    boolean right = coords[2] - coords[0] == 2;
+			    board[right ? 5 : 3][coords[1]] = board[right ? 7 : 0][coords[1]];
+			    board[right ? 7 : 0][coords[1]] = new Empty();
+			}
+		    } else if (event instanceof PawnPromotionMessage) {
 			if (board[coords[2]][coords[3]] instanceof Pawn) {
 			    PawnPromotionMessage ppm = (PawnPromotionMessage) event;
 			    switch (ppm.promo) {
 			    case Queen:
 				board[coords[2]][coords[3]] = new Queen(!black);
 				break;
-			    case Rook:
-				board[coords[2]][coords[3]] = new Rook(!black);
-				break;
 			    case Knight:
 				board[coords[2]][coords[3]] = new Knight(!black);
+				break;
+			    case Rook:
+				board[coords[2]][coords[3]] = new Rook(!black);
 				break;
 			    case Bishop:
 				board[coords[2]][coords[3]] = new Bishop(!black);
@@ -335,11 +342,11 @@ public class Client {
 		case Queen:
 		    piece = new Queen(black);
 		    break;
-		case Rook:
-		    piece = new Rook(black);
-		    break;
 		case Knight:
 		    piece = new Knight(black);
+		    break;
+		case Rook:
+		    piece = new Rook(black);
 		    break;
 		case Bishop:
 		    piece = new Bishop(black);

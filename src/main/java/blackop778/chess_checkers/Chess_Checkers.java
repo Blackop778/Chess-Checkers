@@ -22,6 +22,7 @@ public abstract class Chess_Checkers {
     public static String gameType;
     public static Chess_CheckersPanel panel;
     public static Font font;
+    public static String notation;
 
     public static void main(String[] args) {
 	try {
@@ -46,6 +47,7 @@ public abstract class Chess_Checkers {
 
     public static void setupGame() {
 	offerSurrender = false;
+	notation = "";
 
 	gameType = JOptionPane.showInputDialog(null, "Enter 'chess' to play chess or 'checkers' to play checkers.",
 		"Which game?", JOptionPane.QUESTION_MESSAGE);
