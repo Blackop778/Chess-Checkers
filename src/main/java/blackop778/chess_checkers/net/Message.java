@@ -82,50 +82,6 @@ public class Message {
 	return new Point(x, Math.abs(Integer.valueOf(notation.substring(1)) - 8));
     }
 
-    public static char numberToLetter(int number) {
-	switch (number) {
-	case 0:
-	    return 'A';
-	case 1:
-	    return 'B';
-	case 2:
-	    return 'C';
-	case 3:
-	    return 'D';
-	case 4:
-	    return 'E';
-	case 5:
-	    return 'F';
-	case 6:
-	    return 'G';
-	case 7:
-	    return 'H';
-	}
-	throw new InvalidCoordinateException();
-    }
-
-    public static int letterToNumber(char letter) {
-	switch (letter) {
-	case 'A':
-	    return 0;
-	case 'B':
-	    return 1;
-	case 'C':
-	    return 2;
-	case 'D':
-	    return 3;
-	case 'E':
-	    return 4;
-	case 'F':
-	    return 5;
-	case 'G':
-	    return 6;
-	case 'H':
-	    return 7;
-	}
-	throw new InvalidCoordinateException();
-    }
-
     public static class ChessMessage extends Message {
 	public final String coordinate1;
 	public final String coordinate2;
@@ -142,7 +98,7 @@ public class Message {
 	}
 
 	public static ChessMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender) {
-	    if (coordinate1.matches("[A-H][0-7]") && coordinate2.matches("[A-H][0-7]"))
+	    if (coordinate1.matches("[a-h][1-8]") && coordinate2.matches("[a-h][1-8]"))
 		return new ChessMessage(coordinate1, coordinate2, offerSurrender);
 	    return null;
 	}
@@ -164,7 +120,7 @@ public class Message {
 
 	public static PawnPromotionMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender,
 		Promotion promo) {
-	    if (coordinate1.matches("[A-H][0-7]") && coordinate2.matches("[A-H][0-7]"))
+	    if (coordinate1.matches("[a-h][1-8]") && coordinate2.matches("[a-h][1-8]"))
 		return new PawnPromotionMessage(coordinate1, coordinate2, offerSurrender, promo);
 	    return null;
 	}
@@ -180,7 +136,7 @@ public class Message {
 	}
 
 	public static CheckersMessage instantiate(String coordinate1, JumpTree tree, boolean offerSurrender) {
-	    if (coordinate1.matches("[A-H][0-7]"))
+	    if (coordinate1.matches("[a-h][1-8]"))
 		return new CheckersMessage(coordinate1, tree, offerSurrender);
 	    return null;
 	}

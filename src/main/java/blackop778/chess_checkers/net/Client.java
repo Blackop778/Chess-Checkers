@@ -13,6 +13,7 @@ import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
+import blackop778.chess_checkers.net.Message.CheckersMessage;
 import blackop778.chess_checkers.net.Message.ChessMessage;
 import blackop778.chess_checkers.net.Message.PawnPromotionMessage;
 import blackop778.chess_checkers.pieces.Bishop;
@@ -131,10 +132,12 @@ public class Client {
 		if (msg instanceof ChessMessage) {
 		    ChessMessage event = (ChessMessage) msg;
 		    int[] coords = new int[4];
-		    coords[0] = Message.letterToNumber(event.coordinate1.charAt(0));
-		    coords[1] = Integer.valueOf(event.coordinate1.substring(1, 2));
-		    coords[2] = Message.letterToNumber(event.coordinate2.charAt(0));
-		    coords[3] = Integer.valueOf(event.coordinate2.substring(1, 2));
+		    Point p1 = Message.ChessNotationToPoint(event.coordinate1);
+		    Point p2 = Message.ChessNotationToPoint(event.coordinate2);
+		    coords[0] = p1.x;
+		    coords[1] = p1.y;
+		    coords[2] = p2.x;
+		    coords[3] = p2.y;
 		    board[coords[2]][coords[3]] = board[coords[0]][coords[1]];
 		    board[coords[0]][coords[1]] = new Empty();
 		    // Castling
@@ -163,6 +166,9 @@ public class Client {
 			    }
 			}
 		    }
+		} else if (msg instanceof CheckersMessage) {
+		    CheckersMessage event = (CheckersMessage) msg;
+		    Point p = Message.ChessNotationToPoint(event.coordinate1);
 		}
 	    }
 	    if (Chess_Checkers.panel != null) {
@@ -216,8 +222,9 @@ public class Client {
 	}
     }
 
-    private void passCheckersTurn(String coordinate1, JumpTree tree, boolean offerSurrender) {
+    private void passCheckersTurn(CheckersMessage cm) {
 	turn = false;
+	context.writeAndFlush(cm);
 	if (localServer) {
 	    Client t = Chess_Checkers.client;
 	    Chess_Checkers.client = Chess_Checkers.clientPartner;
@@ -283,8 +290,7 @@ public class Client {
 				    + " wins. Exit this message and click on the board to restart.",
 			    "A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
 		}
-		passCheckersTurn(new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(), tree,
-			false);
+		passCheckersTurn(CheckersMessage.instantiate(Message.pointToChessNotation(i, n), tree, false));
 		// End the search for the jumptree we took and end the method
 		break;
 	    }
@@ -353,9 +359,8 @@ public class Client {
 		    break;
 		}
 
-		message = PawnPromotionMessage.instantiate(
-			new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(),
-			new StringBuilder().append(Message.numberToLetter(x)).append(y).toString(), false, promotion);
+		message = PawnPromotionMessage.instantiate(Message.pointToChessNotation(i, n),
+			Message.pointToChessNotation(x, y), false, promotion);
 	    }
 	} else {
 	    if (board[x][y] instanceof Empty) {
@@ -368,10 +373,8 @@ public class Client {
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();
 
-	passChessTurn((message == null)
-		? ChessMessage.instantiate(new StringBuilder().append(Message.numberToLetter(i)).append(n).toString(),
-			new StringBuilder().append(Message.numberToLetter(x)).append(y).toString(), false)
-		: message);
+	passChessTurn((message == null) ? ChessMessage.instantiate(Message.pointToChessNotation(i, n),
+		Message.pointToChessNotation(x, y), false) : message);
     }
 
     public void unselectAll() {
