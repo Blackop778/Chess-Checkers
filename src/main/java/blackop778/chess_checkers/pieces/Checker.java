@@ -9,7 +9,6 @@ import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.checkers.Jump;
 import blackop778.chess_checkers.checkers.JumpTree;
-import blackop778.chess_checkers.net.Client;
 
 public class Checker extends CheckersPiece {
     public Checker(boolean black, Integer UID) {
@@ -51,8 +50,6 @@ public class Checker extends CheckersPiece {
 
     @Override
     public void select(int x, int y) {
-	Client client = Chess_Checkers.client;
-	Client other = Chess_Checkers.clientPartner;
 	if ((black == Chess_Checkers.client.black) && Chess_Checkers.client.getTurn()) {
 	    Chess_Checkers.client.unselectAll();
 	    JumpTree[] jumps = getValidLocations(x, y);

@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.chess.Snapshot;
 import blackop778.chess_checkers.chess.SnapshotStorage;
-import blackop778.chess_checkers.net.Client;
 import blackop778.chess_checkers.pieces.ChessPiece;
 
 @SuppressWarnings("serial")
@@ -92,8 +91,6 @@ public class Chess_CheckersPanel extends JPanel {
 	g.setColor(Color.BLACK);
 	g.setFont(Chess_Checkers.font.deriveFont(30f));
 	g.drawString("Player turn: ", 10, 35);
-	Client client = Chess_Checkers.client;
-	Client other = Chess_Checkers.clientPartner;
 	if (Chess_Checkers.client.getTurn() && Chess_Checkers.client.black) {
 	    g.setColor(Color.BLACK);
 	} else {

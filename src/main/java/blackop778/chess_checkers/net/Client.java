@@ -180,6 +180,11 @@ public class Client {
 			board[event.tree.getEndJump().getMidPoint().x][event.tree.getEndJump()
 				.getMidPoint().y] = new Empty();
 		    }
+		    if ((event.tree.getEndJump().getEndPoint().y == 0 && !board[x][y].black)
+			    || (event.tree.getEndJump().getEndPoint().y == 7 && board[x][y].black)) {
+			Checker c = (Checker) board[x][y];
+			c.kinged = true;
+		    }
 		    board[event.tree.getEndJump().getEndPoint().x][event.tree.getEndJump()
 			    .getEndPoint().y] = board[x][y];
 		    board[x][y] = new Empty();
