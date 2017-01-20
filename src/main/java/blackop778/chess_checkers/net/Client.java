@@ -169,6 +169,20 @@ public class Client {
 		} else if (msg instanceof CheckersMessage) {
 		    CheckersMessage event = (CheckersMessage) msg;
 		    Point p = Message.ChessNotationToPoint(event.coordinate1);
+		    int x = p.x;
+		    int y = p.y;
+		    for (Jump j : event.tree.getMidJumps()) {
+			if (j.getMidPoint() != null) {
+			    board[j.getMidPoint().x][j.getMidPoint().y] = new Empty();
+			}
+		    }
+		    if (event.tree.getEndJump().getMidPoint() != null) {
+			board[event.tree.getEndJump().getMidPoint().x][event.tree.getEndJump()
+				.getMidPoint().y] = new Empty();
+		    }
+		    board[event.tree.getEndJump().getEndPoint().x][event.tree.getEndJump()
+			    .getEndPoint().y] = board[x][y];
+		    board[x][y] = new Empty();
 		}
 	    }
 	    if (Chess_Checkers.panel != null) {
