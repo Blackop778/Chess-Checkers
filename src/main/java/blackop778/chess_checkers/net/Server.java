@@ -20,9 +20,9 @@ public class Server extends Client {
 	super(black, gameIsCheckers, localServer);
     }
 
-    public void startLocalServer() {
+    public void startLocalServer(int port) {
 	if (localServer) {
-	    final LocalAddress local = new LocalAddress("1778");
+	    final LocalAddress local = new LocalAddress(String.valueOf(port));
 	    EventLoopGroup serverGroup = new DefaultEventLoopGroup();
 	    EventLoopGroup clientGroup = new NioEventLoopGroup();
 	    try {

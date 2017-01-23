@@ -63,6 +63,6 @@ public abstract class Chess_Checkers {
 	}
 	client = new Server(gameType.equalsIgnoreCase("checkers"), Chess_Checkers.gameType.equalsIgnoreCase("checkers"),
 		true);
-	((Server) client).startLocalServer();
+	((Server) client).startLocalServer(1778);
     }
 }
