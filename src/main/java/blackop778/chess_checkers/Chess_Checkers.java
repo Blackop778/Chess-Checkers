@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.graphics.Chess_CheckersFrame;
 import blackop778.chess_checkers.graphics.Chess_CheckersPanel;
+import blackop778.chess_checkers.graphics.Setup;
 import blackop778.chess_checkers.net.Client;
 import blackop778.chess_checkers.net.Server;
 
@@ -31,7 +32,7 @@ public abstract class Chess_Checkers {
 	    e.printStackTrace();
 	}
 
-	setupGame();
+	setup();
     }
 
     public static void startGUI() {
@@ -64,5 +65,9 @@ public abstract class Chess_Checkers {
 	client = new Server(gameType.equalsIgnoreCase("checkers"), Chess_Checkers.gameType.equalsIgnoreCase("checkers"),
 		true);
 	((Server) client).startLocalServer(1778);
+    }
+
+    public static void setup() {
+	Setup o = new Setup();
     }
 }
