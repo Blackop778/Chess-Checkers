@@ -137,24 +137,21 @@ public class Client {
 		    int y1 = p1.y;
 		    int x2 = p2.x;
 		    int y2 = p2.y;
+		    if (board[x1][y1] instanceof Pawn) {
+			if (Math.abs(x2 - x1) == 1 && board[x2][y2] instanceof Empty) {
+			    // Check En passant capturing
+			    board[x2][y1] = new Empty();
+			}
+		    }
 		    board[x2][y2] = board[x1][y1];
 		    board[x1][y1] = new Empty();
-		    // Castling
-		    if (board[x2][y2] instanceof King) {
-			King pieceK = (King) board[x2][y2];
-			if (Math.abs(x2 - x1) == 2 && y1 == y2) {
-			    if (!pieceK.moved) {
-				boolean right = x2 - x1 == 2;
-				Rook pieceR = (Rook) board[right ? 7 : 1][y1];
-				if (!pieceR.moved) {
-				    board[right ? 5 : 3][y1] = board[right ? 7 : 0][y1];
-				    board[right ? 7 : 0][y1] = new Empty();
-				}
+		    if (board[x2][y2] instanceof Pawn) {
+			ChessPiece.pawnCaptureCount = 0;
+			if (Math.abs(y2 - y1) == 2) {
+			    if (y1 == 1 || y1 == 6) {
+				ChessPiece.doubleMovePawn = (Pawn) board[x2][y2];
 			    }
-			}
-			pieceK.moved = true;
-		    } else if (event instanceof PawnPromotionMessage) {
-			if (board[x2][y2] instanceof Pawn) {
+			} else if (event instanceof PawnPromotionMessage) {
 			    PawnPromotionMessage ppm = (PawnPromotionMessage) event;
 			    switch (ppm.promo) {
 			    case Queen:
@@ -171,6 +168,20 @@ public class Client {
 				break;
 			    }
 			}
+			// Castling
+		    } else if (board[x2][y2] instanceof King) {
+			King pieceK = (King) board[x2][y2];
+			if (Math.abs(x2 - x1) == 2 && y1 == y2) {
+			    if (!pieceK.moved) {
+				boolean right = x2 - x1 == 2;
+				Rook pieceR = (Rook) board[right ? 7 : 1][y1];
+				if (!pieceR.moved) {
+				    board[right ? 5 : 3][y1] = board[right ? 7 : 0][y1];
+				    board[right ? 7 : 0][y1] = new Empty();
+				}
+			    }
+			}
+			pieceK.moved = true;
 		    } else if (board[x2][y2] instanceof Rook) {
 			Rook pieceR = (Rook) board[x2][y2];
 			pieceR.moved = true;
@@ -385,8 +396,8 @@ public class Client {
 	    } else {
 		ChessPiece.pawnCaptureCount = 0;
 	    }
+	    ChessPiece.doubleMovePawn = null;
 	}
-	ChessPiece.doubleMovePawn = null;
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();
 
