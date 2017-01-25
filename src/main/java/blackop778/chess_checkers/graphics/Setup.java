@@ -12,12 +12,15 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 public class Setup {
-    public final Options game;
-    public final Options humans;
-    public final Options internet;
-    public final Options host;
+    public final Option game;
+    public final Option humans;
+    public final Option internet;
+    public final Option host;
+    public final Text ip;
+    public final Text port;
     public final JPanel panel;
     public final JDialog dialog;
 
@@ -26,9 +29,9 @@ public class Setup {
 	panel = new JPanel();
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	dialog.add(panel);
-	game = new Options("Game:", "Chess", "Checkers", true);
+	game = new Option("Game:", "Chess", "Checkers", true);
 	panel.add(game);
-	humans = new Options("Number of humans:", "1", "2", false, new ActionListener() {
+	humans = new Option("Number of humans:", "1", "2", false, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
 		internet.removeCustom(panel, dialog);
@@ -40,19 +43,29 @@ public class Setup {
 	    }
 	});
 	panel.add(humans);
-	host = new Options("Host the game:", "yes", "no", true);
-	internet = new Options("Multiplayer over internet:", "yes", "no", false, new ActionListener() {
+	ip = new Text("IP address:", 4);
+	port = new Text("Port:", 4);
+	host = new Option("Host the game:", "yes", "no", true, new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		panel.remove(ip);
+	    }
+	}, new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		panel.add(ip);
+	    }
+	}, new Component[] { port }, new Component[] { ip, port });
+	internet = new Option("Multiplayer over internet:", "yes", "no", true, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		host.addCustom(panel, dialog);
 	    }
-
 	}, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		host.removeCustom(panel, dialog);
 	    }
-
 	}, new Component[] { host }, new Component[0]);
 	internet.addCustom(panel, dialog);
 	dialog.setTitle("Chess-Checkers Setup");
@@ -67,7 +80,7 @@ public class Setup {
      * Designed to be pretty generic but I decided to add some specifics instead
      * of having subclass hell in Setup
      */
-    public class Options extends JPanel {
+    public class Option extends JPanel {
 	private static final long serialVersionUID = -1954244826051963946L;
 
 	public final ButtonGroup bg;
@@ -86,11 +99,11 @@ public class Setup {
 	 * @param b2Label
 	 * @param firstSelected
 	 */
-	public Options(String label, String label1, String label2, boolean firstSelected) {
+	public Option(String label, String label1, String label2, boolean firstSelected) {
 	    this(label, label1, label2, firstSelected, null, null);
 	}
 
-	public Options(String label, String label1, String label2, boolean firstSelected, ActionListener al1,
+	public Option(String label, String label1, String label2, boolean firstSelected, ActionListener al1,
 		ActionListener al2) {
 	    this(label, label1, label2, firstSelected, al1, al2, new Component[0], new Component[0]);
 	}
@@ -108,7 +121,7 @@ public class Setup {
 	 * @param o2Next
 	 *            Don't make null, make empty
 	 */
-	public Options(String label, String label1, String label2, boolean firstSelected, ActionListener al1,
+	public Option(String label, String label1, String label2, boolean firstSelected, ActionListener al1,
 		ActionListener al2, Component[] o1Next, Component[] o2Next) {
 	    this.label1 = label1;
 	    this.label2 = label2;
@@ -149,9 +162,9 @@ public class Setup {
 	    else
 		a = o2Next;
 	    for (Component c : a) {
-		if (c instanceof Options) {
-		    Options o = (Options) c;
-		    o.add(container);
+		if (c instanceof Option) {
+		    Option o = (Option) c;
+		    o.addCustom(container, window);
 		} else
 		    container.add(c);
 	    }
@@ -173,14 +186,27 @@ public class Setup {
 	    else
 		a = o2Next;
 	    for (Component c : a) {
-		if (c instanceof Options) {
-		    Options o = (Options) c;
-		    o.remove(container);
+		if (c instanceof Option) {
+		    Option o = (Option) c;
+		    o.removeCustom(container, window);
 		} else
 		    container.remove(c);
 	    }
 	    container.repaint();
 	    window.pack();
+	}
+    }
+
+    public class Text extends JPanel {
+	private static final long serialVersionUID = -1712072660292711164L;
+	public final JTextField text;
+
+	public Text(String label, int textFieldWidth) {
+	    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+	    add(new JLabel(label));
+	    text = new JTextField(textFieldWidth);
+	    text.setEditable(true);
+	    add(text);
 	}
     }
 }
