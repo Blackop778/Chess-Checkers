@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,46 +18,71 @@ import javax.swing.JTextField;
 public class Setup {
     public final Option game;
     public final Option humans;
+    public final Option black;
     public final Option internet;
     public final Option host;
     public final Text ip;
     public final Text port;
+    public final JButton enter;
     public final JPanel panel;
     public final JDialog dialog;
+    private boolean setup;
 
+    @SuppressWarnings("serial")
     public Setup() {
+	setup = false;
 	dialog = new JDialog();
-	panel = new JPanel();
+	panel = new JPanel() {
+	    // Ghetto solution to keep enter button on bottom
+	    @Override
+	    public Component add(Component comp) {
+		if (setup) {
+		    super.add(comp);
+		    remove(enter);
+		    super.add(enter);
+		} else
+		    super.add(comp);
+
+		return comp;
+	    }
+	};
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	dialog.add(panel);
 	game = new Option("Game:", "Chess", "Checkers", true);
 	panel.add(game);
+	black = new Option("Play as black:", "Yes", "No", false);
 	humans = new Option("Number of humans:", "1", "2", false, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
 		internet.removeCustom(panel, dialog);
+		black.addCustom(panel, dialog);
 	    }
 	}, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
 		internet.addCustom(panel, dialog);
+		black.removeCustom(panel, dialog);
 	    }
 	});
 	panel.add(humans);
 	ip = new Text("IP address:", 4);
 	port = new Text("Port:", 4);
-	host = new Option("Host the game:", "yes", "no", true, new ActionListener() {
+	host = new Option("Host the game:", "Yes", "No", true, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		panel.remove(ip);
+		panel.repaint();
+		dialog.pack();
 	    }
 	}, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		panel.add(ip);
+		panel.repaint();
+		dialog.pack();
 	    }
 	}, new Component[] { port }, new Component[] { ip, port });
-	internet = new Option("Multiplayer over internet:", "yes", "no", true, new ActionListener() {
+	internet = new Option("Multiplayer over internet:", "Yes", "No", false, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		host.addCustom(panel, dialog);
@@ -68,6 +94,9 @@ public class Setup {
 	    }
 	}, new Component[] { host }, new Component[0]);
 	internet.addCustom(panel, dialog);
+	enter = new JButton("Enter");
+	panel.add(enter);
+	setup = true;
 	dialog.setTitle("Chess-Checkers Setup");
 	dialog.pack();
 	dialog.setResizable(false);
