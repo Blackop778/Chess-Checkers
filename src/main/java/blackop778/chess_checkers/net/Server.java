@@ -11,6 +11,8 @@ import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
@@ -23,11 +25,12 @@ public class Server extends Client {
     public void startServer(int port) {
 	EventLoopGroup serverGroup;
 	EventLoopGroup clientGroup = new NioEventLoopGroup();
+	ServerBootstrap b;
 	if (localServer) {
 	    final LocalAddress local = new LocalAddress(String.valueOf(port));
 	    serverGroup = new DefaultEventLoopGroup();
 	    try {
-		ServerBootstrap b = new ServerBootstrap();
+		b = new ServerBootstrap();
 		b.group(serverGroup, clientGroup).channel(LocalServerChannel.class)
 			.handler(new ChannelInitializer<LocalServerChannel>() {
 			    @Override
@@ -46,7 +49,36 @@ public class Server extends Client {
 		System.out.println("Server listening to port " + local.id());
 		ChannelFuture f = b.bind(local).sync();
 		Chess_Checkers.clientPartner = new Client(!black, gameIsCheckers, true);
-		Chess_Checkers.clientPartner.start(clientGroup, local);
+		Chess_Checkers.clientPartner.startLocal(clientGroup, local);
+
+		// Wait until the server socket is closed.
+		f.channel().closeFuture().sync();
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } finally {
+		// Shut down all event loops to terminate all threads.
+		serverGroup.shutdownGracefully();
+		clientGroup.shutdownGracefully();
+	    }
+	} else {
+	    serverGroup = new NioEventLoopGroup();
+	    try {
+
+		b = new ServerBootstrap();
+		b.group(serverGroup, clientGroup).channel(NioServerSocketChannel.class)
+			.handler(new LoggingHandler(LogLevel.ERROR))
+			.childHandler(new ChannelInitializer<SocketChannel>() {
+			    @Override
+			    public void initChannel(SocketChannel ch) throws Exception {
+				ChannelPipeline p = ch.pipeline();
+				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
+			    }
+			});
+
+		// Start the server.
+		System.out.println("Server listening to port " + port);
+		ChannelFuture f = b.bind(port).sync();
 
 		// Wait until the server socket is closed.
 		f.channel().closeFuture().sync();

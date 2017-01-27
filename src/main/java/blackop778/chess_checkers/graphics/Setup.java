@@ -29,10 +29,12 @@ public class Setup {
     public final JPanel panel;
     public final JDialog dialog;
     private boolean setup;
+    public boolean buttonClosed;
 
     @SuppressWarnings("serial")
     public Setup() {
 	setup = false;
+	buttonClosed = false;
 	dialog = new JDialog();
 	panel = new JPanel() {
 	    // Ghetto solution to keep enter button on bottom
@@ -109,16 +111,22 @@ public class Setup {
 	};
 	internet.addCustom(panel, dialog);
 	enter = new JButton("Enter");
+	enter.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent arg0) {
+		buttonClosed = true;
+		dialog.dispose();
+	    }
+	});
 	panel.add(enter);
 	setup = true;
 	dialog.setTitle("Chess-Checkers Setup");
 	dialog.pack();
 	dialog.setResizable(false);
 	dialog.setLocationRelativeTo(null);
-	dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
 	dialog.setModal(true);
 	dialog.setVisible(true);
-	dialog.getClass();
     }
 
     /**

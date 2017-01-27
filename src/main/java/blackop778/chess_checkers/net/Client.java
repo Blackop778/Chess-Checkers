@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.Chess_Checkers.ClientTimeoutException;
 import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.checkers.Jump;
 import blackop778.chess_checkers.checkers.JumpTree;
@@ -35,8 +36,12 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalChannel;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.ReadTimeoutException;
 
 public class Client {
 
@@ -125,6 +130,12 @@ public class Client {
     }
 
     public class ClientHandler extends ChannelInboundHandlerAdapter {
+	private Client owner;
+
+	public ClientHandler(Client owner) {
+	    this.owner = owner;
+	}
+
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
 	    if (msg instanceof Message) {
@@ -219,9 +230,19 @@ public class Client {
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
 	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+	    if (cause instanceof ReadTimeoutException) {
+		if (!localServer) {
+		    if (!(owner instanceof Server)) {
+			
+		}
+	    }
+	}
     }
 
-    public void start(EventLoopGroup group, SocketAddress local) {
+    public void startLocal(EventLoopGroup group, SocketAddress local) {
 	if (localServer) {
 	    try {
 		Bootstrap b = new Bootstrap();
@@ -229,7 +250,7 @@ public class Client {
 		    @Override
 		    public void initChannel(LocalChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
+			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(owner));
 		    }
 		});
 
@@ -247,6 +268,37 @@ public class Client {
 	    } finally {
 		// Shut down the event loop to terminate all threads.
 		group.shutdownGracefully();
+	    }
+	}
+    }
+
+    public void start(String ip, int port) {
+	if (!localServer) {
+	    EventLoopGroup event = new NioEventLoopGroup();
+	    try {
+		Bootstrap b = new Bootstrap();
+		b.group(event).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
+		    @Override
+		    public void initChannel(SocketChannel ch) throws Exception {
+			ChannelPipeline p = ch.pipeline();
+			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(owner));
+		    }
+		});
+
+		// Start the client.
+		ChannelFuture future = b.connect(ip, port).sync();
+
+		// Start GUI
+		Chess_Checkers.startGUI();
+
+		// Wait until the connection is closed.
+		future.channel().closeFuture().sync();
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } finally {
+		// Shut down the event loop to terminate all threads.
+		event.shutdownGracefully();
 	    }
 	}
     }

@@ -50,18 +50,32 @@ public abstract class Chess_Checkers {
 	offerSurrender = false;
 	gameOver = false;
 	Setup s = new Setup();
-	if (s.humans.button1Selected()) {
-	    client = new Server(s.black.button1Selected(), !s.game.button1Selected(), true);
-	    ((Server) client).startServer(11778);
-	} else {
-	    if (!s.internet.button1Selected()) {
+	if (s.buttonClosed) {
+	    if (s.humans.button1Selected()) {
+		// Does nothing special right now
 		client = new Server(s.black.button1Selected(), !s.game.button1Selected(), true);
 		((Server) client).startServer(11778);
 	    } else {
-		if (s.host.button1Selected()) {
-		    client = new Server(s.black.button1Selected(), !s.game.button1Selected(), false);
+		if (!s.internet.button1Selected()) {
+		    // Local server
+		    client = new Server(s.black.button1Selected(), !s.game.button1Selected(), true);
+		    ((Server) client).startServer(11778);
+		} else {
+		    if (s.host.button1Selected()) {
+			// Host a server
+			client = new Server(s.black.button1Selected(), !s.game.button1Selected(), false);
+			((Server) client).startServer(Integer.valueOf(s.port.text.getText()));
+		    } else {
+			// Connect to remote server
+			client = new Client(s.black.button1Selected(), !s.game.button1Selected(), false);
+			client.start(s.ip.text.getText(), Integer.valueOf(s.port.text.getText()));
+		    }
 		}
 	    }
 	}
+    }
+
+    public static class ClientTimeoutException extends Exception {
+	private static final long serialVersionUID = -4472530227066677609L;
     }
 }
