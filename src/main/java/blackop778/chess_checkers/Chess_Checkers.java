@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.graphics.Chess_CheckersFrame;
 import blackop778.chess_checkers.graphics.Chess_CheckersPanel;
@@ -19,15 +18,16 @@ public abstract class Chess_Checkers {
     public static Client client;
     public static Client clientPartner;
     public static boolean offerSurrender;
-    public static boolean gameOver = false;
-    public static String gameType;
+    public static boolean gameOver;
     public static Chess_CheckersPanel panel;
     public static Font font;
+    public static Font fontBold;
     public static String notation;
 
     public static void main(String[] args) {
 	try {
 	    font = Font.createFont(Font.TRUETYPE_FONT, new File("resources" + File.separator + "FreeSans.otf"));
+	    fontBold = Font.createFont(Font.TRUETYPE_FONT, new File("resources" + File.separator + "FreeSansBold.otf"));
 	} catch (FontFormatException | IOException e) {
 	    e.printStackTrace();
 	}
@@ -46,28 +46,22 @@ public abstract class Chess_Checkers {
 	frame.setVisible(true);
     }
 
-    public static void setupGame() {
+    public static void setup() {
 	offerSurrender = false;
-	notation = "";
-
-	gameType = JOptionPane.showInputDialog(null, "Enter 'chess' to play chess or 'checkers' to play checkers.",
-		"Which game?", JOptionPane.QUESTION_MESSAGE);
-	if (gameType == null) {
-	    System.exit(0);
-	}
-	while (!gameType.equalsIgnoreCase("chess") && !gameType.equalsIgnoreCase("checkers")) {
-	    gameType = JOptionPane.showInputDialog(null, "Invalid input. Enter either 'chess' or 'checkers'.",
-		    "Ohoes noes", JOptionPane.ERROR_MESSAGE);
-	    if (gameType == null) {
-		gameType = "null";
+	gameOver = false;
+	Setup s = new Setup();
+	if (s.humans.button1Selected()) {
+	    client = new Server(s.black.button1Selected(), !s.game.button1Selected(), true);
+	    ((Server) client).startServer(11778);
+	} else {
+	    if (!s.internet.button1Selected()) {
+		client = new Server(s.black.button1Selected(), !s.game.button1Selected(), true);
+		((Server) client).startServer(11778);
+	    } else {
+		if (s.host.button1Selected()) {
+		    client = new Server(s.black.button1Selected(), !s.game.button1Selected(), false);
+		}
 	    }
 	}
-	client = new Server(gameType.equalsIgnoreCase("checkers"), Chess_Checkers.gameType.equalsIgnoreCase("checkers"),
-		true);
-	((Server) client).startLocalServer(1778);
-    }
-
-    public static void setup() {
-	Setup o = new Setup();
     }
 }

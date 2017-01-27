@@ -20,11 +20,12 @@ public class Server extends Client {
 	super(black, gameIsCheckers, localServer);
     }
 
-    public void startLocalServer(int port) {
+    public void startServer(int port) {
+	EventLoopGroup serverGroup;
+	EventLoopGroup clientGroup = new NioEventLoopGroup();
 	if (localServer) {
 	    final LocalAddress local = new LocalAddress(String.valueOf(port));
-	    EventLoopGroup serverGroup = new DefaultEventLoopGroup();
-	    EventLoopGroup clientGroup = new NioEventLoopGroup();
+	    serverGroup = new DefaultEventLoopGroup();
 	    try {
 		ServerBootstrap b = new ServerBootstrap();
 		b.group(serverGroup, clientGroup).channel(LocalServerChannel.class)

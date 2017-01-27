@@ -1,7 +1,6 @@
 package blackop778.chess_checkers.graphics;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -21,7 +20,7 @@ public class Chess_CheckersPanel extends JPanel {
 	    @Override
 	    public void mouseClicked(MouseEvent e) {
 		if (Chess_Checkers.gameOver) {
-		    Chess_Checkers.setupGame();
+		    Chess_Checkers.setup();
 		} else if (e.getY() <= 45) {
 		    if (e.getX() >= 200 && e.getX() <= 405) {
 			repaint();
@@ -102,7 +101,7 @@ public class Chess_CheckersPanel extends JPanel {
 	}
 	g.fillRect(150, 5, 30, 30);
 	if (!Chess_Checkers.offerSurrender) {
-	    g.setFont(Chess_Checkers.font.deriveFont(Font.BOLD, 30f));
+	    g.setFont(Chess_Checkers.fontBold.deriveFont(30f));
 	    g.setColor(Color.BLACK);
 	    g.drawString("Offer Surrender", 200, 35);
 	    g.drawRect(200, 1, 205, 43);
@@ -114,7 +113,7 @@ public class Chess_CheckersPanel extends JPanel {
 	    if (ChessPiece.isKingInCheck(Chess_Checkers.client.black)) {
 		if (!ChessPiece.canMove(Chess_Checkers.client.black)) {
 		    g.setColor(new Color(218, 165, 32));
-		    g.setFont(Chess_Checkers.font.deriveFont(Font.BOLD, 30f));
+		    g.setFont(Chess_Checkers.fontBold.deriveFont(30f));
 		    g.drawString("MATE", 507, 35);
 		} else {
 		    g.setColor(Color.RED);

@@ -14,6 +14,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class Setup {
     public final Option game;
@@ -50,7 +52,12 @@ public class Setup {
 	dialog.add(panel);
 	game = new Option("Game:", "Chess", "Checkers", true);
 	panel.add(game);
-	black = new Option("Play as black:", "Yes", "No", false);
+	black = new Option("Play as black:", "Yes", "No", false) {
+	    @Override
+	    public void notified() {
+		enter.setEnabled(true);
+	    }
+	};
 	humans = new Option("Number of humans:", "1", "2", false, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
@@ -60,13 +67,13 @@ public class Setup {
 	}, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
-		internet.addCustom(panel, dialog);
 		black.removeCustom(panel, dialog);
+		internet.addCustom(panel, dialog);
 	    }
 	});
 	panel.add(humans);
-	ip = new Text("IP address:", 4);
-	port = new Text("Port:", 4);
+	ip = new Text("IP address:", 15);
+	port = new Text("Port number:", 4);
 	host = new Option("Host the game:", "Yes", "No", true, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
@@ -86,13 +93,20 @@ public class Setup {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		host.addCustom(panel, dialog);
+		black.removeCustom(panel, dialog);
 	    }
 	}, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		host.removeCustom(panel, dialog);
+		black.addCustom(panel, dialog);
 	    }
-	}, new Component[] { host }, new Component[0]);
+	}, new Component[] { host }, new Component[] { black }) {
+	    @Override
+	    public void notified() {
+		enter.setEnabled(bg.getSelection().getActionCommand().equals(label2));
+	    }
+	};
 	internet.addCustom(panel, dialog);
 	enter = new JButton("Enter");
 	panel.add(enter);
@@ -102,14 +116,16 @@ public class Setup {
 	dialog.setResizable(false);
 	dialog.setLocationRelativeTo(null);
 	dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	dialog.setModal(true);
 	dialog.setVisible(true);
+	dialog.getClass();
     }
 
     /**
      * Designed to be pretty generic but I decided to add some specifics instead
      * of having subclass hell in Setup
      */
-    public class Option extends JPanel {
+    public class Option extends JPanel implements Notification {
 	private static final long serialVersionUID = -1954244826051963946L;
 
 	public final ButtonGroup bg;
@@ -197,6 +213,13 @@ public class Setup {
 		} else
 		    container.add(c);
 	    }
+	    if (setup) {
+		Component c = container.getComponents()[container.getComponentCount() - 1];
+		if (c instanceof Notification) {
+		    Notification n = (Notification) c;
+		    n.notified();
+		}
+	    }
 	    container.repaint();
 	    window.pack();
 	}
@@ -221,12 +244,28 @@ public class Setup {
 		} else
 		    container.remove(c);
 	    }
+	    if (setup) {
+		Component c = container.getComponents()[container.getComponentCount() - 1];
+		if (c instanceof Notification) {
+		    Notification n = (Notification) c;
+		    n.notified();
+		}
+	    }
 	    container.repaint();
 	    window.pack();
 	}
+
+	@Override
+	public void notified() {
+	    enter.setEnabled(false);
+	}
+
+	public boolean button1Selected() {
+	    return bg.getSelection().getActionCommand().equals(label1);
+	}
     }
 
-    public class Text extends JPanel {
+    public class Text extends JPanel implements Notification {
 	private static final long serialVersionUID = -1712072660292711164L;
 	public final JTextField text;
 
@@ -235,7 +274,34 @@ public class Setup {
 	    add(new JLabel(label));
 	    text = new JTextField(textFieldWidth);
 	    text.setEditable(true);
+	    text.getDocument().addDocumentListener(new DocumentListener() {
+
+		@Override
+		public void changedUpdate(DocumentEvent arg0) {
+		    enter.setEnabled(!text.getText().isEmpty());
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent arg0) {
+		    enter.setEnabled(!text.getText().isEmpty());
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent arg0) {
+		    enter.setEnabled(!text.getText().isEmpty());
+		}
+
+	    });
 	    add(text);
 	}
+
+	@Override
+	public void notified() {
+	    enter.setEnabled(!text.getText().isEmpty());
+	}
+    }
+
+    public interface Notification {
+	public abstract void notified();
     }
 }
