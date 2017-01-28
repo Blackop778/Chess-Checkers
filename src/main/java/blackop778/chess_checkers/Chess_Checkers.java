@@ -23,6 +23,7 @@ public abstract class Chess_Checkers {
     public static Font font;
     public static Font fontBold;
     public static String notation;
+    public static Setup setup;
 
     public static void main(String[] args) {
 	try {
@@ -32,6 +33,7 @@ public abstract class Chess_Checkers {
 	    e.printStackTrace();
 	}
 
+	setup = new Setup();
 	setup();
     }
 
@@ -49,26 +51,25 @@ public abstract class Chess_Checkers {
     public static void setup() {
 	offerSurrender = false;
 	gameOver = false;
-	Setup s = new Setup();
-	if (s.buttonClosed) {
-	    if (s.humans.button1Selected()) {
+	if (setup.buttonClosed) {
+	    if (setup.humans.button1Selected()) {
 		// Does nothing special right now
-		client = new Server(s.black.button1Selected(), !s.game.button1Selected(), true);
+		client = new Server(setup.black.button1Selected(), !setup.game.button1Selected(), true);
 		((Server) client).startServer(11778);
 	    } else {
-		if (!s.internet.button1Selected()) {
+		if (!setup.internet.button1Selected()) {
 		    // Local server
-		    client = new Server(s.black.button1Selected(), !s.game.button1Selected(), true);
+		    client = new Server(setup.black.button1Selected(), !setup.game.button1Selected(), true);
 		    ((Server) client).startServer(11778);
 		} else {
-		    if (s.host.button1Selected()) {
+		    if (setup.host.button1Selected()) {
 			// Host a server
-			client = new Server(s.black.button1Selected(), !s.game.button1Selected(), false);
-			((Server) client).startServer(Integer.valueOf(s.port.text.getText()));
+			client = new Server(setup.black.button1Selected(), !setup.game.button1Selected(), false);
+			((Server) client).startServer(Integer.valueOf(setup.port.text.getText()));
 		    } else {
 			// Connect to remote server
-			client = new Client(s.black.button1Selected(), !s.game.button1Selected(), false);
-			client.start(s.ip.text.getText(), Integer.valueOf(s.port.text.getText()));
+			client = new Client(setup.black.button1Selected(), !setup.game.button1Selected(), false);
+			client.start(setup.ip.text.getText(), Integer.valueOf(setup.port.text.getText()));
 		    }
 		}
 	    }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 import blackop778.chess_checkers.Chess_Checkers;
-import blackop778.chess_checkers.Chess_Checkers.ClientTimeoutException;
 import blackop778.chess_checkers.Utilities;
 import blackop778.chess_checkers.checkers.Jump;
 import blackop778.chess_checkers.checkers.JumpTree;
@@ -236,7 +235,8 @@ public class Client {
 	    if (cause instanceof ReadTimeoutException) {
 		if (!localServer) {
 		    if (!(owner instanceof Server)) {
-			
+			Chess_Checkers.setup();
+		    }
 		}
 	    }
 	}
@@ -246,11 +246,12 @@ public class Client {
 	if (localServer) {
 	    try {
 		Bootstrap b = new Bootstrap();
+		Client t = this;
 		b.group(group).channel(LocalChannel.class).handler(new ChannelInitializer<LocalChannel>() {
 		    @Override
 		    public void initChannel(LocalChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(owner));
+			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
 		    }
 		});
 
@@ -277,11 +278,12 @@ public class Client {
 	    EventLoopGroup event = new NioEventLoopGroup();
 	    try {
 		Bootstrap b = new Bootstrap();
+		Client t = this;
 		b.group(event).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
 		    @Override
 		    public void initChannel(SocketChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(owner));
+			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
 		    }
 		});
 
@@ -372,7 +374,8 @@ public class Client {
 			    "A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
 		}
 		passTurn(CheckersMessage.instantiate(Message.pointToChessNotation(i, n), tree, false));
-		// End the search for the jumptree we took and end the method
+		// End the search for the jumptree we took and end the
+		// method
 		break;
 	    }
 	}

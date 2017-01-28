@@ -26,6 +26,7 @@ public class Server extends Client {
 	EventLoopGroup serverGroup;
 	EventLoopGroup clientGroup = new NioEventLoopGroup();
 	ServerBootstrap b;
+	Client t = this;
 	if (localServer) {
 	    final LocalAddress local = new LocalAddress(String.valueOf(port));
 	    serverGroup = new DefaultEventLoopGroup();
@@ -41,7 +42,7 @@ public class Server extends Client {
 			    @Override
 			    public void initChannel(LocalChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
+				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
 			    }
 			});
 
@@ -72,7 +73,7 @@ public class Server extends Client {
 			    @Override
 			    public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
+				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
 			    }
 			});
 
