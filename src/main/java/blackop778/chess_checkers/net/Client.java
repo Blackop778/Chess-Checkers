@@ -29,6 +29,7 @@ import blackop778.chess_checkers.pieces.Queen;
 import blackop778.chess_checkers.pieces.Rook;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
@@ -288,7 +289,8 @@ public class Client {
 		});
 
 		// Start the client.
-		ChannelFuture future = b.connect(ip, port).sync();
+		ChannelFuture future = b.connect(ip, port).sync()
+			.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
 
 		// Start GUI
 		Chess_Checkers.startGUI();
@@ -296,7 +298,6 @@ public class Client {
 		// Wait until the connection is closed.
 		future.channel().closeFuture().sync();
 	    } catch (InterruptedException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    } finally {
 		// Shut down the event loop to terminate all threads.
