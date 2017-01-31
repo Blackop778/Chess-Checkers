@@ -35,7 +35,7 @@ public class Setup {
     public Setup() {
 	setup = false;
 	buttonClosed = false;
-	dialog = new JDialog();
+	dialog = new JDialog((JDialog) null);
 	panel = new JPanel() {
 	    // Ghetto solution to keep enter button on bottom
 	    @Override
@@ -126,6 +126,11 @@ public class Setup {
 	dialog.setLocationRelativeTo(null);
 	dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
 	dialog.setModal(true);
+	dialog.setVisible(true);
+    }
+
+    public void redisplay() {
+	buttonClosed = false;
 	dialog.setVisible(true);
     }
 

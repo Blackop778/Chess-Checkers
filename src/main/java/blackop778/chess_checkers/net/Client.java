@@ -34,6 +34,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.ConnectTimeoutException;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -41,7 +42,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.ReadTimeoutException;
 
 public class Client {
 
@@ -233,12 +233,10 @@ public class Client {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-	    if (cause instanceof ReadTimeoutException) {
-		if (!localServer) {
-		    if (!(owner instanceof Server)) {
-			Chess_Checkers.setup();
-		    }
-		}
+	    System.out.println("Exception Caught");
+	    if (cause instanceof ConnectTimeoutException) {
+		Chess_Checkers.setup.redisplay();
+		Chess_Checkers.setup();
 	    }
 	}
     }
@@ -289,8 +287,8 @@ public class Client {
 		});
 
 		// Start the client.
-		ChannelFuture future = b.connect(ip, port).sync()
-			.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+		ChannelFuture future = b.connect(ip, port).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
+			.sync();
 
 		// Start GUI
 		Chess_Checkers.startGUI();
