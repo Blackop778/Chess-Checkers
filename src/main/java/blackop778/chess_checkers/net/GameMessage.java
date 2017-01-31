@@ -5,8 +5,7 @@ import java.awt.Point;
 import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
-public class Message {
-
+public class GameMessage {
     /**
      * Assumes (0,0) is the top left square
      * 
@@ -82,7 +81,7 @@ public class Message {
 	return new Point(x, Math.abs(Integer.valueOf(notation.substring(1)) - 8));
     }
 
-    public static class ChessMessage extends Message {
+    public static class ChessMessage extends GameMessage {
 	public final String coordinate1;
 	public final String coordinate2;
 	public final boolean offerSurrender;
@@ -126,7 +125,7 @@ public class Message {
 	}
     }
 
-    public static class CheckersMessage extends Message {
+    public static class CheckersMessage extends GameMessage {
 	public final String coordinate1;
 	public final JumpTree tree;
 	public final boolean offerSurrender;

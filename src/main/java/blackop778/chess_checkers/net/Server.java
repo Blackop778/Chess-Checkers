@@ -3,6 +3,8 @@ package blackop778.chess_checkers.net;
 import blackop778.chess_checkers.Chess_Checkers;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.DefaultEventLoopGroup;
@@ -26,7 +28,6 @@ public class Server extends Client {
 	EventLoopGroup serverGroup;
 	EventLoopGroup clientGroup = new NioEventLoopGroup();
 	ServerBootstrap b;
-	Client t = this;
 	if (localServer) {
 	    final LocalAddress local = new LocalAddress(String.valueOf(port));
 	    serverGroup = new DefaultEventLoopGroup();
@@ -42,13 +43,13 @@ public class Server extends Client {
 			    @Override
 			    public void initChannel(LocalChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
+				p.addLast(new LoggingHandler(LogLevel.ERROR), new ServerHandler());
 			    }
 			});
 
 		// Start the server.
 		System.out.println("Server listening to port " + local.id());
-		ChannelFuture f = b.bind(local).sync();
+		ChannelFuture f = b.bind(local).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).sync();
 		Chess_Checkers.clientPartner = new Client(!black, gameIsCheckers, true);
 		Chess_Checkers.clientPartner.startLocal(clientGroup, local);
 
@@ -65,7 +66,6 @@ public class Server extends Client {
 	} else {
 	    serverGroup = new NioEventLoopGroup();
 	    try {
-
 		b = new ServerBootstrap();
 		b.group(serverGroup, clientGroup).channel(NioServerSocketChannel.class)
 			.handler(new LoggingHandler(LogLevel.ERROR))
@@ -73,24 +73,31 @@ public class Server extends Client {
 			    @Override
 			    public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
+				p.addLast(new LoggingHandler(LogLevel.ERROR), new ServerHandler());
 			    }
 			});
 
 		// Start the server.
 		System.out.println("Server listening to port " + port);
-		ChannelFuture f = b.bind(port).sync();
+		ChannelFuture f = b.bind(port).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).sync();
 
 		// Wait until the server socket is closed.
 		f.channel().closeFuture().sync();
 	    } catch (InterruptedException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    } finally {
 		// Shut down all event loops to terminate all threads.
 		serverGroup.shutdownGracefully();
 		clientGroup.shutdownGracefully();
 	    }
+	}
+    }
+
+    public class ServerHandler extends ClientHandler {
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) {
+	    super.channelActive(ctx);
+	    Chess_Checkers.startGUI();
 	}
     }
 }

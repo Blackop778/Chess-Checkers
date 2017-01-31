@@ -56,7 +56,7 @@ public abstract class Chess_Checkers {
 	if (!setup.buttonClosed)
 	    System.exit(0);
 	if (setup.humans.button1Selected()) {
-	    // Does nothing special right now
+	    // VS AI, Does nothing special right now
 	    client = new Server(setup.black.button1Selected(), !setup.game.button1Selected(), true);
 	    ((Server) client).startServer(11778);
 	} else {

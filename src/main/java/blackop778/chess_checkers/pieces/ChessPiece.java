@@ -19,7 +19,7 @@ public abstract class ChessPiece extends Piece {
     @Override
     public void select(int x, int y) {
 	Piece[][] board = Chess_Checkers.client.getBoard();
-	if (black == Chess_Checkers.client.black) {
+	if (black == Chess_Checkers.client.getBlack() && Chess_Checkers.client.getTurn()) {
 	    Chess_Checkers.client.unselectAll();
 	    Point[] locations = getValidLocations(x, y);
 	    for (Point point : locations) {
@@ -198,15 +198,15 @@ public abstract class ChessPiece extends Piece {
 	    JOptionPane.showMessageDialog(null,
 		    "50 turns have passed since a piece has been taken or a pawn has moved. The game is a draw.",
 		    "Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
-	} else if (!canMove(!Chess_Checkers.client.black)) {
+	} else if (!canMove(!Chess_Checkers.client.getBlack())) {
 	    Chess_Checkers.gameOver = true;
-	    if (isKingInCheck(!Chess_Checkers.client.black)) {
-		String winner = Chess_Checkers.client.black ? "black" : "white";
+	    if (isKingInCheck(!Chess_Checkers.client.getBlack())) {
+		String winner = Chess_Checkers.client.getBlack() ? "black" : "white";
 		JOptionPane.showMessageDialog(null,
 			"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
 			"A Champion has been decided", JOptionPane.INFORMATION_MESSAGE);
 	    } else {
-		String cause = !Chess_Checkers.client.black ? "black" : "white";
+		String cause = !Chess_Checkers.client.getBlack() ? "black" : "white";
 		JOptionPane.showMessageDialog(null,
 			"The game is a draw because " + cause + " cannot move but isn't in check.",
 			"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);

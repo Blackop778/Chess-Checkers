@@ -1,6 +1,7 @@
 package blackop778.chess_checkers.net;
 
 import java.awt.Point;
+import java.net.ConnectException;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 
@@ -13,9 +14,9 @@ import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
-import blackop778.chess_checkers.net.Message.CheckersMessage;
-import blackop778.chess_checkers.net.Message.ChessMessage;
-import blackop778.chess_checkers.net.Message.PawnPromotionMessage;
+import blackop778.chess_checkers.net.GameMessage.CheckersMessage;
+import blackop778.chess_checkers.net.GameMessage.ChessMessage;
+import blackop778.chess_checkers.net.GameMessage.PawnPromotionMessage;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
 import blackop778.chess_checkers.pieces.CheckersPiece;
@@ -34,7 +35,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.ConnectTimeoutException;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -46,7 +46,7 @@ import io.netty.handler.logging.LoggingHandler;
 public class Client {
 
     private Piece[][] board;
-    public final boolean black;
+    protected boolean black;
     public final boolean gameIsCheckers;
     private boolean turn;
     private ChannelHandlerContext context;
@@ -130,20 +130,14 @@ public class Client {
     }
 
     public class ClientHandler extends ChannelInboundHandlerAdapter {
-	private Client owner;
-
-	public ClientHandler(Client owner) {
-	    this.owner = owner;
-	}
-
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-	    if (msg instanceof Message) {
+	    if (msg instanceof GameMessage) {
 		turn = true;
 		if (msg instanceof ChessMessage) {
 		    ChessMessage event = (ChessMessage) msg;
-		    Point p1 = Message.ChessNotationToPoint(event.coordinate1);
-		    Point p2 = Message.ChessNotationToPoint(event.coordinate2);
+		    Point p1 = GameMessage.ChessNotationToPoint(event.coordinate1);
+		    Point p2 = GameMessage.ChessNotationToPoint(event.coordinate2);
 		    int x1 = p1.x;
 		    int y1 = p1.y;
 		    int x2 = p2.x;
@@ -199,7 +193,7 @@ public class Client {
 		    }
 		} else if (msg instanceof CheckersMessage) {
 		    CheckersMessage event = (CheckersMessage) msg;
-		    Point p = Message.ChessNotationToPoint(event.coordinate1);
+		    Point p = GameMessage.ChessNotationToPoint(event.coordinate1);
 		    int x = p.x;
 		    int y = p.y;
 		    for (Jump j : event.tree.getMidJumps()) {
@@ -234,9 +228,11 @@ public class Client {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 	    System.out.println("Exception Caught");
-	    if (cause instanceof ConnectTimeoutException) {
+	    if (cause instanceof ConnectException) {
 		Chess_Checkers.setup.redisplay();
 		Chess_Checkers.setup();
+	    } else {
+		ctx.fireExceptionCaught(cause);
 	    }
 	}
     }
@@ -245,25 +241,21 @@ public class Client {
 	if (localServer) {
 	    try {
 		Bootstrap b = new Bootstrap();
-		Client t = this;
 		b.group(group).channel(LocalChannel.class).handler(new ChannelInitializer<LocalChannel>() {
 		    @Override
 		    public void initChannel(LocalChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
+			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
 		    }
 		});
 
 		// Start the client.
-		ChannelFuture future = b.connect(local).sync();
-
-		// Start GUI
-		Chess_Checkers.startGUI();
+		ChannelFuture future = b.connect(local).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
+			.sync();
 
 		// Wait until the connection is closed.
 		future.channel().closeFuture().sync();
 	    } catch (InterruptedException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    } finally {
 		// Shut down the event loop to terminate all threads.
@@ -277,12 +269,11 @@ public class Client {
 	    EventLoopGroup event = new NioEventLoopGroup();
 	    try {
 		Bootstrap b = new Bootstrap();
-		Client t = this;
 		b.group(event).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
 		    @Override
 		    public void initChannel(SocketChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler(t));
+			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
 		    }
 		});
 
@@ -304,7 +295,7 @@ public class Client {
 	}
     }
 
-    private void passTurn(Message m) {
+    private void passTurn(GameMessage m) {
 	turn = false;
 	context.writeAndFlush(m);
 	if (localServer) {
@@ -372,7 +363,7 @@ public class Client {
 				    + " wins. Exit this message and click on the board to restart.",
 			    "A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
 		}
-		passTurn(CheckersMessage.instantiate(Message.pointToChessNotation(i, n), tree, false));
+		passTurn(CheckersMessage.instantiate(GameMessage.pointToChessNotation(i, n), tree, false));
 		// End the search for the jumptree we took and end the
 		// method
 		break;
@@ -441,8 +432,8 @@ public class Client {
 		    break;
 		}
 
-		message = PawnPromotionMessage.instantiate(Message.pointToChessNotation(i, n),
-			Message.pointToChessNotation(x, y), false, promotion);
+		message = PawnPromotionMessage.instantiate(GameMessage.pointToChessNotation(i, n),
+			GameMessage.pointToChessNotation(x, y), false, promotion);
 	    }
 	} else {
 	    if (board[x][y] instanceof Empty) {
@@ -455,8 +446,8 @@ public class Client {
 	board[x][y] = piece;
 	ChessPiece.endGameCheck();
 
-	passTurn((message == null) ? ChessMessage.instantiate(Message.pointToChessNotation(i, n),
-		Message.pointToChessNotation(x, y), false) : message);
+	passTurn((message == null) ? ChessMessage.instantiate(GameMessage.pointToChessNotation(i, n),
+		GameMessage.pointToChessNotation(x, y), false) : message);
     }
 
     public void unselectAll() {
@@ -474,5 +465,9 @@ public class Client {
 
     public boolean getTurn() {
 	return turn;
+    }
+
+    public boolean getBlack() {
+	return new Boolean(black);
     }
 }

@@ -22,6 +22,7 @@ public class Chess_CheckersPanel extends JPanel {
 		if (Chess_Checkers.gameOver) {
 		    Chess_Checkers.setup();
 		} else if (e.getY() <= 45) {
+		    // Surrender box
 		    if (e.getX() >= 200 && e.getX() <= 405) {
 			repaint();
 		    }
@@ -90,10 +91,10 @@ public class Chess_CheckersPanel extends JPanel {
 	g.setColor(Color.BLACK);
 	g.setFont(Chess_Checkers.font.deriveFont(30f));
 	g.drawString("Player turn: ", 10, 35);
-	if (Chess_Checkers.client.getTurn() && Chess_Checkers.client.black) {
+	if (Chess_Checkers.client.getTurn() && Chess_Checkers.client.getBlack()) {
 	    g.setColor(Color.BLACK);
 	} else {
-	    if (Chess_Checkers.client.gameIsCheckers && !Chess_Checkers.client.black) {
+	    if (Chess_Checkers.client.gameIsCheckers && !Chess_Checkers.client.getBlack()) {
 		g.setColor(Color.RED);
 	    } else {
 		g.setColor(Color.WHITE);
@@ -110,8 +111,8 @@ public class Chess_CheckersPanel extends JPanel {
 	    g.setColor(Color.BLACK);
 	    g.setFont(Chess_Checkers.font.deriveFont(30f));
 	    g.drawString("Check: ", 415, 35);
-	    if (ChessPiece.isKingInCheck(Chess_Checkers.client.black)) {
-		if (!ChessPiece.canMove(Chess_Checkers.client.black)) {
+	    if (ChessPiece.isKingInCheck(Chess_Checkers.client.getBlack())) {
+		if (!ChessPiece.canMove(Chess_Checkers.client.getBlack())) {
 		    g.setColor(new Color(218, 165, 32));
 		    g.setFont(Chess_Checkers.fontBold.deriveFont(30f));
 		    g.drawString("MATE", 507, 35);

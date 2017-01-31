@@ -50,7 +50,7 @@ public class Checker extends CheckersPiece {
 
     @Override
     public void select(int x, int y) {
-	if ((black == Chess_Checkers.client.black) && Chess_Checkers.client.getTurn()) {
+	if ((black == Chess_Checkers.client.getBlack()) && Chess_Checkers.client.getTurn()) {
 	    Chess_Checkers.client.unselectAll();
 	    JumpTree[] jumps = getValidLocations(x, y);
 	    lastValidLocations = jumps;
