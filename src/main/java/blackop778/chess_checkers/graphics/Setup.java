@@ -26,10 +26,10 @@ public class Setup {
     public final Text ip;
     public final Text port;
     public final JButton enter;
-    public final JPanel panel;
-    public final JDialog dialog;
+    private final JPanel panel;
+    private final JDialog dialog;
     private boolean setup;
-    public boolean buttonClosed;
+    private boolean buttonClosed;
 
     @SuppressWarnings("serial")
     public Setup() {
@@ -132,6 +132,10 @@ public class Setup {
     public void redisplay() {
 	buttonClosed = false;
 	dialog.setVisible(true);
+    }
+
+    public boolean getButtonClosed() {
+	return new Boolean(buttonClosed);
     }
 
     /**

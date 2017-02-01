@@ -53,7 +53,7 @@ public abstract class Chess_Checkers {
     public static void setup() {
 	offerSurrender = false;
 	gameOver = false;
-	if (!setup.buttonClosed)
+	if (!setup.getButtonClosed())
 	    System.exit(0);
 	if (setup.humans.button1Selected()) {
 	    // VS AI, Does nothing special right now
