@@ -10,6 +10,7 @@ import java.io.IOException;
 import javax.swing.JFrame;
 
 import blackop778.chess_checkers.graphics.Chess_CheckersPanel;
+import blackop778.chess_checkers.graphics.ColorChooser;
 import blackop778.chess_checkers.graphics.Setup;
 import blackop778.chess_checkers.net.Client;
 import blackop778.chess_checkers.net.Server;
@@ -33,6 +34,7 @@ public abstract class Chess_Checkers {
 	    e.printStackTrace();
 	}
 
+	ColorChooser color = new ColorChooser();
 	setup = new Setup();
 	setup();
     }
