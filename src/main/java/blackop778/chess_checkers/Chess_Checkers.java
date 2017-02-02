@@ -33,7 +33,6 @@ public abstract class Chess_Checkers {
 	    e.printStackTrace();
 	}
 
-	// ColorChooser color = new ColorChooser();
 	setup = new Setup();
 	setup();
     }

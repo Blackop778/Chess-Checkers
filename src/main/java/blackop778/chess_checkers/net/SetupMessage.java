@@ -2,13 +2,13 @@ package blackop778.chess_checkers.net;
 
 public class SetupMessage {
     public static class ColorChoice {
-	public enum Color {
-	    black, white
+	public static enum ColorC {
+	    BLACK, WHITE
 	};
 
-	public final Color choice;
+	public final ColorC choice;
 
-	public ColorChoice(Color c) {
+	public ColorChoice(ColorC c) {
 	    this.choice = c;
 	}
     }

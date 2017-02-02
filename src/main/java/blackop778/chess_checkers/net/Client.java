@@ -14,9 +14,12 @@ import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
+import blackop778.chess_checkers.graphics.ColorChooser;
 import blackop778.chess_checkers.net.GameMessage.CheckersMessage;
 import blackop778.chess_checkers.net.GameMessage.ChessMessage;
 import blackop778.chess_checkers.net.GameMessage.PawnPromotionMessage;
+import blackop778.chess_checkers.net.SetupMessage.ColorChoice;
+import blackop778.chess_checkers.net.SetupMessage.ColorChoice.ColorC;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
 import blackop778.chess_checkers.pieces.CheckersPiece;
@@ -223,6 +226,14 @@ public class Client {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
+	    if (!localServer) {
+		ColorChooser color = new ColorChooser();
+		if (color.getButtonClosed()) {
+		    ctx.writeAndFlush(new ColorChoice(color.getBlack() ? ColorC.BLACK : ColorC.WHITE));
+		} else {
+		    System.exit(0);
+		}
+	    }
 	}
 
 	@Override
