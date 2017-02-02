@@ -37,13 +37,13 @@ public class Server extends Client {
 			.handler(new ChannelInitializer<LocalServerChannel>() {
 			    @Override
 			    public void initChannel(LocalServerChannel ch) throws Exception {
-				ch.pipeline().addLast(new LoggingHandler(LogLevel.ERROR));
+				ch.pipeline().addLast(new LoggingHandler(LogLevel.WARN));
 			    }
 			}).childHandler(new ChannelInitializer<LocalChannel>() {
 			    @Override
 			    public void initChannel(LocalChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.ERROR), new ServerHandler());
+				p.addLast(new LoggingHandler(LogLevel.WARN), new ServerHandler());
 			    }
 			});
 
@@ -68,12 +68,12 @@ public class Server extends Client {
 	    try {
 		b = new ServerBootstrap();
 		b.group(serverGroup, clientGroup).channel(NioServerSocketChannel.class)
-			.handler(new LoggingHandler(LogLevel.ERROR))
+			.handler(new LoggingHandler(LogLevel.WARN))
 			.childHandler(new ChannelInitializer<SocketChannel>() {
 			    @Override
 			    public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.ERROR), new ServerHandler());
+				p.addLast(new LoggingHandler(LogLevel.WARN), new ServerHandler());
 			    }
 			});
 
@@ -97,7 +97,8 @@ public class Server extends Client {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    super.channelActive(ctx);
-	    Chess_Checkers.startGUI();
+	    System.out.println("Starting game display");
+	    Chess_Checkers.startGUI(" server");
 	}
     }
 }

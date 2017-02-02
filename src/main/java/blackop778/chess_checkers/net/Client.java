@@ -245,7 +245,7 @@ public class Client {
 		    @Override
 		    public void initChannel(LocalChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
+			p.addLast(new LoggingHandler(LogLevel.DEBUG), new ClientHandler());
 		    }
 		});
 
@@ -273,7 +273,7 @@ public class Client {
 		    @Override
 		    public void initChannel(SocketChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
-			p.addLast(new LoggingHandler(LogLevel.ERROR), new ClientHandler());
+			p.addLast(new LoggingHandler(LogLevel.DEBUG), new ClientHandler());
 		    }
 		});
 
@@ -281,8 +281,14 @@ public class Client {
 		ChannelFuture future = b.connect(ip, port).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
 			.sync();
 
+		if (!future.isSuccess()) {
+		    System.out.println("Printing error: ");
+		    future.cause().printStackTrace();
+		}
+
 		// Start GUI
-		Chess_Checkers.startGUI();
+		System.out.println("Starting game display");
+		Chess_Checkers.startGUI(" client");
 
 		// Wait until the connection is closed.
 		future.channel().closeFuture().sync();
