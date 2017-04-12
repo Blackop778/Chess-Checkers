@@ -5,7 +5,9 @@ import java.awt.Container;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
+import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -17,8 +19,12 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import blackop778.chess_checkers.Chess_Checkers;
+
 public class Setup {
     public final Option game;
+    public final Text whiteName;
+    public final Text blackName;
     public final Option humans;
     public final Option black;
     public final Option internet;
@@ -52,30 +58,31 @@ public class Setup {
 	};
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 	dialog.add(panel);
-	game = new Option("Game:", "Chess", "Checkers", true);
+	game = new Option("Game:", "Chess", "Checkers", true, new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent arg0) {
+		whiteName.setLabel("White's name:");
+	    }
+
+	}, new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent arg0) {
+		whiteName.setLabel("Red's name:");
+	    }
+	});
 	panel.add(game);
+	whiteName = new Text("White's name:", 15, false);
+	panel.add(whiteName);
+	blackName = new Text("Black's name:", 15, false);
+	panel.add(blackName);
 	black = new Option("Play as black:", "Yes", "No", false) {
 	    @Override
 	    public void notified() {
 		enter.setEnabled(true);
 	    }
 	};
-	humans = new Option("Number of humans:", "1", "2", false, new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent arg0) {
-		internet.removeCustom(panel, dialog);
-		black.addCustom(panel, dialog);
-	    }
-	}, new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent arg0) {
-		black.removeCustom(panel, dialog);
-		internet.addCustom(panel, dialog);
-	    }
-	});
-	panel.add(humans);
-	ip = new Text("IP address:", 15);
-	port = new Text("Port number:", 4);
+	ip = new Text("IP address:", 15, true);
+	port = new Text("Port number:", 4, true);
 	host = new Option("Host the game:", "Yes", "No", true, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
@@ -95,21 +102,47 @@ public class Setup {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		host.addCustom(panel, dialog);
-		black.removeCustom(panel, dialog);
+		// humans.removeCustom(panel, dialog);
 	    }
 	}, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		host.removeCustom(panel, dialog);
-		black.addCustom(panel, dialog);
+		// humans.addCustom(panel, dialog);
 	    }
-	}, new Component[] { host }, new Component[] { black }) {
+	}, new Component[] { host }, new Component[0]) {
 	    @Override
 	    public void notified() {
 		enter.setEnabled(bg.getSelection().getActionCommand().equals(label2));
 	    }
 	};
+	humans = new Option("Number of humans:", "1", "2", false, new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent arg0) {
+		internet.removeCustom(panel, dialog);
+		black.addCustom(panel, dialog);
+	    }
+	}, new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent arg0) {
+		black.removeCustom(panel, dialog);
+		internet.addCustom(panel, dialog);
+	    }
+	}, new Component[] { black }, new Component[] { internet });
+	humans.addCustom(panel, dialog);
+	if (Chess_Checkers.DISABLE_AI) {
+	    Enumeration<AbstractButton> buttons = humans.bg.getElements();
+	    while (buttons.hasMoreElements()) {
+		buttons.nextElement().setEnabled(false);
+	    }
+	}
 	internet.addCustom(panel, dialog);
+	if (Chess_Checkers.DISABLE_INTERNET) {
+	    Enumeration<AbstractButton> buttons = internet.bg.getElements();
+	    while (buttons.hasMoreElements()) {
+		buttons.nextElement().setEnabled(false);
+	    }
+	}
 	enter = new JButton("Enter");
 	enter.addActionListener(new ActionListener() {
 	    @Override
@@ -148,9 +181,10 @@ public class Setup {
 	public final ButtonGroup bg;
 	public final String label1;
 	public final String label2;
-	// Added when first button is selected
+
+	// When this is added and button1 is selected, these are added
 	public final Component[] o1Next;
-	// Added when second button is selected
+	// When this is added and button2 is selected, these are added
 	public final Component[] o2Next;
 
 	/**
@@ -277,7 +311,7 @@ public class Setup {
 	    enter.setEnabled(false);
 	}
 
-	public boolean button1Selected() {
+	public boolean isButton1Selected() {
 	    return bg.getSelection().getActionCommand().equals(label1);
 	}
     }
@@ -285,31 +319,38 @@ public class Setup {
     public class Text extends JPanel implements Notification {
 	private static final long serialVersionUID = -1712072660292711164L;
 	public final JTextField text;
+	private final JLabel label;
 
-	public Text(String label, int textFieldWidth) {
+	public Text(String labelText, int textFieldWidth, boolean important) {
 	    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-	    add(new JLabel(label));
+	    add(label = new JLabel(labelText));
 	    text = new JTextField(textFieldWidth);
 	    text.setEditable(true);
-	    text.getDocument().addDocumentListener(new DocumentListener() {
+	    if (important) {
+		text.getDocument().addDocumentListener(new DocumentListener() {
 
-		@Override
-		public void changedUpdate(DocumentEvent arg0) {
-		    enter.setEnabled(!text.getText().isEmpty());
-		}
+		    @Override
+		    public void changedUpdate(DocumentEvent arg0) {
+			enter.setEnabled(!text.getText().isEmpty());
+		    }
 
-		@Override
-		public void insertUpdate(DocumentEvent arg0) {
-		    enter.setEnabled(!text.getText().isEmpty());
-		}
+		    @Override
+		    public void insertUpdate(DocumentEvent arg0) {
+			enter.setEnabled(!text.getText().isEmpty());
+		    }
 
-		@Override
-		public void removeUpdate(DocumentEvent arg0) {
-		    enter.setEnabled(!text.getText().isEmpty());
-		}
+		    @Override
+		    public void removeUpdate(DocumentEvent arg0) {
+			enter.setEnabled(!text.getText().isEmpty());
+		    }
 
-	    });
+		});
+	    }
 	    add(text);
+	}
+
+	public void setLabel(String text) {
+	    label.setText(text);
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package blackop778.chess_checkers;
 
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsConfiguration;
@@ -8,6 +7,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import blackop778.chess_checkers.graphics.Chess_CheckersPanel;
 import blackop778.chess_checkers.graphics.Setup;
@@ -24,12 +25,21 @@ public abstract class Chess_Checkers {
     public static Font fontBold;
     public static String notation;
     public static Setup setup;
+    public static final boolean DISABLE_AI = true;
+    public static final boolean DISABLE_INTERNET = true;
 
     public static void main(String[] args) {
 	try {
 	    font = Font.createFont(Font.TRUETYPE_FONT, new File("resources" + File.separator + "FreeSans.otf"));
 	    fontBold = Font.createFont(Font.TRUETYPE_FONT, new File("resources" + File.separator + "FreeSansBold.otf"));
 	} catch (FontFormatException | IOException e) {
+	    e.printStackTrace();
+	}
+
+	try {
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+		| UnsupportedLookAndFeelException e) {
 	    e.printStackTrace();
 	}
 
@@ -42,7 +52,6 @@ public abstract class Chess_Checkers {
 	panel = new Chess_CheckersPanel();
 	frame.add(Chess_Checkers.panel);
 	frame.setTitle("Chess-Checkers" + name);
-	frame.setPreferredSize(new Dimension(727, 794));
 	frame.pack();
 	frame.setResizable(false);
 	frame.setLocationRelativeTo(null);
@@ -55,23 +64,23 @@ public abstract class Chess_Checkers {
 	gameOver = false;
 	if (!setup.getButtonClosed())
 	    System.exit(0);
-	if (setup.humans.button1Selected()) {
+	if (setup.humans.isButton1Selected()) {
 	    // VS AI, Does nothing special right now
-	    client = new Server(setup.black.button1Selected(), !setup.game.button1Selected(), true);
+	    client = new Server(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), true);
 	    ((Server) client).startServer(11778);
 	} else {
-	    if (!setup.internet.button1Selected()) {
+	    if (!setup.internet.isButton1Selected()) {
 		// Local server
-		client = new Server(setup.black.button1Selected(), !setup.game.button1Selected(), true);
+		client = new Server(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), true);
 		((Server) client).startServer(11778);
 	    } else {
-		if (setup.host.button1Selected()) {
+		if (setup.host.isButton1Selected()) {
 		    // Host a server
-		    client = new Server(setup.black.button1Selected(), !setup.game.button1Selected(), false);
+		    client = new Server(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), false);
 		    ((Server) client).startServer(Integer.valueOf(setup.port.text.getText()));
 		} else {
 		    // Connect to remote server
-		    client = new Client(setup.black.button1Selected(), !setup.game.button1Selected(), false);
+		    client = new Client(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), false);
 		    client.start(setup.ip.text.getText(), Integer.valueOf(setup.port.text.getText()));
 		}
 	    }

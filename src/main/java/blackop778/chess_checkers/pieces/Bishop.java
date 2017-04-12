@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -26,7 +27,8 @@ public class Bishop extends ChessPiece {
 	    g.fillRect(x + 2, y + 2, 86, 86);
 	}
 	String color = black ? "Black" : "White";
-	File image = new File("resources" + File.separator + color + "Bishop.png");
+	URL image = ClassLoader.getSystemClassLoader()
+		.getResource("assets" + File.separator + "images" + File.separator + color + "Bishop.png");
 	try {
 	    g.drawImage(ImageIO.read(image), x, y, null);
 	} catch (IOException e) {

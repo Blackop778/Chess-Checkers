@@ -17,6 +17,16 @@ repositories {
     jcenter()
 }
 
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Main-Class': 'blackop778.chess_checkers.Chess_Checkers'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
 	// https://mvnrepository.com/artifact/io.netty/netty-all
