@@ -59,8 +59,8 @@ public class Chess_CheckersPanel extends JPanel {
 		if (Chess_Checkers.gameOver) {
 		    Chess_Checkers.setup();
 		} else {
-		    int x = e.getX() / 90;
-		    int y = e.getY() / 90;
+		    int x = (int) Math.floor(e.getX() / 90.0);
+		    int y = (int) Math.floor(e.getY() / 90.0);
 		    if (Chess_Checkers.client.getBoard()[x][y].possible) {
 			Chess_Checkers.client.getBoard()[x][y].selector.move(x, y);
 			if (!Chess_Checkers.client.gameIsCheckers) {

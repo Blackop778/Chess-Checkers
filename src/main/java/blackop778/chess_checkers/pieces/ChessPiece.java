@@ -1,6 +1,9 @@
 package blackop778.chess_checkers.pieces;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JOptionPane;
 
@@ -213,4 +216,15 @@ public abstract class ChessPiece extends Piece {
 	    }
 	}
     }
+
+    @Override
+    public void drawSelf(Graphics g, int x, int y) {
+	if (possible) {
+	    g.setColor(Color.YELLOW);
+	    g.fillRect(x + 2, y + 2, 86, 86);
+	}
+	g.drawImage(getBufferedImage(), x, y, null);
+    }
+
+    public abstract BufferedImage getBufferedImage();
 }

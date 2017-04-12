@@ -1,18 +1,16 @@
 package blackop778.chess_checkers.pieces;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Point;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
 
 public class King extends ChessPiece {
     public boolean moved;
+
+    public static BufferedImage blackImage;
+    public static BufferedImage whiteImage;
 
     public King(boolean black) {
 	this.black = black;
@@ -20,21 +18,6 @@ public class King extends ChessPiece {
 	this.selector = null;
 	this.possible = false;
 	this.moved = false;
-    }
-
-    @Override
-    public void drawSelf(Graphics g, int x, int y) {
-	if (possible) {
-	    g.setColor(Color.YELLOW);
-	    g.fillRect(x + 2, y + 2, 86, 86);
-	}
-	String color = black ? "Black" : "White";
-	File image = new File("resources" + File.separator + color + "King.png");
-	try {
-	    g.drawImage(ImageIO.read(image), x, y, null);
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
     }
 
     @Override
@@ -228,5 +211,13 @@ public class King extends ChessPiece {
 	    }
 	}
 	return sides;
+    }
+
+    @Override
+    public BufferedImage getBufferedImage() {
+	if (black)
+	    return blackImage;
+	else
+	    return whiteImage;
     }
 }

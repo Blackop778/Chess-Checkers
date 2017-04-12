@@ -3,6 +3,7 @@ package blackop778.chess_checkers.pieces;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -13,6 +14,10 @@ import javax.imageio.ImageIO;
 import blackop778.chess_checkers.Chess_Checkers;
 
 public class Bishop extends ChessPiece {
+
+    public static BufferedImage blackImage;
+    public static BufferedImage whiteImage;
+
     public Bishop(boolean black) {
 	this.black = black;
 	this.selected = false;
@@ -102,5 +107,13 @@ public class Bishop extends ChessPiece {
 	Point[] array = new Point[0];
 	validLocations.trimToSize();
 	return validLocations.toArray(array);
+    }
+
+    @Override
+    public BufferedImage getBufferedImage() {
+	if (black)
+	    return blackImage;
+	else
+	    return whiteImage;
     }
 }

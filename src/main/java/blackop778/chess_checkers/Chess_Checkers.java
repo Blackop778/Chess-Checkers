@@ -1,11 +1,10 @@
 package blackop778.chess_checkers;
 
-import java.awt.Font;
-import java.awt.FontFormatException;
 import java.awt.GraphicsConfiguration;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -14,6 +13,12 @@ import blackop778.chess_checkers.graphics.Chess_CheckersPanel;
 import blackop778.chess_checkers.graphics.Setup;
 import blackop778.chess_checkers.net.Client;
 import blackop778.chess_checkers.net.Server;
+import blackop778.chess_checkers.pieces.Bishop;
+import blackop778.chess_checkers.pieces.King;
+import blackop778.chess_checkers.pieces.Knight;
+import blackop778.chess_checkers.pieces.Pawn;
+import blackop778.chess_checkers.pieces.Queen;
+import blackop778.chess_checkers.pieces.Rook;
 
 public abstract class Chess_Checkers {
     public static Client client;
@@ -21,21 +26,40 @@ public abstract class Chess_Checkers {
     public static boolean offerSurrender;
     public static boolean gameOver;
     public static Chess_CheckersPanel panel;
-    public static Font font;
-    public static Font fontBold;
     public static String notation;
     public static Setup setup;
     public static final boolean DISABLE_AI = true;
     public static final boolean DISABLE_INTERNET = true;
+    private static boolean imagesLoaded;
 
     public static void main(String[] args) {
-	try {
-	    font = Font.createFont(Font.TRUETYPE_FONT, new File("resources" + File.separator + "FreeSans.otf"));
-	    fontBold = Font.createFont(Font.TRUETYPE_FONT, new File("resources" + File.separator + "FreeSansBold.otf"));
-	} catch (FontFormatException | IOException e) {
-	    e.printStackTrace();
-	}
-
+	imagesLoaded = false;
+	new Thread(new Runnable() {
+	    @Override
+	    public void run() {
+		final String baseFilePath = "assets" + File.separator + "images" + File.separator;
+		final String blackPrefix = "Black";
+		final String whitePrefix = "White";
+		final ClassLoader cl = ClassLoader.getSystemClassLoader();
+		try {
+		    Bishop.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "Bishop.png"));
+		    Bishop.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Bishop.png"));
+		    King.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "King.png"));
+		    King.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "King.png"));
+		    Knight.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "Knight.png"));
+		    Knight.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Knight.png"));
+		    Pawn.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "Pawn.png"));
+		    Pawn.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Pawn.png"));
+		    Queen.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "Queen.png"));
+		    Queen.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Queen.png"));
+		    Rook.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "Rook.png"));
+		    Rook.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Rook.png"));
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+		setImagesLoaded(true);
+	    }
+	}, "ImageLoader").start();
 	try {
 	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -56,6 +80,13 @@ public abstract class Chess_Checkers {
 	frame.setResizable(false);
 	frame.setLocationRelativeTo(null);
 	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	while (!areImagesLoaded()) {
+	    try {
+		Thread.sleep(50);
+	    } catch (InterruptedException e) {
+		e.printStackTrace();
+	    }
+	}
 	frame.setVisible(true);
     }
 
@@ -85,6 +116,14 @@ public abstract class Chess_Checkers {
 		}
 	    }
 	}
+    }
+
+    public static synchronized boolean areImagesLoaded() {
+	return imagesLoaded;
+    }
+
+    public static synchronized void setImagesLoaded(boolean loaded) {
+	imagesLoaded = loaded;
     }
 
     public static class ClientTimeoutException extends Exception {
