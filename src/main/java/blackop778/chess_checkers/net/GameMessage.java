@@ -82,8 +82,7 @@ public class GameMessage {
     }
 
     public static class ChessMessage extends GameMessage {
-	public final String coordinate1;
-	public final String coordinate2;
+	public final String notation;
 	public final boolean offerSurrender;
 
 	/**
@@ -92,19 +91,18 @@ public class GameMessage {
 	 * @param coordinate2
 	 * @return Will be null if invalid input
 	 */
-	public static ChessMessage instantiate(String coordinate1, String coordinate2) {
-	    return instantiate(coordinate1, coordinate2, false);
+	public static ChessMessage instantiate(String notation) {
+	    return instantiate(notation, false);
 	}
 
-	public static ChessMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender) {
-	    if (coordinate1.matches("[a-h][1-8]") && coordinate2.matches("[a-h][1-8]"))
-		return new ChessMessage(coordinate1, coordinate2, offerSurrender);
+	public static ChessMessage instantiate(String notation, boolean offerSurrender) {
+	    if (notation.matches("[a-h][1-8]-[a-h][1-8]"))
+		return new ChessMessage(notation, offerSurrender);
 	    return null;
 	}
 
-	private ChessMessage(String coordinate1, String coordinate2, boolean offerSurrender) {
-	    this.coordinate1 = coordinate1;
-	    this.coordinate2 = coordinate2;
+	private ChessMessage(String notation, boolean offerSurrender) {
+	    this.notation = notation;
 	    this.offerSurrender = offerSurrender;
 	}
     }

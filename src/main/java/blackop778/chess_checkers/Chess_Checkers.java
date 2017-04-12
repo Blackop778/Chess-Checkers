@@ -102,8 +102,13 @@ public abstract class Chess_Checkers {
 	} else {
 	    if (!setup.internet.isButton1Selected()) {
 		// Local server
-		client = new Server(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), true);
-		((Server) client).startServer(11778);
+		if (setup.game.isButton1Selected()) {
+		    client = new Server(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), true);
+		    ((Server) client).startServer(11778);
+		} else {
+		    client = new Server(!setup.black.isButton1Selected(), !setup.game.isButton1Selected(), true);
+		    ((Server) client).startServer(11778);
+		}
 	    } else {
 		if (setup.host.isButton1Selected()) {
 		    // Host a server
