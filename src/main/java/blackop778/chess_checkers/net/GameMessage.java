@@ -3,7 +3,6 @@ package blackop778.chess_checkers.net;
 import java.awt.Point;
 
 import blackop778.chess_checkers.checkers.JumpTree;
-import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
 public class GameMessage {
     /**
@@ -96,7 +95,7 @@ public class GameMessage {
 	}
 
 	public static ChessMessage instantiate(String notation, boolean offerSurrender) {
-	    if (notation.matches("[a-h][1-8]-[a-h][1-8]"))
+	    if (notation.contains("[a-h][1-8][-x][a-h][1-8]") || notation.matches("0-0"))
 		return new ChessMessage(notation, offerSurrender);
 	    return null;
 	}
@@ -104,22 +103,6 @@ public class GameMessage {
 	private ChessMessage(String notation, boolean offerSurrender) {
 	    this.notation = notation;
 	    this.offerSurrender = offerSurrender;
-	}
-    }
-
-    public static class PawnPromotionMessage extends ChessMessage {
-	public final Promotion promo;
-
-	private PawnPromotionMessage(String coordinate1, String coordinate2, boolean offerSurrender, Promotion promo) {
-	    super(coordinate1, coordinate2, offerSurrender);
-	    this.promo = promo;
-	}
-
-	public static PawnPromotionMessage instantiate(String coordinate1, String coordinate2, boolean offerSurrender,
-		Promotion promo) {
-	    if (coordinate1.matches("[a-h][1-8]") && coordinate2.matches("[a-h][1-8]"))
-		return new PawnPromotionMessage(coordinate1, coordinate2, offerSurrender, promo);
-	    return null;
 	}
     }
 
