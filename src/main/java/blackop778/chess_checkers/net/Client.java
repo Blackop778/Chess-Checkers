@@ -17,7 +17,7 @@ import blackop778.chess_checkers.chess.SnapshotStorage;
 import blackop778.chess_checkers.graphics.ColorChooser;
 import blackop778.chess_checkers.net.GameMessage.CheckersMessage;
 import blackop778.chess_checkers.net.GameMessage.ChessMessage;
-import blackop778.chess_checkers.net.GameMessage.PawnPromotionMessage;
+import blackop778.chess_checkers.net.GameMessage.EvaluatedChessMessage;
 import blackop778.chess_checkers.net.SetupMessage.ColorChoice;
 import blackop778.chess_checkers.net.SetupMessage.ColorChoice.ColorC;
 import blackop778.chess_checkers.pieces.Bishop;
@@ -138,65 +138,59 @@ public class Client {
 	    if (msg instanceof GameMessage) {
 		turn = true;
 		if (msg instanceof ChessMessage) {
-		    ChessMessage event = (ChessMessage) msg;
-		    Point p1 = GameMessage.ChessNotationToPoint(event.coordinate1);
-		    Point p2 = GameMessage.ChessNotationToPoint(event.coordinate2);
-		    int x1 = p1.x;
-		    int y1 = p1.y;
-		    int x2 = p2.x;
-		    int y2 = p2.y;
-		    if (board[x1][y1] instanceof Pawn) {
-			if (Math.abs(x2 - x1) == 1 && board[x2][y2] instanceof Empty) {
+		    EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
+		    if (board[m.fromX][m.fromY] instanceof Pawn) {
+			if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
 			    // Check En passant capturing
-			    board[x2][y1] = new Empty();
+			    board[m.toX][m.fromY] = new Empty();
 			}
 		    }
-		    board[x2][y2] = board[x1][y1];
-		    board[x1][y1] = new Empty();
-		    if (board[x2][y2] instanceof Pawn) {
+		    board[m.toX][m.toY] = board[m.fromX][m.fromY];
+		    board[m.fromX][m.fromY] = new Empty();
+		    if (board[m.toX][m.toY] instanceof Pawn) {
 			ChessPiece.pawnCaptureCount = 0;
-			if (Math.abs(y2 - y1) == 2) {
-			    if (y1 == 1 || y1 == 6) {
-				ChessPiece.doubleMovePawn = (Pawn) board[x2][y2];
+			if (Math.abs(m.toY - m.fromY) == 2) {
+			    if (m.fromY == 1 || m.fromY == 6) {
+				ChessPiece.doubleMovePawn = (Pawn) board[m.toX][m.toY];
 			    }
 			} else if (event instanceof PawnPromotionMessage) {
 			    PawnPromotionMessage ppm = (PawnPromotionMessage) event;
 			    switch (ppm.promo) {
 			    case Queen:
-				board[x2][y2] = new Queen(!black);
+				board[m.toX][m.toY] = new Queen(!black);
 				break;
 			    case Knight:
-				board[x2][y2] = new Knight(!black);
+				board[m.toX][m.toY] = new Knight(!black);
 				break;
 			    case Rook:
-				board[x2][y2] = new Rook(!black);
+				board[m.toX][m.toY] = new Rook(!black);
 				break;
 			    case Bishop:
-				board[x2][y2] = new Bishop(!black);
+				board[m.toX][m.toY] = new Bishop(!black);
 				break;
 			    }
 			}
 			// Castling
-		    } else if (board[x2][y2] instanceof King) {
-			King pieceK = (King) board[x2][y2];
-			if (Math.abs(x2 - x1) == 2 && y1 == y2) {
+		    } else if (board[m.toX][m.toY] instanceof King) {
+			King pieceK = (King) board[m.toX][m.toY];
+			if (Math.abs(m.toX - m.fromX) == 2 && m.fromY == m.toY) {
 			    if (!pieceK.moved) {
-				boolean right = x2 - x1 == 2;
-				Rook pieceR = (Rook) board[right ? 7 : 1][y1];
+				boolean right = m.toX - m.fromX == 2;
+				Rook pieceR = (Rook) board[right ? 7 : 1][m.fromY];
 				if (!pieceR.moved) {
-				    board[right ? 5 : 3][y1] = board[right ? 7 : 0][y1];
-				    board[right ? 7 : 0][y1] = new Empty();
+				    board[right ? 5 : 3][m.fromY] = board[right ? 7 : 0][m.fromY];
+				    board[right ? 7 : 0][m.fromY] = new Empty();
 				}
 			    }
 			}
 			pieceK.moved = true;
-		    } else if (board[x2][y2] instanceof Rook) {
-			Rook pieceR = (Rook) board[x2][y2];
+		    } else if (board[m.toX][m.toY] instanceof Rook) {
+			Rook pieceR = (Rook) board[m.toX][m.toY];
 			pieceR.moved = true;
 		    }
 		} else if (msg instanceof CheckersMessage) {
 		    CheckersMessage event = (CheckersMessage) msg;
-		    Point p = GameMessage.ChessNotationToPoint(event.coordinate1);
+		    Point p = GameMessage.chessNotationToPoint(event.coordinate1);
 		    int x = p.x;
 		    int y = p.y;
 		    for (Jump j : event.tree.getMidJumps()) {
