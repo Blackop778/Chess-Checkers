@@ -18,7 +18,7 @@ import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
 public class PawnPromotion {
     public static enum Promotion {
-	Queen, Rook, Bishop, Knight
+	QUEEN, ROOK, BISHOP, KNIGHT, NONE
     };
 
     public Promotion result;
@@ -44,7 +44,7 @@ class DialogWindow extends JPanel implements ActionListener {
     public DialogWindow(PawnPromotion controller, JDialog dialog) {
 	super(new BorderLayout());
 	this.controller = controller;
-	controller.result = Promotion.Queen;
+	controller.result = Promotion.QUEEN;
 	this.dialog = dialog;
 
 	ButtonGroup group = new ButtonGroup();
@@ -99,16 +99,16 @@ class DialogWindow extends JPanel implements ActionListener {
 	    dialog.dispose();
 	    break;
 	case "Queen":
-	    controller.result = Promotion.Queen;
+	    controller.result = Promotion.QUEEN;
 	    break;
 	case "Knight":
-	    controller.result = Promotion.Knight;
+	    controller.result = Promotion.KNIGHT;
 	    break;
 	case "Rook":
-	    controller.result = Promotion.Rook;
+	    controller.result = Promotion.ROOK;
 	    break;
 	case "Bishop":
-	    controller.result = Promotion.Bishop;
+	    controller.result = Promotion.BISHOP;
 	    break;
 	}
     }

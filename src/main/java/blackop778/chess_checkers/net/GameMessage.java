@@ -4,7 +4,9 @@ import java.awt.Point;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.checkers.JumpTree;
+import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
 public class GameMessage {
 
@@ -88,7 +90,8 @@ public class GameMessage {
 
 	public static ChessMessage instantiate(String notation) {
 	    if (notation.contains("[a-h][1-8][-x][a-h][1-8]") || notation.equals("0-0") || notation.equals("0-0-0")
-		    || notation.equals("="))
+		    || notation.equals("(=)") || notation.equals("(=+)") || notation.equals(".5-.5")
+		    || notation.equals("0-1") || notation.equals("1-0"))
 		return new ChessMessage(notation);
 	    return null;
 	}
@@ -112,6 +115,11 @@ public class GameMessage {
 	public final boolean checkmate;
 	public final Direction castleDirection;
 	public final boolean offerSurrender;
+	public final boolean offerDraw;
+	public final boolean blackWin;
+	public final boolean whiteWin;
+	public final boolean draw;
+	public final Promotion pawnPromotion;
 
 	public EvaluatedChessMessage(ChessMessage cm) throws InvalidMessageException {
 	    final String notation = cm.notation;
@@ -129,43 +137,93 @@ public class GameMessage {
 		capture = coords.substring(2, 3).equals("x");
 		check = notation.endsWith("+");
 		checkmate = notation.endsWith("#");
+		blackWin = checkmate && Chess_Checkers.client.black;
+		whiteWin = checkmate && !Chess_Checkers.client.black;
 		castleDirection = Direction.NONE;
 		offerSurrender = false;
+		offerDraw = false;
+		draw = false;
+		String right = notation.substring(m.end(), notation.length());
+		if (right.startsWith("Q"))
+		    pawnPromotion = Promotion.QUEEN;
+		else if (right.startsWith("N"))
+		    pawnPromotion = Promotion.KNIGHT;
+		else if (right.startsWith("R"))
+		    pawnPromotion = Promotion.ROOK;
+		else if (right.startsWith("B"))
+		    pawnPromotion = Promotion.BISHOP;
+		else
+		    pawnPromotion = Promotion.NONE;
 		// Kingside castle
-	    } else if (notation.equals("0-0")) {
-		capture = false;
-		fromX = 4;
-		fromY = -1;
-		toX = 6;
-		toY = -1;
-		check = false;
-		checkmate = false;
-		castleDirection = Direction.RIGHT;
-		offerSurrender = false;
-		// Queenside castle
-	    } else if (notation.equals("0-0-0")) {
-		capture = false;
-		fromX = 4;
-		fromY = -1;
-		toX = 2;
-		toY = -1;
-		check = false;
-		checkmate = false;
-		castleDirection = Direction.LEFT;
-		offerSurrender = false;
-		// Offer surrender
-	    } else if (notation.equals("=")) {
-		offerSurrender = true;
-		capture = false;
-		fromX = -1;
-		fromY = -1;
-		toX = -1;
-		toY = -1;
-		check = false;
-		checkmate = false;
-		castleDirection = Direction.NONE;
 	    } else {
-		throw new InvalidMessageException("Error: ChessMessage matched no patterns");
+		capture = false;
+		check = false;
+		checkmate = false;
+		pawnPromotion = Promotion.NONE;
+		if (notation.equals("0-0")) {
+		    fromX = 4;
+		    fromY = -1;
+		    toX = 6;
+		    toY = -1;
+		    castleDirection = Direction.RIGHT;
+		    offerSurrender = false;
+		    offerDraw = false;
+		    whiteWin = false;
+		    blackWin = false;
+		    draw = false;
+		    // Queenside castle
+		} else if (notation.equals("0-0-0")) {
+		    fromX = 4;
+		    fromY = -1;
+		    toX = 2;
+		    toY = -1;
+		    castleDirection = Direction.LEFT;
+		    offerSurrender = false;
+		    offerDraw = false;
+		    whiteWin = false;
+		    blackWin = false;
+		    draw = false;
+		    // Offer surrender
+		} else {
+		    fromX = -1;
+		    fromY = -1;
+		    toX = -1;
+		    toY = -1;
+		    castleDirection = Direction.NONE;
+		    if (notation.equals(".5-.5")) {
+			whiteWin = false;
+			blackWin = false;
+			draw = true;
+			offerDraw = false;
+			offerSurrender = false;
+		    } else if (notation.equals("1-0")) {
+			whiteWin = true;
+			blackWin = false;
+			draw = false;
+			offerDraw = false;
+			offerSurrender = false;
+		    } else if (notation.equals("0-1")) {
+			whiteWin = false;
+			blackWin = true;
+			draw = false;
+			offerDraw = false;
+			offerSurrender = false;
+		    } else {
+			whiteWin = false;
+			blackWin = false;
+			draw = false;
+			if (notation.equals("(=)")) {
+			    offerDraw = true;
+			    offerSurrender = false;
+			} else if (notation.equals("(=+)")) {
+			    offerSurrender = true;
+			    offerDraw = false;
+			} else {
+			    throw new InvalidMessageException(
+				    "Error: ChessMessage could not be matched to a valid pattern. Closing connection. Your opponent may have attempted to cheat.");
+			}
+		    }
+		}
 	    }
 	}
     }

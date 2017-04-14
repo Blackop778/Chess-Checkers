@@ -135,85 +135,91 @@ public class Client {
     public class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) {
-	    if (msg instanceof GameMessage) {
-		turn = true;
-		if (msg instanceof ChessMessage) {
-		    EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
-		    if (board[m.fromX][m.fromY] instanceof Pawn) {
-			if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
+	    try {
+		if (msg instanceof GameMessage) {
+		    turn = true;
+		    if (msg instanceof ChessMessage) {
+			EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
+			if (board[m.fromX][m.fromY] instanceof Pawn) {
 			    // Check En passant capturing
-			    board[m.toX][m.fromY] = new Empty();
-			}
-		    }
-		    board[m.toX][m.toY] = board[m.fromX][m.fromY];
-		    board[m.fromX][m.fromY] = new Empty();
-		    if (board[m.toX][m.toY] instanceof Pawn) {
-			ChessPiece.pawnCaptureCount = 0;
-			if (Math.abs(m.toY - m.fromY) == 2) {
-			    if (m.fromY == 1 || m.fromY == 6) {
-				ChessPiece.doubleMovePawn = (Pawn) board[m.toX][m.toY];
-			    }
-			} else if (event instanceof PawnPromotionMessage) {
-			    PawnPromotionMessage ppm = (PawnPromotionMessage) event;
-			    switch (ppm.promo) {
-			    case Queen:
-				board[m.toX][m.toY] = new Queen(!black);
-				break;
-			    case Knight:
-				board[m.toX][m.toY] = new Knight(!black);
-				break;
-			    case Rook:
-				board[m.toX][m.toY] = new Rook(!black);
-				break;
-			    case Bishop:
-				board[m.toX][m.toY] = new Bishop(!black);
-				break;
+			    if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
+				board[m.toX][m.fromY] = new Empty();
 			    }
 			}
-			// Castling
-		    } else if (board[m.toX][m.toY] instanceof King) {
-			King pieceK = (King) board[m.toX][m.toY];
-			if (Math.abs(m.toX - m.fromX) == 2 && m.fromY == m.toY) {
-			    if (!pieceK.moved) {
-				boolean right = m.toX - m.fromX == 2;
-				Rook pieceR = (Rook) board[right ? 7 : 1][m.fromY];
-				if (!pieceR.moved) {
-				    board[right ? 5 : 3][m.fromY] = board[right ? 7 : 0][m.fromY];
-				    board[right ? 7 : 0][m.fromY] = new Empty();
+			board[m.toX][m.toY] = board[m.fromX][m.fromY];
+			board[m.fromX][m.fromY] = new Empty();
+			if (board[m.toX][m.toY] instanceof Pawn) {
+			    ChessPiece.pawnCaptureCount = 0;
+			    if (Math.abs(m.toY - m.fromY) == 2) {
+				if (m.fromY == 1 || m.fromY == 6) {
+				    ChessPiece.doubleMovePawn = (Pawn) board[m.toX][m.toY];
+				}
+			    } else {
+				switch (m.pawnPromotion) {
+				case QUEEN:
+				    board[m.toX][m.toY] = new Queen(!black);
+				    break;
+				case KNIGHT:
+				    board[m.toX][m.toY] = new Knight(!black);
+				    break;
+				case ROOK:
+				    board[m.toX][m.toY] = new Rook(!black);
+				    break;
+				case BISHOP:
+				    board[m.toX][m.toY] = new Bishop(!black);
+				    break;
+				case NONE:
+				    break;
 				}
 			    }
+			    // Castling
+			} else if (board[m.toX][m.toY] instanceof King) {
+			    King pieceK = (King) board[m.toX][m.toY];
+			    if (Math.abs(m.toX - m.fromX) == 2 && m.fromY == m.toY) {
+				if (!pieceK.moved) {
+				    boolean right = m.toX - m.fromX == 2;
+				    Rook pieceR = (Rook) board[right ? 7 : 1][m.fromY];
+				    if (!pieceR.moved) {
+					board[right ? 5 : 3][m.fromY] = board[right ? 7 : 0][m.fromY];
+					board[right ? 7 : 0][m.fromY] = new Empty();
+				    }
+				}
+			    }
+			    pieceK.moved = true;
+			} else if (board[m.toX][m.toY] instanceof Rook) {
+			    Rook pieceR = (Rook) board[m.toX][m.toY];
+			    pieceR.moved = true;
 			}
-			pieceK.moved = true;
-		    } else if (board[m.toX][m.toY] instanceof Rook) {
-			Rook pieceR = (Rook) board[m.toX][m.toY];
-			pieceR.moved = true;
-		    }
-		} else if (msg instanceof CheckersMessage) {
-		    CheckersMessage event = (CheckersMessage) msg;
-		    Point p = GameMessage.chessNotationToPoint(event.coordinate1);
-		    int x = p.x;
-		    int y = p.y;
-		    for (Jump j : event.tree.getMidJumps()) {
-			if (j.getMidPoint() != null) {
-			    board[j.getMidPoint().x][j.getMidPoint().y] = new Empty();
+		    } else if (msg instanceof CheckersMessage) {
+			CheckersMessage event = (CheckersMessage) msg;
+			Point p = GameMessage.chessNotationToPoint(event.coordinate1);
+			int x = p.x;
+			int y = p.y;
+			for (Jump j : event.tree.getMidJumps()) {
+			    if (j.getMidPoint() != null) {
+				board[j.getMidPoint().x][j.getMidPoint().y] = new Empty();
+			    }
 			}
+			if (event.tree.getEndJump().getMidPoint() != null) {
+			    board[event.tree.getEndJump().getMidPoint().x][event.tree.getEndJump()
+				    .getMidPoint().y] = new Empty();
+			}
+			if ((event.tree.getEndJump().getEndPoint().y == 0 && !board[x][y].black)
+				|| (event.tree.getEndJump().getEndPoint().y == 7 && board[x][y].black)) {
+			    Checker c = (Checker) board[x][y];
+			    c.kinged = true;
+			}
+			board[event.tree.getEndJump().getEndPoint().x][event.tree.getEndJump()
+				.getEndPoint().y] = board[x][y];
+			board[x][y] = new Empty();
 		    }
-		    if (event.tree.getEndJump().getMidPoint() != null) {
-			board[event.tree.getEndJump().getMidPoint().x][event.tree.getEndJump()
-				.getMidPoint().y] = new Empty();
-		    }
-		    if ((event.tree.getEndJump().getEndPoint().y == 0 && !board[x][y].black)
-			    || (event.tree.getEndJump().getEndPoint().y == 7 && board[x][y].black)) {
-			Checker c = (Checker) board[x][y];
-			c.kinged = true;
-		    }
-		    board[event.tree.getEndJump().getEndPoint().x][event.tree.getEndJump()
-			    .getEndPoint().y] = board[x][y];
-		    board[x][y] = new Empty();
 		}
-	    }
-	    if (Chess_Checkers.panel != null) {
-		Chess_Checkers.panel.repaint();
+		if (Chess_Checkers.panel != null) {
+		    Chess_Checkers.panel.repaint();
+		}
+	    } catch (InvalidMessageException e) {
+		JOptionPane.showMessageDialog(null, e.getMessage());
+		System.exit(1);
 	    }
 	}
 
@@ -383,6 +389,8 @@ public class Client {
     }
 
     public void moveChess(int x, int y, ChessPiece piece) {
+	ChessMessage cm = null;
+	String message;
 	Chess_Checkers.client.unselectAll();
 	int i;
 	int n = 0;
@@ -395,56 +403,83 @@ public class Client {
 	    }
 	}
 
+	boolean capture = false;
 	if (piece instanceof King) {
+	    message = "K";
 	    King pieceK = (King) piece;
 	    if (!pieceK.moved) {
 		pieceK.moved = true;
 		if (x == 2) {
+		    cm = ChessMessage.instantiate("0-0");
 		    board[3][y] = board[0][y];
 		    board[0][y] = new Empty();
 		} else if (x == 6) {
+		    cm = ChessMessage.instantiate("0-0-0");
 		    board[5][y] = board[7][y];
 		    board[7][y] = new Empty();
 		}
 	    }
 	} else if (piece instanceof Rook) {
+	    message = "R";
 	    Rook pieceR = (Rook) piece;
 	    if (!pieceR.moved) {
 		pieceR.moved = true;
 	    }
-	}
-
-	ChessMessage message = null;
-
-	if (piece instanceof Pawn) {
+	} else if (piece instanceof Pawn) {
+	    message = "";
 	    Pawn pieceP = (Pawn) piece;
 	    ChessPiece.pawnCaptureCount = 0;
 	    int yOffset = black ? -1 : 1;
 	    // Check En passant capturing
 	    if (board[x][y + yOffset].equals(ChessPiece.doubleMovePawn)) {
 		board[x][y + yOffset] = new Empty();
+		capture = true;
 	    }
 	    ChessPiece.doubleMovePawn = pieceP;
+	} else if (piece instanceof Bishop) {
+	    message = "B";
+	} else if (piece instanceof Knight) {
+	    message = "N";
+	} else if (piece instanceof Queen) {
+	    message = "Q";
+	} else {
+	    throw new UnexpectedActionException("Error: Unexpected piece type");
+	}
+
+	if (cm == null) {
+	    message = message + GameMessage.pointToChessNotation(i, n);
+	    if (!(board[x][y] instanceof Empty) || capture) {
+		message = message + "x";
+	    } else {
+		message = message + "-";
+	    }
+	    message = message + GameMessage.pointToChessNotation(x, y);
+	}
+
+	if (piece instanceof Pawn) {
 	    if (y == 0 || y == 7) {
 		PawnPromotion promoter = new PawnPromotion();
 		Promotion promotion = promoter.result;
 		switch (promotion) {
-		case Queen:
+		case QUEEN:
 		    piece = new Queen(black);
+		    message = message + "Q";
 		    break;
-		case Knight:
+		case KNIGHT:
 		    piece = new Knight(black);
+		    message = message + "N";
 		    break;
-		case Rook:
+		case ROOK:
 		    piece = new Rook(black);
+		    message = message + "R";
 		    break;
-		case Bishop:
+		case BISHOP:
 		    piece = new Bishop(black);
+		    message = message + "B";
 		    break;
+		case NONE:
+		    System.exit(1);
 		}
-
-		message = PawnPromotionMessage.instantiate(GameMessage.pointToChessNotation(i, n),
-			GameMessage.pointToChessNotation(x, y), false, promotion);
 	    }
 	} else {
 	    if (board[x][y] instanceof Empty) {
@@ -455,10 +490,18 @@ public class Client {
 	    ChessPiece.doubleMovePawn = null;
 	}
 	board[x][y] = piece;
+	// Check for check and checkmate
 	ChessPiece.endGameCheck();
 
-	passTurn((message == null) ? ChessMessage.instantiate(GameMessage.pointToChessNotation(i, n),
-		GameMessage.pointToChessNotation(x, y), false) : message);
+	passTurn((cm == null) ? ChessMessage.instantiate(message) : cm);
+    }
+
+    public static class UnexpectedActionException extends Exception {
+	public UnexpectedActionException(String string) {
+	    super(string);
+	}
+
+	private static final long serialVersionUID = -5532979511854500096L;
     }
 
     public void unselectAll() {
