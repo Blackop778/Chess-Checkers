@@ -10,13 +10,10 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
-import io.netty.channel.local.LocalChannel;
 import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 
 public class Server extends Client {
 
@@ -33,19 +30,7 @@ public class Server extends Client {
 	    serverGroup = new DefaultEventLoopGroup();
 	    try {
 		b = new ServerBootstrap();
-		b.group(serverGroup, clientGroup).channel(LocalServerChannel.class)
-			.handler(new ChannelInitializer<LocalServerChannel>() {
-			    @Override
-			    public void initChannel(LocalServerChannel ch) throws Exception {
-				ch.pipeline().addLast(new LoggingHandler(LogLevel.WARN));
-			    }
-			}).childHandler(new ChannelInitializer<LocalChannel>() {
-			    @Override
-			    public void initChannel(LocalChannel ch) throws Exception {
-				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.WARN), new ServerHandler());
-			    }
-			});
+		b.group(serverGroup, clientGroup).channel(LocalServerChannel.class).childHandler(new ServerHandler());
 
 		// Start the server.
 		System.out.println("Server listening to port " + local.id());
@@ -68,12 +53,11 @@ public class Server extends Client {
 	    try {
 		b = new ServerBootstrap();
 		b.group(serverGroup, clientGroup).channel(NioServerSocketChannel.class)
-			.handler(new LoggingHandler(LogLevel.WARN))
 			.childHandler(new ChannelInitializer<SocketChannel>() {
 			    @Override
 			    public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
-				p.addLast(new LoggingHandler(LogLevel.WARN), new ServerHandler());
+				p.addLast("C_CProcessor", new ServerHandler());
 			    }
 			});
 

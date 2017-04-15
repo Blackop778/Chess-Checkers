@@ -55,7 +55,7 @@ public abstract class ChessPiece extends Piece {
 	return false;
     }
 
-    public static final boolean isKingInCheck(boolean black) {
+    public static boolean isKingInCheck(boolean black) {
 	Piece[][] board = Chess_Checkers.client.getBoard();
 	for (int x = 0; x < 8; x++) {
 	    for (int y = 0; y < 8; y++) {

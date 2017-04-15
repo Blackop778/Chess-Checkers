@@ -10,6 +10,8 @@ import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
 public class GameMessage {
 
+    public static final Pattern chessMessagePattern = Pattern.compile("[a-h][1-8][-x][a-h][1-8]");
+
     /**
      * Assumes (0,0) is the top left square
      * 
@@ -89,9 +91,10 @@ public class GameMessage {
 	public final String notation;
 
 	public static ChessMessage instantiate(String notation) {
-	    if (notation.contains("[a-h][1-8][-x][a-h][1-8]") || notation.equals("0-0") || notation.equals("0-0-0")
-		    || notation.equals("(=)") || notation.equals("(=+)") || notation.equals(".5-.5")
-		    || notation.equals("0-1") || notation.equals("1-0"))
+	    Matcher m = chessMessagePattern.matcher(notation);
+	    if (m.find() || notation.equals("0-0") || notation.equals("0-0-0") || notation.equals("(=)")
+		    || notation.equals("(=+)") || notation.equals(".5-.5") || notation.equals("0-1")
+		    || notation.equals("1-0"))
 		return new ChessMessage(notation);
 	    return null;
 	}
@@ -123,10 +126,9 @@ public class GameMessage {
 
 	public EvaluatedChessMessage(ChessMessage cm) throws InvalidMessageException {
 	    final String notation = cm.notation;
+	    Matcher m = chessMessagePattern.matcher(notation);
 	    // Normal move
-	    if (notation.contains("[a-h][1-8][-x][a-h][1-8]")) {
-		Pattern p = Pattern.compile("[a-h][1-8][-x][a-h][1-8]");
-		Matcher m = p.matcher(notation);
+	    if (m.find()) {
 		String coords = notation.substring(m.start(), m.start() + 5);
 		Point from = chessNotationToPoint(coords.substring(0, 2));
 		fromX = (byte) from.x;
