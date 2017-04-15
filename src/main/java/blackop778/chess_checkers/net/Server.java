@@ -1,6 +1,8 @@
 package blackop778.chess_checkers.net;
 
 import blackop778.chess_checkers.Chess_Checkers;
+import blackop778.chess_checkers.net.EncodingHandlers.EncodableInboundHandler;
+import blackop778.chess_checkers.net.EncodingHandlers.EncodableOutboundHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -14,6 +16,10 @@ import io.netty.channel.local.LocalServerChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 
 public class Server extends Client {
 
@@ -57,6 +63,13 @@ public class Server extends Client {
 			    @Override
 			    public void initChannel(SocketChannel ch) throws Exception {
 				ChannelPipeline p = ch.pipeline();
+				// Decoders
+				p.addLast("frameDecoder", new LineBasedFrameDecoder(80));
+				p.addLast("stringDecoder", new StringDecoder(CharsetUtil.UTF_8));
+				p.addLast("messageDecoder", new EncodableInboundHandler());
+				// Encoders
+				p.addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
+				p.addLast("messageEncoder", new EncodableOutboundHandler());
 				p.addLast("C_CProcessor", new ServerHandler());
 			    }
 			});

@@ -14,13 +14,12 @@ import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
-import blackop778.chess_checkers.graphics.ColorChooser;
+import blackop778.chess_checkers.net.EncodingHandlers.EncodableInboundHandler;
+import blackop778.chess_checkers.net.EncodingHandlers.EncodableOutboundHandler;
 import blackop778.chess_checkers.net.GameMessage.CheckersMessage;
 import blackop778.chess_checkers.net.GameMessage.ChessMessage;
 import blackop778.chess_checkers.net.GameMessage.Direction;
 import blackop778.chess_checkers.net.GameMessage.EvaluatedChessMessage;
-import blackop778.chess_checkers.net.SetupMessage.ColorChoice;
-import blackop778.chess_checkers.net.SetupMessage.ColorChoice.ColorC;
 import blackop778.chess_checkers.pieces.Bishop;
 import blackop778.chess_checkers.pieces.Checker;
 import blackop778.chess_checkers.pieces.CheckersPiece;
@@ -44,6 +43,10 @@ import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 
 public class Client {
 
@@ -235,14 +238,6 @@ public class Client {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
-	    if (!localServer) {
-		ColorChooser color = new ColorChooser();
-		if (color.getButtonClosed()) {
-		    ctx.writeAndFlush(new ColorChoice(color.getBlack() ? ColorC.BLACK : ColorC.WHITE));
-		} else {
-		    System.exit(0);
-		}
-	    }
 	}
 
 	@Override
@@ -288,6 +283,13 @@ public class Client {
 		    @Override
 		    public void initChannel(SocketChannel ch) throws Exception {
 			ChannelPipeline p = ch.pipeline();
+			// Decoders
+			p.addLast("frameDecoder", new LineBasedFrameDecoder(80));
+			p.addLast("stringDecoder", new StringDecoder(CharsetUtil.UTF_8));
+			p.addLast("messageDecoder", new EncodableInboundHandler());
+			// Encoders
+			p.addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
+			p.addLast("messageEncoder", new EncodableOutboundHandler());
 			p.addLast("C_CProcessor", new ClientHandler());
 		    }
 		});

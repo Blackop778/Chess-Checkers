@@ -8,7 +8,7 @@ import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 
-public class GameMessage {
+public abstract class GameMessage {
 
     public static final Pattern chessMessagePattern = Pattern.compile("[a-h][1-8][-x][a-h][1-8]");
 

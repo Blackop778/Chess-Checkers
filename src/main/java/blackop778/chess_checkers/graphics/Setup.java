@@ -101,12 +101,14 @@ public class Setup {
 	internet = new Option("Multiplayer over internet:", "Yes", "No", false, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
+		black.addCustom(panel, dialog);
 		host.addCustom(panel, dialog);
 		// humans.removeCustom(panel, dialog);
 	    }
 	}, new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
+		black.removeCustom(panel, dialog);
 		host.removeCustom(panel, dialog);
 		// humans.addCustom(panel, dialog);
 	    }

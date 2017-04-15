@@ -29,7 +29,7 @@ public abstract class Chess_Checkers {
     public static String notation;
     public static Setup setup;
     public static final boolean DISABLE_AI = true;
-    public static final boolean DISABLE_INTERNET = true;
+    public static final boolean DISABLE_INTERNET = false;
     private static boolean imagesLoaded;
 
     public static void main(String[] args) {
