@@ -1,5 +1,8 @@
 package blackop778.chess_checkers.graphics;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -8,17 +11,20 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.net.HandshakeMessage;
 
-public class ColorConflictCorrection extends JDialog {
-    private static final long serialVersionUID = -3907485484317650006L;
+public class ColorConflictCorrection {
+    private final JDialog dialog;
     private final JPanel panel;
     private final JRadioButton random;
     private final JRadioButton rps;
-    private HandshakeMessage msg;
+    private final HandshakeMessage msg;
+    private final ColorConflictCorrection _this;
 
     public ColorConflictCorrection(HandshakeMessage msg) {
-	super((JDialog) null);
+	dialog = new JDialog((JDialog) null);
+	_this = this;
 	this.msg = msg;
 	panel = new JPanel();
 	panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -34,8 +40,17 @@ public class ColorConflictCorrection extends JDialog {
 	bp.add(rps);
 	panel.add(bp);
 	JButton enter = new JButton("Enter");
+	enter.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent arg0) {
+		dialog.setVisible(false);
+		Chess_Checkers.client.resolveColorConflict(_this);
+	    }
+	});
 	panel.add(enter);
-	pack();
+	dialog.add(panel);
+	dialog.pack();
+	dialog.setVisible(true);
     }
 
     public JRadioButton getRandom() {
@@ -44,5 +59,9 @@ public class ColorConflictCorrection extends JDialog {
 
     public JRadioButton getRPS() {
 	return rps;
+    }
+
+    public HandshakeMessage getMSG() {
+	return msg;
     }
 }

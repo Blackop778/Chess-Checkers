@@ -21,7 +21,7 @@ public class HandshakeMessage {
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, HandshakeMessage msg) throws Exception {
 	    if (Chess_Checkers.client instanceof Server) {
-		ColorConflictCorrection ccc = new ColorConflictCorrection(msg);
+		new ColorConflictCorrection(msg);
 	    } else {
 		JOptionPane.showMessageDialog(null,
 			"Both players tried to choose the same color, Server host is choosing how to decide.",

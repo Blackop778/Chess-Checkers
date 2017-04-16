@@ -14,6 +14,7 @@ import blackop778.chess_checkers.checkers.JumpTree;
 import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
+import blackop778.chess_checkers.graphics.ColorConflictCorrection;
 import blackop778.chess_checkers.net.EncodingHandlers.EncodableInboundHandler;
 import blackop778.chess_checkers.net.EncodingHandlers.EncodableOutboundHandler;
 import blackop778.chess_checkers.net.GameMessage.CheckersMessage;
@@ -520,6 +521,12 @@ public class Client {
 		piece.possible = false;
 		piece.selected = false;
 	    }
+	}
+    }
+
+    public void resolveColorConflict(ColorConflictCorrection ccc) {
+	if (ccc.getRandom().isSelected()) {
+
 	}
     }
 
