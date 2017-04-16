@@ -35,10 +35,10 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -134,95 +134,94 @@ public class Client {
 	}
     }
 
-    public class ClientHandler extends ChannelInboundHandlerAdapter {
+    public class ClientHandler extends SimpleChannelInboundHandler<GameMessage> {
 	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object msg) {
+	public void channelRead0(ChannelHandlerContext ctx, GameMessage msg) {
 	    try {
-		if (msg instanceof GameMessage) {
-		    turn = true;
-		    if (msg instanceof ChessMessage) {
-			System.out.println(((ChessMessage) msg).notation);
-			EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
-			if (m.castleDirection == Direction.NONE) {
-			    if (board[m.fromX][m.fromY] instanceof Pawn) {
-				// Check En passant capturing
-				if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
-				    board[m.toX][m.fromY] = new Empty();
+		turn = true;
+		if (msg instanceof ChessMessage) {
+		    System.out.println(((ChessMessage) msg).notation);
+		    EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
+		    if (m.castleDirection == Direction.NONE) {
+			if (board[m.fromX][m.fromY] instanceof Pawn) {
+			    // Check En passant capturing
+			    if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
+				board[m.toX][m.fromY] = new Empty();
+			    }
+			}
+			board[m.toX][m.toY] = board[m.fromX][m.fromY];
+			board[m.fromX][m.fromY] = new Empty();
+			if (board[m.toX][m.toY] instanceof Pawn) {
+			    ChessPiece.pawnCaptureCount = 0;
+			    if (Math.abs(m.toY - m.fromY) == 2) {
+				if (m.fromY == 1 || m.fromY == 6) {
+				    ChessPiece.doubleMovePawn = (Pawn) board[m.toX][m.toY];
+				}
+			    } else {
+				switch (m.pawnPromotion) {
+				case QUEEN:
+				    board[m.toX][m.toY] = new Queen(!black);
+				    break;
+				case KNIGHT:
+				    board[m.toX][m.toY] = new Knight(!black);
+				    break;
+				case ROOK:
+				    board[m.toX][m.toY] = new Rook(!black);
+				    break;
+				case BISHOP:
+				    board[m.toX][m.toY] = new Bishop(!black);
+				    break;
+				case NONE:
+				    break;
 				}
 			    }
-			    board[m.toX][m.toY] = board[m.fromX][m.fromY];
-			    board[m.fromX][m.fromY] = new Empty();
-			    if (board[m.toX][m.toY] instanceof Pawn) {
-				ChessPiece.pawnCaptureCount = 0;
-				if (Math.abs(m.toY - m.fromY) == 2) {
-				    if (m.fromY == 1 || m.fromY == 6) {
-					ChessPiece.doubleMovePawn = (Pawn) board[m.toX][m.toY];
-				    }
-				} else {
-				    switch (m.pawnPromotion) {
-				    case QUEEN:
-					board[m.toX][m.toY] = new Queen(!black);
-					break;
-				    case KNIGHT:
-					board[m.toX][m.toY] = new Knight(!black);
-					break;
-				    case ROOK:
-					board[m.toX][m.toY] = new Rook(!black);
-					break;
-				    case BISHOP:
-					board[m.toX][m.toY] = new Bishop(!black);
-					break;
-				    case NONE:
-					break;
-				    }
-				}
-			    } else if (board[m.toX][m.toY] instanceof King) {
-				King pieceK = (King) board[m.toX][m.toY];
-				pieceK.moved = true;
-			    } else if (board[m.toX][m.toY] instanceof Rook) {
-				Rook pieceR = (Rook) board[m.toX][m.toY];
-				pieceR.moved = true;
-			    }
-			    // Castling
+			} else if (board[m.toX][m.toY] instanceof King) {
+			    King pieceK = (King) board[m.toX][m.toY];
+			    pieceK.moved = true;
+			} else if (board[m.toX][m.toY] instanceof Rook) {
+			    Rook pieceR = (Rook) board[m.toX][m.toY];
+			    pieceR.moved = true;
+			}
+			// Castling
+		    } else {
+			int y;
+			if (black) {
+			    y = 7;
 			} else {
-			    int y;
-			    if (black)
-				y = 7;
-			    else
-				y = 0;
-			    boolean right = m.castleDirection == Direction.RIGHT;
-			    King pieceK = (King) board[m.fromX][y];
-			    Rook pieceR = (Rook) board[right ? 7 : 0][y];
-			    if (!pieceR.moved && !pieceK.moved) {
-				board[right ? 5 : 3][y] = board[right ? 7 : 0][y];
-				board[right ? 7 : 0][y] = new Empty();
-				board[m.toX][y] = board[m.fromX][y];
-				board[m.fromX][y] = new Empty();
-			    }
+			    y = 0;
 			}
-		    } else if (msg instanceof CheckersMessage) {
-			CheckersMessage event = (CheckersMessage) msg;
-			Point p = GameMessage.chessNotationToPoint(event.coordinate1);
-			int x = p.x;
-			int y = p.y;
-			for (Jump j : event.tree.getMidJumps()) {
-			    if (j.getMidPoint() != null) {
-				board[j.getMidPoint().x][j.getMidPoint().y] = new Empty();
-			    }
+			boolean right = m.castleDirection == Direction.RIGHT;
+			King pieceK = (King) board[m.fromX][y];
+			Rook pieceR = (Rook) board[right ? 7 : 0][y];
+			if (!pieceR.moved && !pieceK.moved) {
+			    board[right ? 5 : 3][y] = board[right ? 7 : 0][y];
+			    board[right ? 7 : 0][y] = new Empty();
+			    board[m.toX][y] = board[m.fromX][y];
+			    board[m.fromX][y] = new Empty();
 			}
-			if (event.tree.getEndJump().getMidPoint() != null) {
-			    board[event.tree.getEndJump().getMidPoint().x][event.tree.getEndJump()
-				    .getMidPoint().y] = new Empty();
-			}
-			if ((event.tree.getEndJump().getEndPoint().y == 0 && !board[x][y].black)
-				|| (event.tree.getEndJump().getEndPoint().y == 7 && board[x][y].black)) {
-			    Checker c = (Checker) board[x][y];
-			    c.kinged = true;
-			}
-			board[event.tree.getEndJump().getEndPoint().x][event.tree.getEndJump()
-				.getEndPoint().y] = board[x][y];
-			board[x][y] = new Empty();
 		    }
+		} else if (msg instanceof CheckersMessage) {
+		    CheckersMessage event = (CheckersMessage) msg;
+		    Point p = GameMessage.chessNotationToPoint(event.coordinate1);
+		    int x = p.x;
+		    int y = p.y;
+		    for (Jump j : event.tree.getMidJumps()) {
+			if (j.getMidPoint() != null) {
+			    board[j.getMidPoint().x][j.getMidPoint().y] = new Empty();
+			}
+		    }
+		    if (event.tree.getEndJump().getMidPoint() != null) {
+			board[event.tree.getEndJump().getMidPoint().x][event.tree.getEndJump()
+				.getMidPoint().y] = new Empty();
+		    }
+		    if ((event.tree.getEndJump().getEndPoint().y == 0 && !board[x][y].black)
+			    || (event.tree.getEndJump().getEndPoint().y == 7 && board[x][y].black)) {
+			Checker c = (Checker) board[x][y];
+			c.kinged = true;
+		    }
+		    board[event.tree.getEndJump().getEndPoint().x][event.tree.getEndJump()
+			    .getEndPoint().y] = board[x][y];
+		    board[x][y] = new Empty();
 		}
 		if (Chess_Checkers.panel != null) {
 		    Chess_Checkers.panel.repaint();
@@ -448,9 +447,8 @@ public class Client {
 	    message = "N";
 	} else if (piece instanceof Queen) {
 	    message = "Q";
-	} else {
+	} else
 	    throw new RuntimeException("Error: Unknown and unhandled piece type");
-	}
 
 	if (cm == null) {
 	    message = message + GameMessage.pointToChessNotation(i, n);
