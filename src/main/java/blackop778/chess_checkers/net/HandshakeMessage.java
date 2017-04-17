@@ -14,7 +14,8 @@ public class HandshakeMessage {
     // More to be added
     public HandshakeMessage() {
 	black = Chess_Checkers.client.getBlack();
-	seed = System.currentTimeMillis();
+	Chess_Checkers.ourSeed = System.currentTimeMillis();
+	seed = Chess_Checkers.ourSeed;
     }
 
     public static class HandshakeHandler extends SimpleChannelInboundHandler<HandshakeMessage> {

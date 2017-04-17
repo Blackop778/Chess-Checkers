@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.net.ConnectException;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JOptionPane;
 
@@ -15,6 +16,7 @@ import blackop778.chess_checkers.chess.PawnPromotion;
 import blackop778.chess_checkers.chess.PawnPromotion.Promotion;
 import blackop778.chess_checkers.chess.SnapshotStorage;
 import blackop778.chess_checkers.graphics.ColorConflictCorrection;
+import blackop778.chess_checkers.net.ColorConflictMessage.ColorAgreementMessage;
 import blackop778.chess_checkers.net.EncodingHandlers.EncodableInboundHandler;
 import blackop778.chess_checkers.net.EncodingHandlers.EncodableOutboundHandler;
 import blackop778.chess_checkers.net.GameMessage.CheckersMessage;
@@ -526,6 +528,13 @@ public class Client {
 
     public void resolveColorConflict(ColorConflictCorrection ccc) {
 	if (ccc.getRandom().isSelected()) {
+	    Random random = new Random((ccc.getMSG().seed + Chess_Checkers.ourSeed) / 3);
+	    boolean answer = random.nextBoolean();
+	    if (!answer) {
+		black = !black;
+	    }
+	    context.write(new ColorAgreementMessage(black));
+	} else {
 
 	}
     }

@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import com.google.gson.Gson;
 
+import blackop778.chess_checkers.net.ColorConflictMessage.ColorAgreementMessage;
 import blackop778.chess_checkers.net.GameMessage.CheckersMessage;
 import blackop778.chess_checkers.net.GameMessage.ChessMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,6 +21,12 @@ public abstract class EncodingHandlers {
 	    return GSON.fromJson(parts[1], CheckersMessage.class);
 	} else if (parts[0].equals("ChessMessage")) {
 	    return ChessMessage.instantiate(parts[1]);
+	} else if (parts[0].equals("HandshakeMessage:")) {
+	    return GSON.fromJson(msg, HandshakeMessage.class);
+	} else if (parts[0].equals("ColorConflictMessage:")) {
+	    return GSON.fromJson(msg, ColorConflictMessage.class);
+	} else if (parts[0].equals("ColorAgreementMessage:")) {
+	    return GSON.fromJson(msg, ColorAgreementMessage.class);
 	} else {
 	    throw new ClassCastException(parts[0] + " is not an expected message type");
 	}
@@ -39,6 +46,12 @@ public abstract class EncodingHandlers {
 	    return "ChessMessage:" + ((ChessMessage) obj).notation + "\n";
 	} else if (obj instanceof CheckersMessage) {
 	    return "CheckersMessage:" + GSON.toJson(obj) + "\n";
+	} else if (obj instanceof HandshakeMessage) {
+	    return "HandshakeMessage:" + GSON.toJson(obj) + "\n";
+	} else if (obj instanceof ColorConflictMessage) {
+	    return "ColorConflictMessage:" + GSON.toJson(obj);
+	} else if (obj instanceof ColorAgreementMessage) {
+	    return "ColorAgreementMessage:" + GSON.toJson(obj);
 	} else {
 	    throw new ClassCastException(obj.getClass().getName() + " is not an expected message type");
 	}

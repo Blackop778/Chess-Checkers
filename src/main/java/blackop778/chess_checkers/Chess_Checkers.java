@@ -2,7 +2,12 @@ package blackop778.chess_checkers;
 
 import java.awt.GraphicsConfiguration;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -31,9 +36,42 @@ public abstract class Chess_Checkers {
     public static final boolean DISABLE_AI = true;
     public static final boolean DISABLE_INTERNET = false;
     private static boolean imagesLoaded;
+    public static long ourSeed;
+    public static final boolean LOG_TO_FILE = true;
+    public static final boolean IMAGE_LOAD_TROUBLE = true;
 
     public static void main(String[] args) {
+	int index = 0;
+	if (LOG_TO_FILE) {
+	    File output = new File("output.txt");
+	    while (output.exists()) {
+		index++;
+		output = new File("output" + index + ".txt");
+	    }
+	    PrintStream out = null;
+	    try {
+		out = new PrintStream(new FileOutputStream(output));
+	    } catch (FileNotFoundException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+		System.exit(2);
+	    }
+	    System.setOut(out);
+	    System.setErr(out);
+	}
 	imagesLoaded = false;
+	if (IMAGE_LOAD_TROUBLE) {
+	    Timer t = new Timer();
+	    t.schedule(new TimerTask() {
+		@Override
+		public void run() {
+		    if (!areImagesLoaded()) {
+			System.out.println("Images failed to load after 10s, terminating");
+			System.exit(3);
+		    }
+		}
+	    }, 10000);
+	}
 	new Thread(new Runnable() {
 	    @Override
 	    public void run() {
@@ -87,6 +125,7 @@ public abstract class Chess_Checkers {
 		e.printStackTrace();
 	    }
 	}
+	System.out.println("Starting and images loaded");
 	frame.setVisible(true);
     }
 
