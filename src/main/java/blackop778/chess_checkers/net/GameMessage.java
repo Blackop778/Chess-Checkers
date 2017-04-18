@@ -139,8 +139,8 @@ public abstract class GameMessage {
 		capture = coords.substring(2, 3).equals("x");
 		check = notation.endsWith("+");
 		checkmate = notation.endsWith("#");
-		blackWin = checkmate && Chess_Checkers.client.black;
-		whiteWin = checkmate && !Chess_Checkers.client.black;
+		blackWin = checkmate && Chess_Checkers.client.getBlack();
+		whiteWin = checkmate && !Chess_Checkers.client.getBlack();
 		castleDirection = Direction.NONE;
 		offerSurrender = false;
 		offerDraw = false;

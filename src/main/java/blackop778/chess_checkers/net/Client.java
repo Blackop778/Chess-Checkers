@@ -54,7 +54,7 @@ import io.netty.util.CharsetUtil;
 public class Client {
 
     private Piece[][] board;
-    protected boolean black;
+    private boolean black;
     public final boolean gameIsCheckers;
     private boolean turn;
     private ChannelHandlerContext context;
@@ -536,6 +536,9 @@ public class Client {
 	    context.write(new ColorAgreementMessage(black));
 	} else {
 
+	}
+	if (!(this instanceof Server)) {
+	    black = !black;
 	}
     }
 
