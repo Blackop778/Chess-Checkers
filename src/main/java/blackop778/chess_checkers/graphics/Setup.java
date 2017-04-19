@@ -150,7 +150,7 @@ public class Setup {
 	    @Override
 	    public void actionPerformed(ActionEvent arg0) {
 		buttonClosed = true;
-		dialog.dispose();
+		dialog.setVisible(false);
 	    }
 	});
 	panel.add(enter);

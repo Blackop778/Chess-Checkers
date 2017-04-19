@@ -143,9 +143,38 @@ public class Client {
 	    if (msg instanceof GameMessage) {
 		turn = true;
 		if (msg instanceof ChessMessage) {
-		    System.out.println(((ChessMessage) msg).notation);
 		    EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
-		    if (m.castleDirection == Direction.NONE) {
+		    if (m.offerDraw && (!Chess_Checkers.getNotation().endsWith("(=)")
+			    || !Chess_Checkers.getNotation().endsWith("(=)\n"))) {
+			int response = JOptionPane.showConfirmDialog(null,
+				"You opponent proposes a draw. Do you accept?", "Draw proposal",
+				JOptionPane.YES_NO_OPTION);
+			if (response == JOptionPane.YES_OPTION) {
+			    passTurn(ChessMessage.instantiate(".5-.5"));
+			} else {
+			    passTurn(ChessMessage.instantiate("(=)"));
+			}
+		    } else if (m.offerSurrender && (!Chess_Checkers.getNotation().endsWith("(=+)")
+			    || !Chess_Checkers.getNotation().endsWith("(=+)\n"))) {
+			int response = JOptionPane.showConfirmDialog(null,
+				"You opponent offers their surrender. Do you accept?", "Surrender offer",
+				JOptionPane.YES_NO_OPTION);
+			if (response == JOptionPane.YES_OPTION) {
+			    if (black) {
+				passTurn(ChessMessage.instantiate("0-1"));
+			    } else {
+				passTurn(ChessMessage.instantiate("1-0"));
+			    }
+			} else {
+
+			}
+		    } else if (m.draw) {
+			JOptionPane.showMessageDialog(null, "Your match ends in an honorable draw.");
+		    } else if (m.blackWin) {
+
+		    } else if (m.whiteWin) {
+
+		    } else if (m.castleDirection == Direction.NONE) {
 			if (board[m.fromX][m.fromY] instanceof Pawn) {
 			    // Check En passant capturing
 			    if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
@@ -203,6 +232,8 @@ public class Client {
 			    board[m.fromX][y] = new Empty();
 			}
 		    }
+		    System.out.println(((ChessMessage) msg).notation);
+		    Chess_Checkers.updateNotation(((ChessMessage) msg).notation);
 		} else if (msg instanceof CheckersMessage) {
 		    CheckersMessage event = (CheckersMessage) msg;
 		    Point p = GameMessage.chessNotationToPoint(event.coordinate1);
@@ -555,6 +586,12 @@ public class Client {
 	}
 	if (!(this instanceof Server)) {
 	    black = !black;
+	}
+    }
+
+    public void offer(String message) {
+	if (message.equals("(=)") || message.equals("(=+)")) {
+	    passTurn(ChessMessage.instantiate(message));
 	}
     }
 

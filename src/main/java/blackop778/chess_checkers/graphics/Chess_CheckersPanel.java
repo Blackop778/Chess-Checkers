@@ -30,9 +30,22 @@ public class Chess_CheckersPanel extends JPanel {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		Chess_Checkers.offerSurrender = true;
+		if (Chess_Checkers.client.getTurn()) {
+		    Chess_Checkers.client.offer("(=+)");
+		}
 	    }
 	});
 	hudContainer.add(surrender);
+	JButton draw = new JButton("Propose Draw");
+	draw.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		if (Chess_Checkers.client.getTurn()) {
+		    Chess_Checkers.client.offer("(=)");
+		}
+	    }
+	});
+	hudContainer.add(draw);
 	add(hudContainer);
 	game = new JPanel() {
 	    @Override

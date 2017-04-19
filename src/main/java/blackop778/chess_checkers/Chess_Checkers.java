@@ -31,7 +31,10 @@ public abstract class Chess_Checkers {
     public static boolean offerSurrender;
     public static boolean gameOver;
     public static Chess_CheckersPanel panel;
-    public static String notation;
+    private static String notation;
+    // If we need to start a new notation line
+    private static boolean newLine;
+    private static int turns;
     public static Setup setup;
     public static final boolean DISABLE_AI = true;
     public static final boolean DISABLE_INTERNET = false;
@@ -105,7 +108,6 @@ public abstract class Chess_Checkers {
 	    e.printStackTrace();
 	}
 
-	setup = new Setup();
 	setup();
     }
 
@@ -130,8 +132,16 @@ public abstract class Chess_Checkers {
     }
 
     public static void setup() {
+	if (setup == null) {
+	    setup = new Setup();
+	} else {
+	    setup.redisplay();
+	}
 	offerSurrender = false;
 	gameOver = false;
+	notation = "";
+	turns = 0;
+	newLine = true;
 	if (!setup.getButtonClosed())
 	    System.exit(0);
 	if (setup.humans.isButton1Selected()) {
@@ -178,5 +188,22 @@ public abstract class Chess_Checkers {
 
     public static class ClientTimeoutException extends Exception {
 	private static final long serialVersionUID = -4472530227066677609L;
+    }
+
+    public static String getNotation() {
+	return notation;
+    }
+
+    public static void updateNotation(String toAdd) {
+	if (newLine) {
+	    notation += (turns + 1) + ".";
+	}
+	notation += " " + toAdd;
+	if (!newLine) {
+	    notation += "\n";
+	    turns++;
+	}
+
+	newLine = !newLine;
     }
 }
