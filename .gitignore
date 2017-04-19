@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/windows,osx,linux,eclipse,java,gradle
 
+### Chess_Checkers
+LogOutput*.txt
+
 ### Windows ###
 # Windows image file caches
 Thumbs.db

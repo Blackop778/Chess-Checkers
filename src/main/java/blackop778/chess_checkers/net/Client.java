@@ -38,10 +38,10 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -137,10 +137,10 @@ public class Client {
 	}
     }
 
-    public class ClientHandler extends SimpleChannelInboundHandler<GameMessage> {
+    public class ClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
-	public void channelRead0(ChannelHandlerContext ctx, GameMessage msg) {
-	    try {
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws InvalidMessageException {
+	    if (msg instanceof GameMessage) {
 		turn = true;
 		if (msg instanceof ChessMessage) {
 		    System.out.println(((ChessMessage) msg).notation);
@@ -229,22 +229,21 @@ public class Client {
 		if (Chess_Checkers.panel != null) {
 		    Chess_Checkers.panel.repaint();
 		}
-	    } catch (
-
-	    InvalidMessageException e) {
-		JOptionPane.showMessageDialog(null, e.getMessage());
-		System.exit(1);
+	    } else {
+		ctx.fireChannelRead(msg);
 	    }
 	}
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
+	    Chess_Checkers.debugLog("Sending HandshakeMessage");
+	    ctx.writeAndFlush(new HandshakeMessage());
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-	    System.out.println("Exception Caught");
+	    System.out.println("Exception Caught yo");
 	    if (cause instanceof ConnectException) {
 		Chess_Checkers.setup.redisplay();
 		Chess_Checkers.setup();
@@ -253,6 +252,10 @@ public class Client {
 	    }
 	}
 
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx) {
+	    Chess_Checkers.debugLog("Channel is now Inactive");
+	}
     }
 
     public void startLocal(EventLoopGroup group, SocketAddress local) {
@@ -264,6 +267,10 @@ public class Client {
 		// Start the client.
 		ChannelFuture future = b.connect(local).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
 			.sync();
+
+		// Start GUI
+		Chess_Checkers.debugLog("Starting game display");
+		Chess_Checkers.startGUI(" server");
 
 		// Wait until the connection is closed.
 		future.channel().closeFuture().sync();
@@ -292,7 +299,9 @@ public class Client {
 			// Encoders
 			p.addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
 			p.addLast("messageEncoder", new EncodableOutboundHandler());
-			p.addLast("C_CProcessor", new ClientHandler());
+			// Handlers
+			p.addLast("c_cClientProcessor", new ClientHandler());
+			p.addLast("miscHandler", new MiscHandler());
 		    }
 		});
 
@@ -301,13 +310,9 @@ public class Client {
 			.sync();
 
 		if (!future.isSuccess()) {
-		    System.out.println("Printing error: ");
+		    System.out.println("Future not successful. Printing error: ");
 		    future.cause().printStackTrace();
 		}
-
-		// Start GUI
-		System.out.println("Starting game display");
-		Chess_Checkers.startGUI(" client");
 
 		// Wait until the connection is closed.
 		future.channel().closeFuture().sync();
@@ -527,13 +532,24 @@ public class Client {
     }
 
     public void resolveColorConflict(ColorConflictCorrection ccc) {
-	if (ccc.getRandom().isSelected()) {
+	if (ccc.isRandomSelected()) {
 	    Random random = new Random((ccc.getMSG().seed + Chess_Checkers.ourSeed) / 3);
 	    boolean answer = random.nextBoolean();
 	    if (!answer) {
 		black = !black;
 	    }
-	    context.write(new ColorAgreementMessage(black));
+	    if (this instanceof Server) {
+		Chess_Checkers.debugLog("Sending ColorConflictMessage");
+		context.writeAndFlush(ccc);
+	    }
+	    try {
+		Thread.sleep(1000);
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	    Chess_Checkers.debugLog("Sending ColorAgreementMessage");
+	    context.writeAndFlush(new ColorAgreementMessage(black));
 	} else {
 
 	}

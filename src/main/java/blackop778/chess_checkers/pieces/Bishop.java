@@ -1,15 +1,8 @@
 package blackop778.chess_checkers.pieces;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 import blackop778.chess_checkers.Chess_Checkers;
 
@@ -23,22 +16,6 @@ public class Bishop extends ChessPiece {
 	this.selected = false;
 	this.selector = null;
 	this.possible = false;
-    }
-
-    @Override
-    public void drawSelf(Graphics g, int x, int y) {
-	if (possible) {
-	    g.setColor(Color.YELLOW);
-	    g.fillRect(x + 2, y + 2, 86, 86);
-	}
-	String color = black ? "Black" : "White";
-	URL image = ClassLoader.getSystemClassLoader()
-		.getResource("assets" + File.separator + "images" + File.separator + color + "Bishop.png");
-	try {
-	    g.drawImage(ImageIO.read(image), x, y, null);
-	} catch (IOException e) {
-	    // e.printStackTrace();
-	}
     }
 
     @Override

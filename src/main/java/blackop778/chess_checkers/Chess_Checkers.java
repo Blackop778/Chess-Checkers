@@ -37,22 +37,22 @@ public abstract class Chess_Checkers {
     public static final boolean DISABLE_INTERNET = false;
     private static boolean imagesLoaded;
     public static long ourSeed;
-    public static final boolean LOG_TO_FILE = true;
-    public static final boolean IMAGE_LOAD_TROUBLE = true;
+    public static final boolean LOG_TO_FILE = false;
+    public static final boolean IMAGE_LOAD_TROUBLE = false;
+    public static final boolean DEBUG_LOGGING = true;
 
     public static void main(String[] args) {
 	int index = 0;
 	if (LOG_TO_FILE) {
-	    File output = new File("output.txt");
+	    File output = new File("LogOutput.txt");
 	    while (output.exists()) {
 		index++;
-		output = new File("output" + index + ".txt");
+		output = new File("LogOutput" + index + ".txt");
 	    }
 	    PrintStream out = null;
 	    try {
 		out = new PrintStream(new FileOutputStream(output));
 	    } catch (FileNotFoundException e1) {
-		// TODO Auto-generated catch block
 		e1.printStackTrace();
 		System.exit(2);
 	    }
@@ -125,7 +125,7 @@ public abstract class Chess_Checkers {
 		e.printStackTrace();
 	    }
 	}
-	System.out.println("Starting and images loaded");
+	debugLog("Starting and images loaded");
 	frame.setVisible(true);
     }
 
@@ -168,6 +168,12 @@ public abstract class Chess_Checkers {
 
     public static synchronized void setImagesLoaded(boolean loaded) {
 	imagesLoaded = loaded;
+    }
+
+    public static void debugLog(String message) {
+	if (DEBUG_LOGGING) {
+	    System.out.println("[" + System.currentTimeMillis() + "] " + message);
+	}
     }
 
     public static class ClientTimeoutException extends Exception {

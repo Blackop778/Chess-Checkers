@@ -5,12 +5,13 @@ import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 
 public class InfoDialog {
     private JFrame frame;
     private JPanel panel;
+    private boolean displaying;
 
     public static InfoDialog showMessage(String message) {
 	return showMessage(message, "");
@@ -21,10 +22,12 @@ public class InfoDialog {
 	_this.frame = new JFrame();
 	_this.frame.setTitle(title);
 	_this.panel = new JPanel();
-	_this.panel.add(new JTextArea(message));
+	_this.panel.add(new JLabel(message));
 	_this.frame.add(_this.panel);
-	_this.frame.setVisible(true);
 	_this.frame.pack();
+	_this.frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+	_this.displaying = true;
+	_this.frame.setVisible(true);
 
 	return _this;
     }
@@ -48,6 +51,10 @@ public class InfoDialog {
 
     public void close() {
 	frame.setVisible(false);
-	frame.dispose();
+	displaying = false;
+    }
+
+    public boolean isDisplaying() {
+	return displaying;
     }
 }

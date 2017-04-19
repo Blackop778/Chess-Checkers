@@ -47,7 +47,6 @@ public class Server extends Client {
 		// Wait until the server socket is closed.
 		f.channel().closeFuture().sync();
 	    } catch (InterruptedException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    } finally {
 		// Shut down all event loops to terminate all threads.
@@ -70,12 +69,14 @@ public class Server extends Client {
 				// Encoders
 				p.addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8));
 				p.addLast("messageEncoder", new EncodableOutboundHandler());
-				p.addLast("C_CProcessor", new ServerHandler());
+				// Handlers
+				p.addLast("c_cServerProcessor", new ServerHandler());
+				p.addLast("miscHandler", new MiscHandler());
 			    }
 			});
 
 		// Start the server.
-		System.out.println("Server listening to port " + port);
+		Chess_Checkers.debugLog("Server listening to port " + port);
 		ChannelFuture f = b.bind(port).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).sync();
 
 		// Wait until the server socket is closed.
@@ -94,8 +95,6 @@ public class Server extends Client {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    super.channelActive(ctx);
-	    System.out.println("Starting game display");
-	    Chess_Checkers.startGUI(" server");
 	}
     }
 }
