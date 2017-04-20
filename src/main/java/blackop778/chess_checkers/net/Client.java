@@ -59,11 +59,18 @@ public class Client {
     private boolean turn;
     private ChannelHandlerContext context;
     protected final boolean localServer;
+    private String notation;
+ // If we need to start a new notation line
+    private static boolean newLine;
+    private static int turns;
 
     public Client(boolean black, boolean gameIsCheckers, boolean localServer) {
 	this.black = black;
 	this.gameIsCheckers = gameIsCheckers;
 	this.localServer = localServer;
+	notation = "";
+	newLine = true;
+	turns = 0;
 
 	board = new Piece[8][8];
 	for (int i = 0; i < board.length; i++) {
@@ -144,8 +151,8 @@ public class Client {
 		turn = true;
 		if (msg instanceof ChessMessage) {
 		    EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
-		    if (m.offerDraw && (!Chess_Checkers.getNotation().endsWith("(=)")
-			    || !Chess_Checkers.getNotation().endsWith("(=)\n"))) {
+		    if (m.offerDraw && (!notation.endsWith("(=)")
+			    || !notation.endsWith("(=)\n"))) {
 			int response = JOptionPane.showConfirmDialog(null,
 				"You opponent proposes a draw. Do you accept?", "Draw proposal",
 				JOptionPane.YES_NO_OPTION);
@@ -154,8 +161,8 @@ public class Client {
 			} else {
 			    passTurn(ChessMessage.instantiate("(=)"));
 			}
-		    } else if (m.offerSurrender && (!Chess_Checkers.getNotation().endsWith("(=+)")
-			    || !Chess_Checkers.getNotation().endsWith("(=+)\n"))) {
+		    } else if (m.offerSurrender && (!notation.endsWith("(=+)")
+			    || !notation.endsWith("(=+)\n"))) {
 			int response = JOptionPane.showConfirmDialog(null,
 				"You opponent offers their surrender. Do you accept?", "Surrender offer",
 				JOptionPane.YES_NO_OPTION);
@@ -166,7 +173,7 @@ public class Client {
 				passTurn(ChessMessage.instantiate("1-0"));
 			    }
 			} else {
-
+			    passTurn(ChessMessage.instantiate("(=+)"));
 			}
 		    } else if (m.draw) {
 			JOptionPane.showMessageDialog(null, "Your match ends in an honorable draw.");
@@ -233,7 +240,7 @@ public class Client {
 			}
 		    }
 		    System.out.println(((ChessMessage) msg).notation);
-		    Chess_Checkers.updateNotation(((ChessMessage) msg).notation);
+		    updateNotation(((ChessMessage) msg).notation);
 		} else if (msg instanceof CheckersMessage) {
 		    CheckersMessage event = (CheckersMessage) msg;
 		    Point p = GameMessage.chessNotationToPoint(event.coordinate1);
@@ -605,5 +612,22 @@ public class Client {
 
     public boolean getBlack() {
 	return new Boolean(black);
+    }
+    
+    public String getNotation() {
+	return notation;
+    }
+
+    public void updateNotation(String toAdd) {
+	if (newLine) {
+	    notation += (turns + 1) + ".";
+	}
+	notation += " " + toAdd;
+	if (!newLine) {
+	    notation += "\n";
+	    turns++;
+	}
+
+	newLine = !newLine;
     }
 }
