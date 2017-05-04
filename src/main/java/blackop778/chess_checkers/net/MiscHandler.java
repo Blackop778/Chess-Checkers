@@ -41,7 +41,8 @@ public class MiscHandler extends ChannelInboundHandlerAdapter {
 		throw new InvalidMessageException("Colors supposed to be corrected but are conflicting");
 	    } else {
 		// Start GUI
-		System.out.println("Starting game display");
+		Chess_Checkers.debugLog("Now playing as: " + (Chess_Checkers.client.getBlack() ? "Black" : "White"));
+		Chess_Checkers.debugLog("Starting game display");
 		Chess_Checkers.startGUI(" " + ((Chess_Checkers.client instanceof Server) ? "server" : "client"));
 	    }
 	} else {

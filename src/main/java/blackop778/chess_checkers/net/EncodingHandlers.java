@@ -42,6 +42,7 @@ public abstract class EncodingHandlers {
 
     }
 
+    // MUST append \n to EACH message
     public static String encode(Object obj) {
 	if (obj instanceof ChessMessage) {
 	    return "ChessMessage" + MESSAGE_SEPARATOR + ((ChessMessage) obj).notation + "\n";
@@ -50,9 +51,9 @@ public abstract class EncodingHandlers {
 	} else if (obj instanceof HandshakeMessage) {
 	    return "HandshakeMessage" + MESSAGE_SEPARATOR + GSON.toJson(obj) + "\n";
 	} else if (obj instanceof ColorConflictMessage) {
-	    return "ColorConflictMessage" + MESSAGE_SEPARATOR + GSON.toJson(obj);
+	    return "ColorConflictMessage" + MESSAGE_SEPARATOR + GSON.toJson(obj) + "\n";
 	} else if (obj instanceof ColorAgreementMessage) {
-	    return "ColorAgreementMessage" + MESSAGE_SEPARATOR + GSON.toJson(obj);
+	    return "ColorAgreementMessage" + MESSAGE_SEPARATOR + GSON.toJson(obj) + "\n";
 	} else {
 	    throw new ClassCastException(obj.getClass().getName() + " is not an expected message type");
 	}

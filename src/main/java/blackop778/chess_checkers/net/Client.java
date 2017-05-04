@@ -60,7 +60,7 @@ public class Client {
     private ChannelHandlerContext context;
     protected final boolean localServer;
     private String notation;
- // If we need to start a new notation line
+    // If we need to start a new notation line
     private static boolean newLine;
     private static int turns;
 
@@ -151,8 +151,7 @@ public class Client {
 		turn = true;
 		if (msg instanceof ChessMessage) {
 		    EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
-		    if (m.offerDraw && (!notation.endsWith("(=)")
-			    || !notation.endsWith("(=)\n"))) {
+		    if (m.offerDraw && (!notation.endsWith("(=)") || !notation.endsWith("(=)\n"))) {
 			int response = JOptionPane.showConfirmDialog(null,
 				"You opponent proposes a draw. Do you accept?", "Draw proposal",
 				JOptionPane.YES_NO_OPTION);
@@ -161,8 +160,7 @@ public class Client {
 			} else {
 			    passTurn(ChessMessage.instantiate("(=)"));
 			}
-		    } else if (m.offerSurrender && (!notation.endsWith("(=+)")
-			    || !notation.endsWith("(=+)\n"))) {
+		    } else if (m.offerSurrender && (!notation.endsWith("(=+)") || !notation.endsWith("(=+)\n"))) {
 			int response = JOptionPane.showConfirmDialog(null,
 				"You opponent offers their surrender. Do you accept?", "Surrender offer",
 				JOptionPane.YES_NO_OPTION);
@@ -340,6 +338,8 @@ public class Client {
 			// Handlers
 			p.addLast("c_cClientProcessor", new ClientHandler());
 			p.addLast("miscHandler", new MiscHandler());
+			// p.addLast("logging", new
+			// LoggingHandler(LogLevel.INFO));
 		    }
 		});
 
@@ -594,6 +594,13 @@ public class Client {
 	if (!(this instanceof Server)) {
 	    black = !black;
 	}
+	if (black)
+	    turn = false;
+	else
+	    turn = true;
+	Chess_Checkers.debugLog("Now playing as: " + (black ? "Black" : "White"));
+	Chess_Checkers.debugLog("Starting game display");
+	Chess_Checkers.startGUI(" " + ((Chess_Checkers.client instanceof Server) ? "server" : "client"));
     }
 
     public void offer(String message) {
@@ -613,7 +620,7 @@ public class Client {
     public boolean getBlack() {
 	return new Boolean(black);
     }
-    
+
     public String getNotation() {
 	return notation;
     }
