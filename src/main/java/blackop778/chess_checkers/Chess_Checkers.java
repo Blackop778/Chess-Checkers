@@ -65,7 +65,7 @@ public abstract class Chess_Checkers {
 		@Override
 		public void run() {
 		    if (!areImagesLoaded()) {
-			System.out.println("Images failed to load after 10s, terminating");
+			System.err.println("Images failed to load after 10s, terminating");
 			System.exit(3);
 		    }
 		}
@@ -155,11 +155,11 @@ public abstract class Chess_Checkers {
 		if (setup.host.isButton1Selected()) {
 		    // Host a server
 		    client = new Server(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), false);
-		    ((Server) client).startServer(Integer.valueOf(setup.port.text.getText()));
+		    ((Server) client).startServer(Integer.valueOf(setup.port.getText()));
 		} else {
 		    // Connect to remote server
 		    client = new Client(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), false);
-		    client.start(setup.ip.text.getText(), Integer.valueOf(setup.port.text.getText()));
+		    client.start(setup.ip.getText(), Integer.valueOf(setup.port.getText()));
 		}
 	    }
 	}

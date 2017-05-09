@@ -10,8 +10,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.chess.Snapshot;
@@ -21,6 +23,8 @@ import blackop778.chess_checkers.chess.SnapshotStorage;
 public class Chess_CheckersPanel extends JPanel {
     private final JPanel game;
     private final JPanel hudContainer;
+    private final JLabel turn;
+    private final JTextArea moves;
 
     public Chess_CheckersPanel() {
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -46,6 +50,12 @@ public class Chess_CheckersPanel extends JPanel {
 	    }
 	});
 	hudContainer.add(draw);
+	turn = new JLabel();
+	hudContainer.add(turn);
+	moves = new JTextArea();
+	moves.setEditable(false);
+	hudContainer.add(moves);
+	updateHUD();
 	add(hudContainer);
 	game = new JPanel() {
 	    @Override
@@ -128,5 +138,32 @@ public class Chess_CheckersPanel extends JPanel {
 	    }
 	});
 	add(game);
+    }
+
+    public void updateHUD() {
+	// Multiplayer over internet
+	if (Chess_Checkers.setup.internet.isButton1Selected()) {
+	    if (Chess_Checkers.client.getTurn()) {
+		turn.setText(Chess_Checkers.setup.whiteName.getText() + "'s turn");
+	    } else {
+		turn.setText(Chess_Checkers.setup.blackName.getText() + "'s turn");
+	    }
+	} else {
+	    if (Chess_Checkers.client.getTurn()) {
+		if (Chess_Checkers.client.getBlack()) {
+		    turn.setText(Chess_Checkers.setup.blackName.getText() + "'s turn");
+		} else {
+		    turn.setText(Chess_Checkers.setup.whiteName.getText() + "'s turn");
+		}
+	    } else {
+		if (Chess_Checkers.client.getBlack()) {
+		    turn.setText(Chess_Checkers.setup.whiteName.getText() + "'s turn");
+		} else {
+		    turn.setText(Chess_Checkers.setup.blackName.getText() + "'s turn");
+		}
+	    }
+	}
+
+	moves.setText(Chess_Checkers.client.getNotation());
     }
 }

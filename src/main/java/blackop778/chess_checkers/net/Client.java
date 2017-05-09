@@ -61,8 +61,8 @@ public class Client {
     protected final boolean localServer;
     private String notation;
     // If we need to start a new notation line
-    private static boolean newLine;
-    private static int turns;
+    private boolean newLine;
+    private int turns;
 
     public Client(boolean black, boolean gameIsCheckers, boolean localServer) {
 	this.black = black;
@@ -265,6 +265,7 @@ public class Client {
 		if (Chess_Checkers.panel != null) {
 		    Chess_Checkers.panel.repaint();
 		}
+		Chess_Checkers.panel.updateHUD();
 	    } else {
 		ctx.fireChannelRead(msg);
 	    }
@@ -365,6 +366,7 @@ public class Client {
 
     private void passTurn(GameMessage m) {
 	turn = false;
+	Chess_Checkers.panel.updateHUD();
 	context.writeAndFlush(m);
 	if (localServer) {
 	    Client t = Chess_Checkers.client;
@@ -549,7 +551,10 @@ public class Client {
 	}
 	ChessPiece.endGameCheck();
 
-	passTurn((cm == null) ? ChessMessage.instantiate(message) : cm);
+	if (cm == null)
+	    cm = ChessMessage.instantiate(message);
+	updateNotation(cm.notation);
+	passTurn(cm);
     }
 
     public static class UnexpectedActionException extends Exception {
@@ -583,7 +588,6 @@ public class Client {
 	    try {
 		Thread.sleep(1000);
 	    } catch (InterruptedException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
 	    Chess_Checkers.debugLog("Sending ColorAgreementMessage");

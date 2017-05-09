@@ -39,7 +39,7 @@ public class Server extends Client {
 		b.group(serverGroup, clientGroup).channel(LocalServerChannel.class).childHandler(new ServerHandler());
 
 		// Start the server.
-		System.out.println("Server listening to port " + local.id());
+		Chess_Checkers.debugLog("Server listening to port " + local.id());
 		ChannelFuture f = b.bind(local).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).sync();
 		Chess_Checkers.clientPartner = new Client(!getBlack(), gameIsCheckers, true);
 		Chess_Checkers.clientPartner.startLocal(clientGroup, local);

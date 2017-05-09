@@ -104,6 +104,8 @@ public class Setup {
 		black.addCustom(panel, dialog);
 		host.addCustom(panel, dialog);
 		// humans.removeCustom(panel, dialog);
+		whiteName.setLabel("Your name:");
+		blackName.setLabel("Their name:");
 	    }
 	}, new ActionListener() {
 	    @Override
@@ -111,6 +113,12 @@ public class Setup {
 		black.removeCustom(panel, dialog);
 		host.removeCustom(panel, dialog);
 		// humans.addCustom(panel, dialog);
+		if (game.isButton1Selected()) {
+		    whiteName.setLabel("White's name:");
+		} else {
+		    whiteName.setLabel("Red's name:");
+		}
+		blackName.setLabel("Black's name:");
 	    }
 	}, new Component[] { host }, new Component[0]) {
 	    @Override
@@ -358,6 +366,10 @@ public class Setup {
 	@Override
 	public void notified() {
 	    enter.setEnabled(!text.getText().isEmpty());
+	}
+
+	public String getText() {
+	    return text.getText();
 	}
     }
 
