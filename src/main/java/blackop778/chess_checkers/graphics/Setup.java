@@ -159,6 +159,27 @@ public class Setup {
 	    public void actionPerformed(ActionEvent arg0) {
 		buttonClosed = true;
 		dialog.setVisible(false);
+		// Playing local
+		if (!internet.isButton1Selected()) {
+		    if (whiteName.getText().equals("")) {
+			if (game.isButton1Selected()) {
+			    whiteName.setText("White");
+			} else {
+			    whiteName.setText("Red");
+			}
+		    }
+		    if (blackName.getText().equals("")) {
+			blackName.setText("Black");
+		    }
+		} else {
+		    // Playing on internet
+		    if (whiteName.getText().equals("")) {
+			whiteName.setText("Your");
+		    }
+		    if (blackName.getText().equals("")) {
+			blackName.setLabel("Your partner");
+		    }
+		}
 	    }
 	});
 	panel.add(enter);
@@ -370,6 +391,10 @@ public class Setup {
 
 	public String getText() {
 	    return text.getText();
+	}
+
+	public void setText(String newText) {
+	    text.setText(newText);
 	}
     }
 
