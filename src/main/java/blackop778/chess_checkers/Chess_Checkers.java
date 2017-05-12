@@ -36,8 +36,8 @@ public abstract class Chess_Checkers {
     public static final boolean DISABLE_INTERNET = false;
     private static boolean imagesLoaded;
     public static long ourSeed;
-    public static final boolean LOG_TO_FILE = false;
-    public static final boolean IMAGE_LOAD_TROUBLE = false;
+    public static final boolean LOG_TO_FILE = true;
+    public static final boolean IMAGE_LOAD_TROUBLE = true;
     public static final boolean DEBUG_LOGGING = true;
 
     public static void main(String[] args) {
@@ -52,6 +52,7 @@ public abstract class Chess_Checkers {
 	    try {
 		out = new PrintStream(new FileOutputStream(output));
 	    } catch (FileNotFoundException e1) {
+		System.out.println("Fatal: Failed to start FileOutputStream for logging");
 		e1.printStackTrace();
 		System.exit(2);
 	    }
