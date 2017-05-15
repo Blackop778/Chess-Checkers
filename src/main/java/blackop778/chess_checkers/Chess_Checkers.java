@@ -36,13 +36,13 @@ public abstract class Chess_Checkers {
     public static final boolean DISABLE_INTERNET = false;
     private static boolean imagesLoaded;
     public static long ourSeed;
-    public static final boolean LOG_TO_FILE = true;
+    public static final boolean LOG_TO_FILE = false;
     public static final boolean IMAGE_LOAD_TROUBLE = true;
     public static final boolean DEBUG_LOGGING = true;
 
     public static void main(String[] args) {
-	int index = 0;
 	if (LOG_TO_FILE) {
+	    int index = 0;
 	    File output = new File("LogOutput.txt");
 	    while (output.exists()) {
 		index++;
@@ -75,11 +75,15 @@ public abstract class Chess_Checkers {
 	new Thread(new Runnable() {
 	    @Override
 	    public void run() {
-		final String baseFilePath = "assets" + File.separator + "images" + File.separator;
+		// final String baseFilePath = "assets" + File.separator +
+		// "images" + File.separator;
+		final String baseFilePath = "assets/images/";
 		final String blackPrefix = "Black";
 		final String whitePrefix = "White";
 		final ClassLoader cl = ClassLoader.getSystemClassLoader();
 		try {
+		    // debugLog(cl.getResource(baseFilePath + blackPrefix +
+		    // "Bishop.png").toExternalForm());
 		    Bishop.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "Bishop.png"));
 		    Bishop.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Bishop.png"));
 		    King.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "King.png"));
