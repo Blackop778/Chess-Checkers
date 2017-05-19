@@ -96,10 +96,10 @@ public abstract class Chess_Checkers {
 		    Queen.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Queen.png"));
 		    Rook.blackImage = ImageIO.read(cl.getResource(baseFilePath + blackPrefix + "Rook.png"));
 		    Rook.whiteImage = ImageIO.read(cl.getResource(baseFilePath + whitePrefix + "Rook.png"));
+		    setImagesLoaded(true);
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
-		setImagesLoaded(true);
 	    }
 	}, "ImageLoader").start();
 	try {

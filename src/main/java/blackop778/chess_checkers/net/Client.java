@@ -63,6 +63,8 @@ public class Client {
     // If we need to start a new notation line
     private boolean newLine;
     private int turns;
+    private boolean offeredSurrender;
+    private boolean offeredDraw;
 
     public Client(boolean black, boolean gameIsCheckers, boolean localServer) {
 	this.black = black;
@@ -71,6 +73,8 @@ public class Client {
 	notation = "";
 	newLine = true;
 	turns = 0;
+	offeredSurrender = false;
+	offeredDraw = false;
 
 	board = new Piece[8][8];
 	for (int i = 0; i < board.length; i++) {
@@ -151,90 +155,100 @@ public class Client {
 		turn = true;
 		if (msg instanceof ChessMessage) {
 		    EvaluatedChessMessage m = new EvaluatedChessMessage((ChessMessage) msg);
-		    if (m.offerDraw && (!notation.endsWith("(=)") || !notation.endsWith("(=)\n"))) {
-			int response = JOptionPane.showConfirmDialog(null,
-				"You opponent proposes a draw. Do you accept?", "Draw proposal",
-				JOptionPane.YES_NO_OPTION);
-			if (response == JOptionPane.YES_OPTION) {
-			    passTurn(ChessMessage.instantiate(".5-.5"));
-			} else {
-			    passTurn(ChessMessage.instantiate("(=)"));
-			}
-		    } else if (m.offerSurrender && (!notation.endsWith("(=+)") || !notation.endsWith("(=+)\n"))) {
-			int response = JOptionPane.showConfirmDialog(null,
-				"You opponent offers their surrender. Do you accept?", "Surrender offer",
-				JOptionPane.YES_NO_OPTION);
-			if (response == JOptionPane.YES_OPTION) {
-			    if (black) {
-				passTurn(ChessMessage.instantiate("0-1"));
+		    if (m.offerDraw) {
+			if (!offeredDraw) {
+			    int response = JOptionPane.showConfirmDialog(null,
+				    "You opponent proposes a draw. Do you accept?", "Draw proposal",
+				    JOptionPane.YES_NO_OPTION);
+			    if (response == JOptionPane.YES_OPTION) {
+				passTurn(ChessMessage.instantiate(".5-.5"));
 			    } else {
-				passTurn(ChessMessage.instantiate("1-0"));
-			    }
-			} else {
-			    passTurn(ChessMessage.instantiate("(=+)"));
-			}
-		    } else if (m.draw) {
-			JOptionPane.showMessageDialog(null, "Your match ends in an honorable draw.");
-		    } else if (m.blackWin) {
-
-		    } else if (m.whiteWin) {
-
-		    } else if (m.castleDirection == Direction.NONE) {
-			if (board[m.fromX][m.fromY] instanceof Pawn) {
-			    // Check En passant capturing
-			    if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
-				board[m.toX][m.fromY] = new Empty();
+				offer("(=)");
 			    }
 			}
-			board[m.toX][m.toY] = board[m.fromX][m.fromY];
-			board[m.fromX][m.fromY] = new Empty();
-			if (board[m.toX][m.toY] instanceof Pawn) {
-			    ChessPiece.pawnCaptureCount = 0;
-			    if (Math.abs(m.toY - m.fromY) == 2) {
-				if (m.fromY == 1 || m.fromY == 6) {
-				    ChessPiece.doubleMovePawn = (Pawn) board[m.toX][m.toY];
+		    } else if (m.offerSurrender) {
+			if (!offeredSurrender) {
+			    int response = JOptionPane.showConfirmDialog(null,
+				    "You opponent offers their surrender. Do you accept?", "Surrender offer",
+				    JOptionPane.YES_NO_OPTION);
+			    if (response == JOptionPane.YES_OPTION) {
+				if (black) {
+				    passTurn(ChessMessage.instantiate("0-1"));
+				    updateNotation("0-1");
+				} else {
+				    passTurn(ChessMessage.instantiate("1-0"));
+				    updateNotation("1-0");
 				}
 			    } else {
-				switch (m.pawnPromotion) {
-				case QUEEN:
-				    board[m.toX][m.toY] = new Queen(!black);
-				    break;
-				case KNIGHT:
-				    board[m.toX][m.toY] = new Knight(!black);
-				    break;
-				case ROOK:
-				    board[m.toX][m.toY] = new Rook(!black);
-				    break;
-				case BISHOP:
-				    board[m.toX][m.toY] = new Bishop(!black);
-				    break;
-				case NONE:
-				    break;
-				}
+				offer("(=+)");
 			    }
-			} else if (board[m.toX][m.toY] instanceof King) {
-			    King pieceK = (King) board[m.toX][m.toY];
-			    pieceK.moved = true;
-			} else if (board[m.toX][m.toY] instanceof Rook) {
-			    Rook pieceR = (Rook) board[m.toX][m.toY];
-			    pieceR.moved = true;
 			}
-			// Castling
 		    } else {
-			int y;
-			if (black) {
-			    y = 7;
+			offeredSurrender = false;
+			offeredDraw = false;
+			if (m.draw) {
+			    JOptionPane.showMessageDialog(null, "Your match ends in an honorable draw.");
+			} else if (m.blackWin) {
+
+			} else if (m.whiteWin) {
+
+			} else if (m.castleDirection == Direction.NONE) {
+			    if (board[m.fromX][m.fromY] instanceof Pawn) {
+				// Check En passant capturing
+				if (Math.abs(m.toX - m.fromX) == 1 && board[m.toX][m.toY] instanceof Empty) {
+				    board[m.toX][m.fromY] = new Empty();
+				}
+			    }
+			    board[m.toX][m.toY] = board[m.fromX][m.fromY];
+			    board[m.fromX][m.fromY] = new Empty();
+			    if (board[m.toX][m.toY] instanceof Pawn) {
+				ChessPiece.pawnCaptureCount = 0;
+				if (Math.abs(m.toY - m.fromY) == 2) {
+				    if (m.fromY == 1 || m.fromY == 6) {
+					ChessPiece.doubleMovePawn = (Pawn) board[m.toX][m.toY];
+				    }
+				} else {
+				    switch (m.pawnPromotion) {
+				    case QUEEN:
+					board[m.toX][m.toY] = new Queen(!black);
+					break;
+				    case KNIGHT:
+					board[m.toX][m.toY] = new Knight(!black);
+					break;
+				    case ROOK:
+					board[m.toX][m.toY] = new Rook(!black);
+					break;
+				    case BISHOP:
+					board[m.toX][m.toY] = new Bishop(!black);
+					break;
+				    case NONE:
+					break;
+				    }
+				}
+			    } else if (board[m.toX][m.toY] instanceof King) {
+				King pieceK = (King) board[m.toX][m.toY];
+				pieceK.moved = true;
+			    } else if (board[m.toX][m.toY] instanceof Rook) {
+				Rook pieceR = (Rook) board[m.toX][m.toY];
+				pieceR.moved = true;
+			    }
+			    // Castling
 			} else {
-			    y = 0;
-			}
-			boolean right = m.castleDirection == Direction.RIGHT;
-			King pieceK = (King) board[m.fromX][y];
-			Rook pieceR = (Rook) board[right ? 7 : 0][y];
-			if (!pieceR.moved && !pieceK.moved) {
-			    board[right ? 5 : 3][y] = board[right ? 7 : 0][y];
-			    board[right ? 7 : 0][y] = new Empty();
-			    board[m.toX][y] = board[m.fromX][y];
-			    board[m.fromX][y] = new Empty();
+			    int y;
+			    if (black) {
+				y = 7;
+			    } else {
+				y = 0;
+			    }
+			    boolean right = m.castleDirection == Direction.RIGHT;
+			    King pieceK = (King) board[m.fromX][y];
+			    Rook pieceR = (Rook) board[right ? 7 : 0][y];
+			    if (!pieceR.moved && !pieceK.moved) {
+				board[right ? 5 : 3][y] = board[right ? 7 : 0][y];
+				board[right ? 7 : 0][y] = new Empty();
+				board[m.toX][y] = board[m.fromX][y];
+				board[m.fromX][y] = new Empty();
+			    }
 			}
 		    }
 		    System.out.println(((ChessMessage) msg).notation);
@@ -266,6 +280,7 @@ public class Client {
 		    Chess_Checkers.panel.repaint();
 		}
 		Chess_Checkers.panel.updateHUD();
+
 	    } else {
 		ctx.fireChannelRead(msg);
 	    }
@@ -274,8 +289,10 @@ public class Client {
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) {
 	    context = ctx;
-	    Chess_Checkers.debugLog("Sending HandshakeMessage");
-	    ctx.writeAndFlush(new HandshakeMessage());
+	    if (!localServer) {
+		Chess_Checkers.debugLog("Sending HandshakeMessage");
+		ctx.writeAndFlush(new HandshakeMessage());
+	    }
 	}
 
 	@Override
@@ -293,6 +310,7 @@ public class Client {
 	public void channelInactive(ChannelHandlerContext ctx) {
 	    Chess_Checkers.debugLog("Channel is now Inactive");
 	}
+
     }
 
     public void startLocal(EventLoopGroup group, SocketAddress local) {
@@ -609,6 +627,11 @@ public class Client {
 
     public void offer(String message) {
 	if (message.equals("(=)") || message.equals("(=+)")) {
+	    if (message.equals("(=)"))
+		offeredDraw = true;
+	    else
+		offeredSurrender = true;
+	    updateNotation(message);
 	    passTurn(ChessMessage.instantiate(message));
 	}
     }
@@ -629,7 +652,7 @@ public class Client {
 	return notation;
     }
 
-    public void updateNotation(String toAdd) {
+    private void updateNotation(String toAdd) {
 	if (newLine) {
 	    notation += (turns + 1) + ".";
 	}
