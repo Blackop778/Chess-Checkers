@@ -23,12 +23,14 @@ public class Empty extends Piece {
     }
 
     @Override
-    public void select(int x, int y) {
+    public PossibleMove[] select(int x, int y) {
 	if (possible) {
 	    selector.move(x, y);
 	} else {
 	    Chess_Checkers.client.unselectAll();
 	}
+
+	return null;
     }
 
     @Override

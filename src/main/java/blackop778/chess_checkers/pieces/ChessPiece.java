@@ -20,19 +20,25 @@ public abstract class ChessPiece extends Piece {
     public static boolean threefoldRepetition;
 
     @Override
-    public void select(int x, int y) {
+    public PossibleMove[] select(int x, int y) {
 	Piece[][] board = Chess_Checkers.client.getBoard();
 	if (black == Chess_Checkers.client.getBlack() && Chess_Checkers.client.getTurn()) {
 	    Chess_Checkers.client.unselectAll();
 	    Point[] locations = getValidLocations(x, y);
-	    for (Point point : locations) {
-		if (point != null) {
+	    PossibleMove[] pLocations = new PossibleMove[locations.length];
+	    for (int i = 0; i < locations.length; i++) {
+		pLocations[i] = new PossibleMove(locations[i]);
+		if (locations[i] != null) {
 		    selected = true;
-		    board[point.x][point.y].possible = true;
-		    board[point.x][point.y].selector = this;
+		    board[locations[i].x][locations[i].y].possible = true;
+		    board[locations[i].x][locations[i].y].selector = this;
 		}
 	    }
+
+	    return pLocations;
 	}
+
+	return null;
     }
 
     @Override

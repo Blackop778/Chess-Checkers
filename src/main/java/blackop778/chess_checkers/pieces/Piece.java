@@ -1,24 +1,43 @@
 package blackop778.chess_checkers.pieces;
 
 import java.awt.Graphics;
+import java.awt.Point;
 
-public abstract class Piece
-{
-	public boolean black;
+import blackop778.chess_checkers.checkers.JumpTree;
 
-	public boolean selected;
+public abstract class Piece {
+    public boolean black;
 
-	public Piece selector;
+    public boolean selected;
 
-	public boolean possible;
+    public Piece selector;
 
-	public abstract void drawSelf(Graphics g, int x, int y);
+    public boolean possible;
 
-	public abstract void select(int x, int y);
+    public abstract void drawSelf(Graphics g, int x, int y);
 
-	/**
-	 * @param x The x coordinate to move to
-	 * @param y The y coordinate to move to
-	 */
-	public abstract void move(int x, int y);
+    public abstract PossibleMove[] select(int x, int y);
+
+    /**
+     * @param x
+     *            The x coordinate to move to
+     * @param y
+     *            The y coordinate to move to
+     */
+    public abstract void move(int x, int y);
+
+    public static class PossibleMove {
+	public final Point point;
+	public final JumpTree tree;
+
+	public PossibleMove(Point point) {
+	    this.point = point;
+	    tree = null;
+	}
+
+	public PossibleMove(JumpTree tree) {
+	    this.tree = tree;
+	    point = null;
+	}
+    }
 }

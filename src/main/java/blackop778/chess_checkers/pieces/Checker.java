@@ -49,18 +49,23 @@ public class Checker extends CheckersPiece {
     }
 
     @Override
-    public void select(int x, int y) {
+    public PossibleMove[] select(int x, int y) {
 	if ((black == Chess_Checkers.client.getBlack()) && Chess_Checkers.client.getTurn()) {
 	    Chess_Checkers.client.unselectAll();
 	    JumpTree[] jumps = getValidLocations(x, y);
+	    PossibleMove[] pLocations = new PossibleMove[jumps.length];
 	    lastValidLocations = jumps;
-	    for (JumpTree tree : jumps) {
-		if (tree != null) {
+	    for (int i = 0; i < jumps.length; i++) {
+		if (jumps[i] != null) {
 		    selected = true;
-		    Chess_Checkers.client.select(tree.getEndJump().getEndPoint(), this);
+		    Chess_Checkers.client.select(jumps[i].getEndJump().getEndPoint(), this);
 		}
 	    }
+
+	    return pLocations;
 	}
+
+	return null;
     }
 
     @Override

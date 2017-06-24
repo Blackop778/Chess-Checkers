@@ -158,7 +158,7 @@ public class Client {
 		    if (m.offerDraw) {
 			if (!offeredDraw) {
 			    int response = JOptionPane.showConfirmDialog(null,
-				    "You opponent proposes a draw. Do you accept?", "Draw proposal",
+				    "Your opponent proposes a draw. Do you accept?", "Draw proposal",
 				    JOptionPane.YES_NO_OPTION);
 			    if (response == JOptionPane.YES_OPTION) {
 				passTurn(ChessMessage.instantiate(".5-.5"));
@@ -169,7 +169,7 @@ public class Client {
 		    } else if (m.offerSurrender) {
 			if (!offeredSurrender) {
 			    int response = JOptionPane.showConfirmDialog(null,
-				    "You opponent offers their surrender. Do you accept?", "Surrender offer",
+				    "Your opponent offers their surrender. Do you accept?", "Surrender offer",
 				    JOptionPane.YES_NO_OPTION);
 			    if (response == JOptionPane.YES_OPTION) {
 				if (black) {

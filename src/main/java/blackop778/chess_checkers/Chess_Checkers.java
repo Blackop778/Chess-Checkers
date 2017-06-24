@@ -28,11 +28,10 @@ import blackop778.chess_checkers.pieces.Rook;
 public abstract class Chess_Checkers {
     public static Client client;
     public static Client clientPartner;
-    public static boolean offerSurrender;
     public static boolean gameOver;
     public static Chess_CheckersPanel panel;
     public static Setup setup;
-    public static final boolean DISABLE_AI = true;
+    public static final boolean DISABLE_AI = false;
     public static final boolean DISABLE_INTERNET = false;
     private static boolean imagesLoaded;
     public static long ourSeed;
@@ -52,7 +51,7 @@ public abstract class Chess_Checkers {
 	    try {
 		out = new PrintStream(new FileOutputStream(output));
 	    } catch (FileNotFoundException e1) {
-		System.out.println("Fatal: Failed to start FileOutputStream for logging");
+		System.err.println("Fatal: Failed to start FileOutputStream for logging");
 		e1.printStackTrace();
 		System.exit(2);
 	    }
@@ -138,7 +137,6 @@ public abstract class Chess_Checkers {
 	} else {
 	    setup.redisplay();
 	}
-	offerSurrender = false;
 	gameOver = false;
 	if (!setup.getButtonClosed())
 	    System.exit(0);

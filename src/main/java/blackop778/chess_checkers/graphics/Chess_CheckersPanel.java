@@ -36,7 +36,6 @@ public class Chess_CheckersPanel extends JPanel {
 	surrender.addActionListener(new ActionListener() {
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		Chess_Checkers.offerSurrender = true;
 		if (Chess_Checkers.client.getTurn()) {
 		    Chess_Checkers.client.offer("(=+)");
 		}
@@ -94,36 +93,6 @@ public class Chess_CheckersPanel extends JPanel {
 					"Threefold repitition has occured, and the game is"
 						+ " a draw. Click on the board after exiting this message to start a new game.",
 					"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
-			    }
-			}
-			if (!Chess_Checkers.gameOver && Chess_Checkers.offerSurrender) {
-			    String color;
-			    // Client hasn't switched yet on local games
-			    if (!Chess_Checkers.client.getBlack()) {
-				color = "Black";
-			    } else if (Chess_Checkers.client.gameIsCheckers) {
-				color = "Red";
-			    } else {
-				color = "White";
-			    }
-			    int response = JOptionPane.showConfirmDialog(null,
-				    color + " has offered to surrender. Do you accept?", "", JOptionPane.YES_NO_OPTION,
-				    JOptionPane.QUESTION_MESSAGE);
-			    if (response == JOptionPane.OK_OPTION) {
-				Chess_Checkers.gameOver = true;
-				String winner;
-				if (Chess_Checkers.client.gameIsCheckers) {
-				    winner = Chess_Checkers.client.getBlack() ? "Black" : "Red";
-				} else {
-				    winner = Chess_Checkers.client.getBlack() ? "Black" : "White";
-				}
-				JOptionPane.showMessageDialog(null,
-					"Congratulations, " + winner
-						+ " wins. Exit this message and click on the board to restart.",
-					"A Champion has been decided!", JOptionPane.INFORMATION_MESSAGE);
-			    } else {
-				Chess_Checkers.offerSurrender = false;
-				repaint();
 			    }
 			}
 		    } else {
