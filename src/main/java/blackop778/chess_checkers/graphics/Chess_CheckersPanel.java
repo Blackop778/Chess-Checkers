@@ -10,26 +10,28 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import blackop778.chess_checkers.Chess_Checkers;
 import blackop778.chess_checkers.chess.Snapshot;
 import blackop778.chess_checkers.chess.SnapshotStorage;
+import blackop778.chess_checkers.graphics.Tabs.MoveLogs;
 
 @SuppressWarnings("serial")
 public class Chess_CheckersPanel extends JPanel {
+    private final JFrame frame;
     private final JPanel gameContainer;
     private final JPanel game;
-    private final JScrollPane scroll;
     private final JPanel hudContainer;
     private final JLabel turn;
-    private final JTextArea moves;
+    private final TabManager tabs;
+    private final MoveLogs logs;
 
-    public Chess_CheckersPanel() {
+    public Chess_CheckersPanel(JFrame frame) {
+	this.frame = frame;
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	hudContainer = new JPanel();
 	JButton surrender = new JButton("Offer Surrender");
@@ -54,8 +56,6 @@ public class Chess_CheckersPanel extends JPanel {
 	hudContainer.add(draw);
 	turn = new JLabel();
 	hudContainer.add(turn);
-	moves = new JTextArea();
-	moves.setEditable(false);
 	add(hudContainer);
 	game = new JPanel() {
 	    @Override
@@ -89,9 +89,8 @@ public class Chess_CheckersPanel extends JPanel {
 			if (!Chess_Checkers.client.gameIsCheckers) {
 			    if (SnapshotStorage.addSnapshot(new Snapshot())) {
 				Chess_Checkers.gameOver = true;
-				JOptionPane.showMessageDialog(null,
-					"Threefold repitition has occured, and the game is"
-						+ " a draw. Click on the board after exiting this message to start a new game.",
+				JOptionPane.showMessageDialog(null, "Threefold repitition has occured, and the game is"
+					+ " a draw. Click on the board after exiting this message to start a new game.",
 					"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
 			    }
 			}
@@ -109,10 +108,9 @@ public class Chess_CheckersPanel extends JPanel {
 	});
 	gameContainer = new JPanel();
 	gameContainer.add(game);
-	scroll = new JScrollPane();
-	gameContainer.add(scroll);
-	scroll.setViewportView(moves);
-	scroll.setPreferredSize(new Dimension(140, 720));
+	tabs = new TabManager(gameContainer, frame);
+	logs = new MoveLogs();
+	tabs.addTab(logs);
 	updateHUD();
 	add(gameContainer);
     }
@@ -121,10 +119,11 @@ public class Chess_CheckersPanel extends JPanel {
 	// Multiplayer over internet
 	if (Chess_Checkers.setup.internet.isButton1Selected()) {
 	    if (Chess_Checkers.client.getTurn()) {
-		if (Chess_Checkers.setup.whiteName.getText().equals("Your"))
+		if (Chess_Checkers.setup.whiteName.getText().equals("Your")) {
 		    turn.setText(Chess_Checkers.setup.whiteName.getText() + " turn");
-		else
+		} else {
 		    turn.setText(Chess_Checkers.setup.whiteName.getText() + "'s turn");
+		}
 	    } else {
 		turn.setText(Chess_Checkers.setup.blackName.getText() + "'s turn");
 	    }
@@ -145,6 +144,6 @@ public class Chess_CheckersPanel extends JPanel {
 	    }
 	}
 
-	moves.setText(Chess_Checkers.client.getNotation());
+	logs.setText(Chess_Checkers.client.getNotation());
     }
 }

@@ -113,7 +113,7 @@ public abstract class Chess_Checkers {
 
     public static void startGUI(String name) {
 	JFrame frame = new JFrame((GraphicsConfiguration) null);
-	panel = new Chess_CheckersPanel();
+	panel = new Chess_CheckersPanel(frame);
 	frame.add(Chess_Checkers.panel);
 	frame.setTitle("Chess-Checkers" + name);
 	frame.pack();
@@ -138,8 +138,9 @@ public abstract class Chess_Checkers {
 	    setup.redisplay();
 	}
 	gameOver = false;
-	if (!setup.getButtonClosed())
+	if (!setup.getButtonClosed()) {
 	    System.exit(0);
+	}
 	if (setup.humans.isButton1Selected()) {
 	    // VS AI, Does nothing special right now
 	    client = new Server(setup.black.isButton1Selected(), !setup.game.isButton1Selected(), true);
