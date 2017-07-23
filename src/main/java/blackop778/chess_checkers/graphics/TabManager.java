@@ -28,6 +28,7 @@ public class TabManager {
 	content = new JPanel();
 	background.add(content);
 	tabs = new HashMap<>();
+	superBackground.add(background);
     }
 
     public void addTab(AbstractTab tab) {
