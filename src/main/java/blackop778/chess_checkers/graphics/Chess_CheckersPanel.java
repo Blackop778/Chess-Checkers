@@ -22,7 +22,6 @@ import blackop778.chess_checkers.graphics.Tabs.MoveLogs;
 
 @SuppressWarnings("serial")
 public class Chess_CheckersPanel extends JPanel {
-    private final JFrame frame;
     private final JPanel gameContainer;
     private final JPanel game;
     private final JPanel hudContainer;
@@ -31,7 +30,6 @@ public class Chess_CheckersPanel extends JPanel {
     private final MoveLogs logs;
 
     public Chess_CheckersPanel(JFrame frame) {
-	this.frame = frame;
 	setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 	hudContainer = new JPanel();
 	JButton surrender = new JButton("Offer Surrender");
@@ -88,9 +86,11 @@ public class Chess_CheckersPanel extends JPanel {
 			Chess_Checkers.client.getBoard()[x][y].selector.move(x, y);
 			if (!Chess_Checkers.client.gameIsCheckers) {
 			    if (SnapshotStorage.addSnapshot(new Snapshot())) {
+				// TODO: move to net message
 				Chess_Checkers.gameOver = true;
-				JOptionPane.showMessageDialog(null, "Threefold repitition has occured, and the game is"
-					+ " a draw. Click on the board after exiting this message to start a new game.",
+				JOptionPane.showMessageDialog(null,
+					"Threefold repitition has occured, and the game is"
+						+ " a draw. Click on the board after exiting this message to start a new game.",
 					"Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
 			    }
 			}

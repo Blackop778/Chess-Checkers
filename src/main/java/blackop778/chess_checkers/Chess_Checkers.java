@@ -30,6 +30,7 @@ public abstract class Chess_Checkers {
     public static Client clientPartner;
     public static boolean gameOver;
     public static Chess_CheckersPanel panel;
+    public static JFrame frame;
     public static Setup setup;
     public static final boolean DISABLE_AI = false;
     public static final boolean DISABLE_INTERNET = false;
@@ -112,7 +113,7 @@ public abstract class Chess_Checkers {
     }
 
     public static void startGUI(String name) {
-	JFrame frame = new JFrame((GraphicsConfiguration) null);
+	frame = new JFrame((GraphicsConfiguration) null);
 	panel = new Chess_CheckersPanel(frame);
 	frame.add(Chess_Checkers.panel);
 	frame.setTitle("Chess-Checkers" + name);

@@ -162,6 +162,9 @@ public class Client {
 				    JOptionPane.YES_NO_OPTION);
 			    if (response == JOptionPane.YES_OPTION) {
 				passTurn(ChessMessage.instantiate(".5-.5"));
+				updateNotation(".5-.5");
+				JOptionPane.showMessageDialog(null, "Your match ends in an honorable draw.");
+				endGame();
 			    } else {
 				offer("(=)");
 			    }
@@ -179,6 +182,8 @@ public class Client {
 				    passTurn(ChessMessage.instantiate("1-0"));
 				    updateNotation("1-0");
 				}
+				JOptionPane.showMessageDialog(null, "You have won, congratulations.");
+				endGame();
 			    } else {
 				offer("(=+)");
 			    }
@@ -188,10 +193,15 @@ public class Client {
 			offeredDraw = false;
 			if (m.draw) {
 			    JOptionPane.showMessageDialog(null, "Your match ends in an honorable draw.");
+			    endGame();
 			} else if (m.blackWin) {
-
+			    JOptionPane.showMessageDialog(null,
+				    black ? "You have won, congratulations." : "You have been defeated.");
+			    endGame();
 			} else if (m.whiteWin) {
-
+			    JOptionPane.showMessageDialog(null,
+				    black ? "You have been defeated." : "You have won, congratulations.");
+			    endGame();
 			} else if (m.castleDirection == Direction.NONE) {
 			    if (board[m.fromX][m.fromY] instanceof Pawn) {
 				// Check En passant capturing
@@ -325,7 +335,7 @@ public class Client {
 
 		// Start GUI
 		Chess_Checkers.debugLog("Starting game display");
-		Chess_Checkers.startGUI(" server");
+		Chess_Checkers.startGUI(" local");
 
 		// Wait until the connection is closed.
 		future.channel().closeFuture().sync();
@@ -663,5 +673,15 @@ public class Client {
 	}
 
 	newLine = !newLine;
+    }
+
+    /**
+     * Doesn't display any notification simply closes game and connection and
+     * redisplays setup menu
+     */
+    public void endGame() {
+	Chess_Checkers.frame.dispose();
+	context.deregister();
+	Chess_Checkers.setup();
     }
 }

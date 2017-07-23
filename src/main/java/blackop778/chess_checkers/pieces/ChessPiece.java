@@ -201,6 +201,7 @@ public abstract class ChessPiece extends Piece {
 	return false;
     }
 
+    // TODO: Integrate into net messages
     public static void endGameCheck() {
 	if (pawnCaptureCount == 50) {
 	    Chess_Checkers.gameOver = true;
@@ -209,12 +210,7 @@ public abstract class ChessPiece extends Piece {
 		    "Deadlock has been reached", JOptionPane.INFORMATION_MESSAGE);
 	} else if (!canMove(!Chess_Checkers.client.getBlack())) {
 	    Chess_Checkers.gameOver = true;
-	    if (isKingInCheck(!Chess_Checkers.client.getBlack())) {
-		String winner = Chess_Checkers.client.getBlack() ? "black" : "white";
-		JOptionPane.showMessageDialog(null,
-			"Congratulations, " + winner + " wins. Exit this message and click on the board to restart.",
-			"A Champion has been decided", JOptionPane.INFORMATION_MESSAGE);
-	    } else {
+	    if (!isKingInCheck(!Chess_Checkers.client.getBlack())) {
 		String cause = !Chess_Checkers.client.getBlack() ? "black" : "white";
 		JOptionPane.showMessageDialog(null,
 			"The game is a draw because " + cause + " cannot move but isn't in check.",
