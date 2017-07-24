@@ -10,9 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 
 import blackop778.chess_checkers.graphics.Chess_CheckersPanel;
 import blackop778.chess_checkers.graphics.Setup;
@@ -120,7 +118,7 @@ public abstract class Chess_Checkers {
 	frame.pack();
 	frame.setResizable(false);
 	frame.setLocationRelativeTo(null);
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	while (!areImagesLoaded()) {
 	    try {
 		Thread.sleep(50);
@@ -170,11 +168,11 @@ public abstract class Chess_Checkers {
 	}
     }
 
-    public static synchronized boolean areImagesLoaded() {
+    private static synchronized boolean areImagesLoaded() {
 	return imagesLoaded;
     }
 
-    public static synchronized void setImagesLoaded(boolean loaded) {
+    private static synchronized void setImagesLoaded(boolean loaded) {
 	imagesLoaded = loaded;
     }
 

@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import blackop778.chess_checkers.Chess_Checkers;
 
 public class TabManager {
-    private final JPanel background;
     private final JPanel tabsPanel;
     private final JPanel content;
     private HashMap<String, JButton> tabs;
@@ -21,7 +20,7 @@ public class TabManager {
 
     public TabManager(JPanel superBackground, JFrame frame) {
 	this.frame = frame;
-	background = new JPanel();
+	JPanel background = new JPanel();
 	background.setLayout(new BoxLayout(background, BoxLayout.Y_AXIS));
 	tabsPanel = new JPanel();
 	background.add(tabsPanel);
